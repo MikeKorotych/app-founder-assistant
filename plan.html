@@ -364,13 +364,14 @@
 [
   { "id":"A", "title_uk":"Пайплайн агента + grounding", "title_en":"Agent pipeline + grounding", "owner":"—", "status":"in-progress" },
   { "id":"B", "title_uk":"Стрімінг, персист, юніт-економіка", "title_en":"Streaming, persistence, unit economics", "owner":"—", "status":"in-progress" },
-  { "id":"C", "title_uk":"Report UI + інтерактив", "title_en":"Report UI + interactivity", "owner":"—", "status":"todo" },
+  { "id":"C", "title_uk":"Report UI + інтерактив", "title_en":"Report UI + interactivity", "owner":"Mykhailo", "status":"in-progress" },
   { "id":"D", "title_uk":"Експорт, демо, деплой", "title_en":"Export, demo, deploy", "owner":"Ruslan", "status":"in-progress" }
 ]
 </script>
 <script type="application/json" id="data-progress">
 [
   { "date":"2026-05-30", "time":"12:20", "author":"Ruslan", "workstream":"D", "summary":"🔨 started D3: migrate stack to Cloudflare on the phasekit pattern — Hono Worker (apps/api), D1+Drizzle (packages/db), OpenNext surface (apps/web), Biome, and CI deploy.yml.", "commit":"—" },
+  { "date":"2026-05-30", "time":"12:15", "author":"Mykhailo", "workstream":"C", "summary":"🔨 started C1: UI stack = Next.js + shadcn; porting the design system from funnel-analyzer into apps/web (stripping funnel/prisma/auth/crawler).", "commit":"—" },
   { "date":"2026-05-30", "time":"12:10", "author":"Anton", "workstream":"D", "summary":"Drop Railway deploy integration (delete railway.json) — target is Cloudflare now; updated README/PLAN/CLAUDE/plan.html refs (incl. risk #3, D3) + .env.example. Trash-commit leftovers were already gone via the monorepo migration.", "commit":"—" },
   { "date":"2026-05-30", "time":"11:56", "author":"Codex", "workstream":"A", "summary":"Expanded integrations source registry into one app-research table: no-auth iTunes/Play scraper plus Appfigures, Crunchbase, Trustpilot, Similarweb, AppBrain; added auth/access/research metadata.", "commit":"—" },
   { "date":"2026-05-30", "time":"11:55", "author":"scaffold", "workstream":"—", "summary":"plan.html: Roadmap tab — 34 sub-tasks (F/A/B/C/D) claimable by id via #data-roadmap; claim now per sub-task.", "commit":"—" },
@@ -412,7 +413,7 @@
   { "id":"B4", "group":"B", "title_uk":"Роздача статики UI + plan.html", "title_en":"Serve static UI + plan.html", "owner":"—", "status":"todo" },
   { "id":"B5", "group":"B", "title_uk":"Spend cap, бюджети по кроках, обробка помилок", "title_en":"Spend cap, per-step budgets, error handling", "owner":"—", "status":"todo" },
 
-  { "id":"C1", "group":"C", "title_uk":"Вибір UI-стека + скафолд apps/web", "title_en":"Pick UI stack + scaffold apps/web", "owner":"—", "status":"todo" },
+  { "id":"C1", "group":"C", "title_uk":"Вибір UI-стека + скафолд apps/web (Next.js + shadcn)", "title_en":"Pick UI stack + scaffold apps/web (Next.js + shadcn)", "owner":"Mykhailo", "status":"in-progress" },
   { "id":"C2", "group":"C", "title_uk":"Форма вводу (ідея + регіон + бюджет)", "title_en":"Input form (idea + region + budget)", "owner":"—", "status":"todo" },
   { "id":"C3", "group":"C", "title_uk":"Живий research-timeline (SSE)", "title_en":"Live research timeline (SSE)", "owner":"—", "status":"todo" },
   { "id":"C4", "group":"C", "title_uk":"Секції звіту (ринок/конкуренти/canvas/GTM/ризики/синтез)", "title_en":"Report sections (market/competitors/canvas/GTM/risks/synthesis)", "owner":"—", "status":"todo" },
