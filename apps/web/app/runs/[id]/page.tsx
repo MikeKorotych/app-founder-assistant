@@ -12,7 +12,7 @@ import { SynthesisSection } from "./_components/synthesis-section";
 import { UnitEconomicsSection } from "./_components/unit-economics-section";
 import { ValidationSection } from "./_components/validation-section";
 
-const API_URL = process.env.API_URL ?? "http://localhost:3000";
+const API_URL = process.env.API_URL ?? "http://localhost:8787";
 
 async function fetchRun(id: string): Promise<Run | null> {
   const res = await fetch(`${API_URL}/runs/${id}`, { cache: "no-store" });
