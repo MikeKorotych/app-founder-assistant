@@ -1,15 +1,20 @@
 "use client";
 
 import type { Run, RunInput } from "@hahaton/contracts";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@hahaton/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Label } from "@hahaton/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const REGIONS = [
-  { value: "UA", label: "Ukraine" },
-  { value: "US", label: "United States" },
-  { value: "EU", label: "European Union" },
-  { value: "Global", label: "Global" },
+/** Sample ideas for the "Suggest an idea" button — specific & demo-friendly. */
+const SAMPLE_IDEAS = [
+  "A subscription that delivers vet-formulated fresh dog food to pet owners in Poland.",
+  "An AI co-pilot for indie iOS founders that drafts App Store keywords and creatives from a product description.",
+  "A meditation app for night-shift workers that adapts sessions to irregular sleep schedules.",
+  "A budgeting app for freelancers that automatically sets aside taxes from each invoice.",
+  "A B2B tool that turns customer-support tickets into a prioritized product backlog.",
+  "A language-learning app that teaches a language only through the lyrics of songs you like.",
+  "A marketplace connecting small cafes with local bakeries for same-day pastry supply.",
+  "An AI study buddy that turns lecture recordings into spaced-repetition flashcards.",
 ];
 
 type Status =
@@ -21,9 +26,17 @@ type Status =
 export function IdeaForm() {
   const router = useRouter();
   const [idea, setIdea] = useState("");
-  const [region, setRegion] = useState("UA");
-  const [budget, setBudget] = useState("");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+
+  const submitting = status.kind === "submitting";
+
+  function suggestIdea() {
+    // Pick a different sample than the current one.
+    const pool = SAMPLE_IDEAS.filter((s) => s !== idea.trim());
+    const next = pool[Math.floor(Math.random() * pool.length)] ?? SAMPLE_IDEAS[0];
+    setIdea(next);
+    if (status.kind === "error") setStatus({ kind: "idle" });
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,11 +46,7 @@ export function IdeaForm() {
     }
 
     setStatus({ kind: "submitting" });
-    const body: RunInput = {
-      idea: idea.trim(),
-      region: region || undefined,
-      budget: budget.trim() || undefined,
-    };
+    const body: RunInput = { idea: idea.trim() };
 
     try {
       const res = await fetch("/api/pipeline", {
@@ -57,8 +66,6 @@ export function IdeaForm() {
     }
   }
 
-  const submitting = status.kind === "submitting";
-
   return (
     <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <CardHeader>
@@ -67,7 +74,17 @@ export function IdeaForm() {
       <CardContent>
         <form onSubmit={onSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="idea">Idea</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="idea">Idea</Label>
+              <button
+                type="button"
+                onClick={suggestIdea}
+                disabled={submitting}
+                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                ✨ Suggest an idea
+              </button>
+            </div>
             <textarea
               id="idea"
               value={idea}
@@ -78,36 +95,6 @@ export function IdeaForm() {
               required
               disabled={submitting}
             />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="region">Region</Label>
-              <select
-                id="region"
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                disabled={submitting}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {REGIONS.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {r.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="budget">Budget (optional)</Label>
-              <Input
-                id="budget"
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-                placeholder="$10k seed, 6-mo runway, bootstrapped…"
-                disabled={submitting}
-              />
-            </div>
           </div>
 
           {status.kind === "error" && (
