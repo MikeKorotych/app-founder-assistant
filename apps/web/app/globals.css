@@ -1,1 +1,5 @@
 @import "@hahaton/ui/styles.css";
+
+/* Tailwind v4 ignores node_modules by default — scan the shared UI package
+   so shadcn component classes (Button/Card/Input/...) are generated. */
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
