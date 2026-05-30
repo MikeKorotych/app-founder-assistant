@@ -2,6 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Run } from "@hahaton/contracts";
 import { Button } from "@hahaton/ui";
+import { BriefSection } from "./_components/brief-section";
+import { MarketSection } from "./_components/market-section";
+import { CompetitorsSection } from "./_components/competitors-section";
+import { CanvasSection } from "./_components/canvas-section";
+import { GtmSection } from "./_components/gtm-section";
+import { UnitEconomicsSection } from "./_components/unit-economics-section";
+import { RisksSection } from "./_components/risks-section";
+import { SynthesisSection } from "./_components/synthesis-section";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3000";
 
@@ -12,6 +20,12 @@ async function fetchRun(id: string): Promise<Run | null> {
   return (await res.json()) as Run;
 }
 
+const STATUS_LABEL: Record<Run["status"], string> = {
+  running: "Running",
+  completed: "Completed",
+  failed: "Failed",
+};
+
 export default async function RunPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const run = await fetchRun(id);
@@ -20,23 +34,28 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
   return (
     <main className="flex flex-1 flex-col gap-6">
       <header className="flex flex-wrap items-baseline justify-between gap-3">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Run</p>
+        <div className="space-y-1">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Run</p>
           <h1 className="font-mono text-lg">{run.id}</h1>
+          <p className="text-sm text-muted-foreground">
+            {STATUS_LABEL[run.status]} · idea: <span className="text-foreground/85">{run.input.idea}</span>
+          </p>
         </div>
         <Link href="/">
           <Button variant="outline">New run</Button>
         </Link>
       </header>
 
-      <p className="text-sm text-muted-foreground">
-        Status: <span className="font-medium text-foreground">{run.status}</span>. Report sections (C4) land here next —
-        for now this page shows the raw run JSON so the pipeline can be exercised end-to-end.
-      </p>
-
-      <pre className="overflow-auto rounded-md border border-border/60 bg-card/60 p-4 text-xs leading-relaxed">
-        {JSON.stringify(run, null, 2)}
-      </pre>
+      <div className="flex flex-col gap-5">
+        <BriefSection brief={run.brief} />
+        <MarketSection market={run.market} citations={run.citations} />
+        <CompetitorsSection scan={run.competitors} citations={run.citations} />
+        <CanvasSection canvas={run.canvas} />
+        <GtmSection gtm={run.gtm} />
+        <UnitEconomicsSection assumptions={run.assumptions} citations={run.citations} />
+        <RisksSection register={run.risks} />
+        <SynthesisSection synthesis={run.synthesis} />
+      </div>
     </main>
   );
 }

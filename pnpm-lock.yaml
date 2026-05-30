@@ -63,6 +63,9 @@ importers:
       '@hahaton/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@hahaton/unit-economics':
+        specifier: workspace:*
+        version: link:../../packages/unit-economics
       next:
         specifier: ^15.1.0
         version: 15.5.18(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
