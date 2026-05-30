@@ -1,6 +1,6 @@
 # Хакатон: AI CEO / Founder Strategist (AI-співробітник)
 
-> План адаптирован под **реальный скаффолд этого репозитория**: Node 20 + TypeScript (ESM) + Express + `@anthropic-ai/sdk`, деплой на Railway (`railway.json` уже настроен). Ядро агента ложится на `src/agent.ts` / `src/index.ts`. Стек НЕ Next.js/Prisma — мы расширяем существующий бэкенд и добавляем лёгкий фронт.
+> План адаптирован под **реальный скаффолд этого репозитория**: Node 20 + TypeScript (ESM) + Express + `@anthropic-ai/sdk`, деплой на **Cloudflare** (Workers/Pages; порт в работе). Ядро агента ложится на `packages/agent`. Стек НЕ Next.js/Prisma — мы расширяем существующий бэкенд и добавляем лёгкий фронт.
 
 ## Context
 
@@ -44,7 +44,7 @@
 
 **Оставляем существующий бэкенд, расширяем его, добавляем лёгкий фронт.**
 
-- **Backend:** текущий **Express + TypeScript (ESM) + `@anthropic-ai/sdk`** (`src/index.ts`, `src/agent.ts`). `npm run dev` (tsx watch) / `npm run start`. Деплой Railway уже сконфигурен (`railway.json`, healthcheck `/health`).
+- **Backend:** текущий **Express + TypeScript (ESM) + `@anthropic-ai/sdk`** (`apps/api`). `pnpm dev` / `pnpm start`. Деплой — **Cloudflare** (Workers/Pages); порт с Railway в работе (см. ниже).
   - **Бамп SDK:** проверить, что версия `@anthropic-ai/sdk` поддерживает серверный `web_search` tool; при необходимости обновить (`^0.39.0` → актуальная).
 - **LLM:** Claude API через SDK, с **prompt caching** общего контекста (структурированная идея + накопленный ресёрч) между шагами.
 - **Grounding:** **нативный `web_search` tool Anthropic** — серверный, **цитаты возвращаются встроенно** (`cited_text`/`title`/`url`), не стоят токенов. Убирает интеграцию Tavily/Serper. Самое выгодное решение.
@@ -97,12 +97,12 @@
 
 ## Разбивка по команде (3-4 чел., 2 дня)
 
-**Общий kickoff (~1.5ч, все):** заморозить TypeScript-типы всех 8 шагов + `Assumptions` + `Citation` (`src/shared/types.ts`). **Типы — контракт**, после заморозки 4 потока параллелятся. Поднять `npm run dev`, проверить Anthropic-ключ, hello-world деплой на Railway.
+**Общий kickoff (~1.5ч, все):** заморозить TypeScript-типы всех 8 шагов + `Assumptions` + `Citation` (`src/shared/types.ts`). **Типы — контракт**, после заморозки 4 потока параллелятся. Поднять `pnpm dev`, проверить Anthropic-ключ, hello-world деплой на Cloudflare.
 
 - **Workstream A — Пайплайн агента + grounding** (сильнейший backend): D1 оркестратор в `src/agent/orchestrator.ts` + шаги 1-3 (citations, prompt caching). D2 шаги 4,5,7,8 + роутинг моделей + тюнинг промптов на дисциплину grounding.
 - **Workstream B — Стриминг + персист + движок юнит-экономики** (backend/fullstack): D1 SSE-эндпоинт `/agent/stream` + схема событий, `Run` персист/реплей (JSON/SQLite), чистый `computeUnitEconomics` + тесты. D2 связка шага 6 → движок, опц. «re-evaluate».
 - **Workstream C — Report UI + интерактив** (frontend): D1 Vite+React shell (раздаётся Express), форма ввода, live research-timeline (SSE), каркас секций. D2 все секции, чарты, сноски, **интерактивная панель юнит-экономики (слайдеры → мгновенный пересчёт)**, полировка.
-- **Workstream D — Экспорт + демо + деплой** (4-й; при 3 чел. делят A-lead и C-lead на D2): D1 PDF-пайплайн, hardening Railway-деплоя. D2 PPTX-stretch, **2-3 golden-прогона** (пред-прогнанные, реплеятся мгновенно), репетиция, offline-fallback.
+- **Workstream D — Экспорт + демо + деплой** (4-й; при 3 чел. делят A-lead и C-lead на D2): D1 PDF-пайплайн, hardening Cloudflare-деплоя. D2 PPTX-stretch, **2-3 golden-прогона** (пред-прогнанные, реплеятся мгновенно), репетиция, offline-fallback.
 
 **MVP (обязан демо):** форма → live-timeline с реальными запросами+цитатами (шаги 2-3) → полный отчёт (8 секций) → интерактивная юнит-экономика с мгновенным пересчётом → экспорт PDF → один отполированный golden-прогон.
 
@@ -135,7 +135,7 @@
 
 1. **Live web-search падает на сцене** (главный) → демо из реплея сохранённого golden-Run (offline), live-генерация только в Q&A. Per-step таймауты + cached fallback. Spend-cap + второй API-ключ.
 2. **Галлюцинированные цифры/фейк-цитаты** → schema-enforce `citationId`, серверная валидация что id есть в источниках шага, честный `estimated:true`. Opus на числовых шагах.
-3. **Долгий агент рвёт стриминг/таймаут** → персистентный Express-сервер Railway (нет serverless-лимита), SSE с heartbeat, персист каждого события для реплея, per-step бюджеты токенов/времени.
+3. **Долгий агент рвёт стриминг/таймаут** → на Cloudflare нет «вечного» процесса, поэтому долгий прогон держим в **Workflow/Durable Object** (а не в одном Worker-инвоке), SSE через `ReadableStream` с heartbeat, персист каждого события для реплея, per-step бюджеты токенов/времени. Главная страховка демо — offline-реплей golden-прогона.
 4. **Стоимость/латентность** → prompt caching, Sonnet/Haiku на невидимых шагах, cap web_search per step, параллель независимых шагов.
 5. **Математика расходится с прозой LLM** → математика в тестируемом чистом TS, LLM даёт только допущения. Один источник истины на каждую цифру.
 6. **Schema churn стопорит параллель** → заморозка типов на kickoff (`src/shared/types.ts`), изменение схемы = тим-синк.

@@ -364,12 +364,17 @@
 [
   { "id":"A", "title_uk":"Пайплайн агента + grounding", "title_en":"Agent pipeline + grounding", "owner":"—", "status":"in-progress" },
   { "id":"B", "title_uk":"Стрімінг, персист, юніт-економіка", "title_en":"Streaming, persistence, unit economics", "owner":"—", "status":"in-progress" },
-  { "id":"C", "title_uk":"Report UI + інтерактив", "title_en":"Report UI + interactivity", "owner":"—", "status":"todo" },
-  { "id":"D", "title_uk":"Експорт, демо, деплой", "title_en":"Export, demo, deploy", "owner":"—", "status":"todo" }
+  { "id":"C", "title_uk":"Report UI + інтерактив", "title_en":"Report UI + interactivity", "owner":"Mykhailo", "status":"in-progress" },
+  { "id":"D", "title_uk":"Експорт, демо, деплой", "title_en":"Export, demo, deploy", "owner":"Ruslan", "status":"in-progress" }
 ]
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"12:30", "author":"Anton", "workstream":"A", "summary":"Add packages/scout/PLAN.md — spec for the Scout sub-agent (fan-out → fan-in → fan-out): plan sources from the frozen @hahaton/integrations registry, build concrete HTTP requests, query sources in parallel (Firecrawl fallback), aggregate, then LLM per-source reports. Researched live no-auth APIs (HN Algolia, iTunes, Reddit) + Firecrawl. Added roadmap A13–A17.", "commit":"6578056" },
+  { "date":"2026-05-30", "time":"12:25", "author":"Anton", "workstream":"—", "summary":"CLAUDE.md: require a claim-commit pushed at session start (before any code) — update plan.html JSON islands or an empty commit (git commit --allow-empty) announcing the sub-task, so the team sees who works on what BEFORE the task is done.", "commit":"—" },
+  { "date":"2026-05-30", "time":"12:20", "author":"Ruslan", "workstream":"D", "summary":"🔨 started D3: migrate stack to Cloudflare on the phasekit pattern — Hono Worker (apps/api), D1+Drizzle (packages/db), OpenNext surface (apps/web), Biome, and CI deploy.yml.", "commit":"—" },
+  { "date":"2026-05-30", "time":"12:15", "author":"Mykhailo", "workstream":"C", "summary":"🔨 started C1: UI stack = Next.js + shadcn; porting the design system from funnel-analyzer into apps/web (stripping funnel/prisma/auth/crawler).", "commit":"—" },
+  { "date":"2026-05-30", "time":"12:10", "author":"Anton", "workstream":"D", "summary":"Drop Railway deploy integration (delete railway.json) — target is Cloudflare now; updated README/PLAN/CLAUDE/plan.html refs (incl. risk #3, D3) + .env.example. Trash-commit leftovers were already gone via the monorepo migration.", "commit":"—" },
   { "date":"2026-05-30", "time":"11:56", "author":"Codex", "workstream":"A", "summary":"Expanded integrations source registry into one app-research table: no-auth iTunes/Play scraper plus Appfigures, Crunchbase, Trustpilot, Similarweb, AppBrain; added auth/access/research metadata.", "commit":"—" },
   { "date":"2026-05-30", "time":"11:55", "author":"scaffold", "workstream":"—", "summary":"plan.html: Roadmap tab — 34 sub-tasks (F/A/B/C/D) claimable by id via #data-roadmap; claim now per sub-task.", "commit":"—" },
   { "date":"2026-05-30", "time":"11:42", "author":"Ruslan", "workstream":"—", "summary":"Doc sync: reconciled CLAUDE.md + plan.html with the monorepo reality and logged the integrations + LLM-gateway work. Typecheck green (10/10).", "commit":"—" },
@@ -404,13 +409,19 @@
   { "id":"A11", "group":"A", "title_uk":"Multi-LLM панель + скоринг 4×25 + gaps", "title_en":"Multi-LLM panel + 4×25 scoring + gaps", "owner":"—", "status":"todo" },
   { "id":"A12", "group":"A", "title_uk":"Роутинг моделей + prompt caching", "title_en":"Model routing + prompt caching", "owner":"—", "status":"todo" },
 
+  { "id":"A13", "group":"A", "title_uk":"Scout: каркас пакета + контракти (packages/scout)", "title_en":"Scout: package scaffold + contracts (packages/scout)", "owner":"—", "status":"todo" },
+  { "id":"A14", "group":"A", "title_uk":"Scout: планувальник джерел + шаблони HTTP-запитів", "title_en":"Scout: source planner + HTTP request templates", "owner":"—", "status":"todo" },
+  { "id":"A15", "group":"A", "title_uk":"Scout: паралельний fetch джерел + Firecrawl-фолбек", "title_en":"Scout: parallel source fetch + Firecrawl fallback", "owner":"—", "status":"todo" },
+  { "id":"A16", "group":"A", "title_uk":"Scout: агрегація + звіт по кожному джерелу (LLM)", "title_en":"Scout: aggregate + per-source report (LLM)", "owner":"—", "status":"todo" },
+  { "id":"A17", "group":"A", "title_uk":"Scout: /scout ендпоінт + інтеграція в крок конкурентів/ринку", "title_en":"Scout: /scout endpoint + wire into competitors/market step", "owner":"—", "status":"todo" },
+
   { "id":"B1", "group":"B", "title_uk":"SSE /agent/stream (apps/api)", "title_en":"SSE /agent/stream (apps/api)", "owner":"—", "status":"todo" },
   { "id":"B2", "group":"B", "title_uk":"Схема подій + heartbeats", "title_en":"Event schema + heartbeats", "owner":"—", "status":"todo" },
   { "id":"B3", "group":"B", "title_uk":"Персист Run + реплей (packages/store)", "title_en":"Run persist + replay (packages/store)", "owner":"—", "status":"todo" },
   { "id":"B4", "group":"B", "title_uk":"Роздача статики UI + plan.html", "title_en":"Serve static UI + plan.html", "owner":"—", "status":"todo" },
   { "id":"B5", "group":"B", "title_uk":"Spend cap, бюджети по кроках, обробка помилок", "title_en":"Spend cap, per-step budgets, error handling", "owner":"—", "status":"todo" },
 
-  { "id":"C1", "group":"C", "title_uk":"Вибір UI-стека + скафолд apps/web", "title_en":"Pick UI stack + scaffold apps/web", "owner":"—", "status":"todo" },
+  { "id":"C1", "group":"C", "title_uk":"Вибір UI-стека + скафолд apps/web (Next.js + shadcn)", "title_en":"Pick UI stack + scaffold apps/web (Next.js + shadcn)", "owner":"Mykhailo", "status":"in-progress" },
   { "id":"C2", "group":"C", "title_uk":"Форма вводу (ідея + регіон + бюджет)", "title_en":"Input form (idea + region + budget)", "owner":"—", "status":"todo" },
   { "id":"C3", "group":"C", "title_uk":"Живий research-timeline (SSE)", "title_en":"Live research timeline (SSE)", "owner":"—", "status":"todo" },
   { "id":"C4", "group":"C", "title_uk":"Секції звіту (ринок/конкуренти/canvas/GTM/ризики/синтез)", "title_en":"Report sections (market/competitors/canvas/GTM/risks/synthesis)", "owner":"—", "status":"todo" },
@@ -421,7 +432,7 @@
 
   { "id":"D1", "group":"D", "title_uk":"Експорт PDF (HTML → PDF + sources appendix)", "title_en":"PDF export (HTML → PDF + sources appendix)", "owner":"—", "status":"todo" },
   { "id":"D2", "group":"D", "title_uk":"PPTX-дек (stretch)", "title_en":"PPTX deck (stretch)", "owner":"—", "status":"todo" },
-  { "id":"D3", "group":"D", "title_uk":"Hardening деплою Railway", "title_en":"Railway deploy hardening", "owner":"—", "status":"todo" },
+  { "id":"D3", "group":"D", "title_uk":"Hardening деплою Cloudflare (Workers/Pages)", "title_en":"Cloudflare deploy hardening (Workers/Pages)", "owner":"Ruslan", "status":"in-progress" },
   { "id":"D4", "group":"D", "title_uk":"Golden-прогони (offline-реплей)", "title_en":"Golden demo runs (offline replay)", "owner":"—", "status":"todo" },
   { "id":"D5", "group":"D", "title_uk":"Демо-сценарій + репетиція", "title_en":"Demo script + rehearsal", "owner":"—", "status":"todo" }
 ]
@@ -433,7 +444,7 @@
       eyebrow:"Хакатон 2026 · AI-співробітник",
       lede:"Агент, який із однієї фрази-ідеї збирає обґрунтований, цитований звіт валідації: оцінка за 4 категоріями (×25 → /100), жива юніт-економіка та список gaps для CustDev — робота консультанта за $5k і 2 тижні, за ~90 секунд.",
       pill_team:"Команда <b>4 особи</b>", pill_time:"Термін <b>1 день</b>",
-      pill_priority:"Пріоритет <b>бізнес-цінність + чисте демо</b>", pill_stack:"Стек <b>Express · Claude API · Railway</b>",
+      pill_priority:"Пріоритет <b>бізнес-цінність + чисте демо</b>", pill_stack:"Стек <b>Express · Claude API · Cloudflare</b>",
       toc_status:"Статус", toc_progress:"Прогрес", toc_concept:"Концепція", toc_validation:"Валідація",
       toc_pipeline:"Пайплайн", toc_demo:"Демо", toc_risks:"Ризики", toc_stack:"Стек", toc_sources:"Джерела",
       toc_roadmap:"Roadmap",
@@ -477,11 +488,11 @@
       risk_label:"Ризики та мітигації", risk_th1:"Ризик", risk_th2:"Мітигація",
       risk_r1k:"Live-пошук падає на сцені", risk_r1v:"Реплей збереженого golden-Run (offline); live — тільки в Q&A. Spend-cap + другий ключ.",
       risk_r2k:"Галюциновані цифри/цитати", risk_r2v:"Schema-enforce <code>citationId</code>, серверна валідація, чесний <code>estimated:true</code>. Opus на числах.",
-      risk_r3k:"Довгий агент рве стрімінг", risk_r3v:"Персистентний Express на Railway, SSE з heartbeat, персист подій, per-step бюджети.",
+      risk_r3k:"Довгий агент рве стрімінг", risk_r3v:"На Cloudflare немає вічного процесу — довгий прогон у Workflow/Durable Object, SSE з heartbeat, персист подій, per-step бюджети, offline-реплей як страховка.",
       risk_r4k:"Математика ≠ проза LLM", risk_r4v:"Математика у тестованому чистому TS; LLM дає лише припущення. Одне джерело істини.",
       risk_r5k:"Schema churn стопорить команду", risk_r5v:"Контракт <code>src/shared/types.ts</code> заморожений на kickoff; зміна = тім-синк.",
       stack_label:"Стек і ключові файли",
-      stack_sub:"Розширюємо наявний бекенд (Express + TypeScript ESM + <code>@anthropic-ai/sdk</code>, деплой Railway вже налаштовано), додаємо легкий фронт. Без Next.js/Prisma — не окупається за 1 день поверх готового скафолда.",
+      stack_sub:"Розширюємо наявний бекенд (Express + TypeScript ESM + <code>@anthropic-ai/sdk</code>, деплой на Cloudflare — порт у роботі), додаємо легкий фронт. Без Next.js/Prisma — не окупається за 1 день поверх готового скафолда.",
       f_types:"Заморожений контракт: 8 кроків, Run, AgentEvent (SSE), Fact/Citation",
       f_ue:"Чистий детермінований рушій (математика тут, не в LLM)",
       f_orch:"DAG-раннер: роутинг моделей + емісія подій", f_steps:"Типізовані кроки (1 TODO = 1 задача workstream A)",
@@ -501,7 +512,7 @@
       eyebrow:"Hackathon 2026 · AI Employee",
       lede:"An agent that turns a one-line idea into a grounded, cited validation report: a score across 4 categories (×25 → /100), live unit economics, and a CustDev gap list — a consultant's $5k, two-week deliverable in ~90 seconds.",
       pill_team:"Team <b>4 people</b>", pill_time:"Timeline <b>1 day</b>",
-      pill_priority:"Priority <b>business value + clean demo</b>", pill_stack:"Stack <b>Express · Claude API · Railway</b>",
+      pill_priority:"Priority <b>business value + clean demo</b>", pill_stack:"Stack <b>Express · Claude API · Cloudflare</b>",
       toc_status:"Status", toc_progress:"Progress", toc_concept:"Concept", toc_validation:"Validation",
       toc_pipeline:"Pipeline", toc_demo:"Demo", toc_risks:"Risks", toc_stack:"Stack", toc_sources:"Sources",
       toc_roadmap:"Roadmap",
@@ -545,11 +556,11 @@
       risk_label:"Risks & mitigations", risk_th1:"Risk", risk_th2:"Mitigation",
       risk_r1k:"Live search fails on stage", risk_r1v:"Replay a saved golden run (offline); live only in Q&A. Spend cap + second key.",
       risk_r2k:"Hallucinated figures/citations", risk_r2v:"Schema-enforce <code>citationId</code>, server-side validation, honest <code>estimated:true</code>. Opus on numbers.",
-      risk_r3k:"Long agent breaks streaming", risk_r3v:"Persistent Express on Railway, SSE with heartbeats, event persistence, per-step budgets.",
+      risk_r3k:"Long agent breaks streaming", risk_r3v:"Cloudflare has no long-lived process — run the long pipeline in a Workflow/Durable Object, SSE with heartbeats, event persistence, per-step budgets, offline replay as the safety net.",
       risk_r4k:"Math ≠ the LLM's prose", risk_r4v:"Math in tested pure TS; the LLM only supplies assumptions. One source of truth.",
       risk_r5k:"Schema churn stalls the team", risk_r5v:"The <code>src/shared/types.ts</code> contract is frozen at kickoff; a change = team sync.",
       stack_label:"Stack & key files",
-      stack_sub:"We extend the existing backend (Express + TypeScript ESM + <code>@anthropic-ai/sdk</code>, Railway deploy already configured) and add a light frontend. No Next.js/Prisma — not worth it in 1 day on top of a working scaffold.",
+      stack_sub:"We extend the existing backend (Express + TypeScript ESM + <code>@anthropic-ai/sdk</code>, deploy to Cloudflare — port in progress) and add a light frontend. No Next.js/Prisma — not worth it in 1 day on top of a working scaffold.",
       f_types:"Frozen contract: 8 steps, Run, AgentEvent (SSE), Fact/Citation",
       f_ue:"Pure deterministic engine (math lives here, not in the LLM)",
       f_orch:"DAG runner: model routing + event emission", f_steps:"Typed steps (1 TODO = 1 workstream-A task)",

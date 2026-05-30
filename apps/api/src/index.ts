@@ -9,7 +9,7 @@ app.use(express.json());
 
 const PORT = Number(process.env.PORT) || 3000;
 
-// Railway healthcheck hits this.
+// Platform healthcheck hits this.
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });

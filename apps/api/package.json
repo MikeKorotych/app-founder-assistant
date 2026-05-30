@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "HTTP service exposing the agent pipeline. Deployed to Railway.",
+  "description": "HTTP service exposing the agent pipeline. Deployed to Cloudflare.",
   "scripts": {
     "dev": "tsx watch --env-file-if-exists=.env src/index.ts",
     "build": "tsc",
