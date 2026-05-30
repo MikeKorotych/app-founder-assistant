@@ -63,6 +63,8 @@
    (Опц.) если у воркстрима в целом сменился статус — обнови и `#data-workstreams`.
 2. В `#data-progress` добавь запись о старте (в начало массива), с `id` саб-таска в summary:
    `{ "date":"…", "time":"HH:MM", "author":"<имя>", "workstream":"A|B|C|D", "summary":"🔨 started A3: <что именно начал>", "commit":"—" }`.
+   `time` всегда указывай в локальной зоне проекта `Europe/Kyiv` (например:
+   `TZ=Europe/Kyiv date '+%H:%M'`), чтобы лог не показывал будущие записи у людей в другом часовом поясе.
 3. **Сразу сделай отдельный claim-коммит и push — ДО основной работы:**
    `git add plan.html && git commit -m "🔨 start A3: market sizing" && git pull --rebase origin main && git push origin main`.
    После этого только приступай к коду/докам самой задачи.
@@ -90,7 +92,8 @@
    { "date":"YYYY-MM-DD", "time":"HH:MM", "author":"<имя>", "workstream":"A|B|C|D",
      "summary":"<one line, in English>", "commit":"<short-sha|—>" }
    ```
-   Дату бери из системного контекста сессии.
+   Дату бери из системного контекста сессии, время — только в локальной зоне проекта
+   `Europe/Kyiv` (`TZ=Europe/Kyiv date '+%H:%M'`).
 2. **`#data-workstreams`** — если статус твоего воркстрима изменился, обнови `status`
    (`todo` → `in-progress` → `review` → `done`) и `owner`. Заголовки воркстримов двуязычны
    (`title_uk` / `title_en`) — их менять обычно не нужно.
