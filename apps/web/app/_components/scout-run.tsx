@@ -1,7 +1,7 @@
 "use client";
 
 import type { SearchExpansion } from "@hahaton/contracts";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@hahaton/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@hahaton/ui";
 import { useEffect, useRef, useState } from "react";
 import { apiUrl } from "../_lib/api";
 
@@ -62,7 +62,7 @@ function Chips({ items, tone }: { items: string[]; tone: "keyword" | "category" 
 // → /scout (spawns the competitor-discovery Workflow) → poll /scout/:id until the
 // Workflow completes, then render the ranked competitors. All calls go browser →
 // API directly (CORS open). See app/_lib/api.ts.
-export function ScoutRun({ idea }: { idea: string }) {
+export function ScoutRun({ idea }: { idea: string; onRestart?: () => void }) {
   const [phase, setPhase] = useState<Phase>({ kind: "expanding" });
   const cancelled = useRef(false);
 
@@ -156,7 +156,9 @@ export function ScoutRun({ idea }: { idea: string }) {
           <p className="text-sm text-foreground/85">{idea}</p>
 
           {phase.kind === "expanding" && (
-            <p className="text-sm text-muted-foreground">Розбираємо ідею на ключові слова та категорії…</p>
+            <p className="text-sm text-muted-foreground">
+              Розбираємо ідею на ключові слова та категорії…
+            </p>
           )}
 
           {expansion && (

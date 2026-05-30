@@ -2,6 +2,7 @@
 
 import { Button, Card, CardContent } from "@hahaton/ui";
 import { useRef, useState } from "react";
+import { startBackgroundMusic, stopBackgroundMusic } from "../_lib/background-music";
 import { RunStream } from "./run-stream";
 import { ScoutRun } from "./scout-run";
 
@@ -72,11 +73,13 @@ export function IdeaForm() {
     const forceDemo =
       typeof window !== "undefined" &&
       new URLSearchParams(window.location.search).get("demo") === "1";
+    void startBackgroundMusic();
     setDemo(forceDemo);
     setStarted(value);
   }
 
   function restartRun() {
+    stopBackgroundMusic();
     setRestarting(true);
     window.setTimeout(() => {
       setIdea("");
