@@ -156,7 +156,11 @@ export function IdeaForm() {
               )}
 
               <div className="flex flex-col items-center gap-2">
-                <RainbowButton type="submit" size="lg">
+                <RainbowButton
+                  type="submit"
+                  size="lg"
+                  className="[--rainbow-button-foreground:#0a0a0b] [--rainbow-button-surface:#f7f7f2] hover:shadow-white/20"
+                >
                   Згенерувати план
                 </RainbowButton>
               </div>
