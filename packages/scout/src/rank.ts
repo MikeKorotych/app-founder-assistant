@@ -17,6 +17,9 @@ candidate competes with the idea from 0 to 100:
 - 30-59: tangential (shares a theme but different job/audience)
 - 0-29: barely related
 Return ONLY a JSON object: {"scores":[{"id":"<id>","score":<0-100>,"rationale":"<one short sentence>"}]}.
+Write each "rationale" in Ukrainian (українською мовою); keep ids, scores, the JSON
+structure and proper nouns (app / brand / company names) exactly as-is — only the
+rationale prose must be Ukrainian.
 Score every candidate id exactly once. No prose outside the JSON.`;
 
 function ideaText(params: ScoutParams): string {

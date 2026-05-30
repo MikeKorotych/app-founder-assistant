@@ -710,7 +710,7 @@ function SourceTable({ source, items }: { source: string; items: Competitor[] })
                     </div>
                   </td>
                   <td className="px-3 py-2.5 text-center">
-                    {typeof c.compatibilityScore === "number" ? (
+                    {typeof c.compatibilityScore === "number" && c.compatibilityScore > 0 ? (
                       <span className="inline-block rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-xs font-medium tabular-nums">
                         {c.compatibilityScore}/100
                       </span>
@@ -719,7 +719,9 @@ function SourceTable({ source, items }: { source: string; items: Competitor[] })
                     )}
                   </td>
                   <td className="px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-                    {c.rationale ?? "—"}
+                    {typeof c.compatibilityScore === "number" && c.compatibilityScore > 0
+                      ? (c.rationale ?? "—")
+                      : "—"}
                   </td>
                 </tr>
               ))}
