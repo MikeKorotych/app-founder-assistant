@@ -1,0 +1,1 @@
+ALTER TABLE `competitors` ADD `icon_url` text;

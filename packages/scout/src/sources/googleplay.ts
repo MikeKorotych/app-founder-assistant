@@ -22,6 +22,8 @@ interface SerpApiApp {
   reviews?: number;
   price?: string;
   free?: boolean;
+  // SerpApi google_play returns the app icon as `thumbnail`.
+  thumbnail?: string;
 }
 
 function toCompetitor(a: SerpApiApp): RawCompetitor | null {
@@ -36,6 +38,7 @@ function toCompetitor(a: SerpApiApp): RawCompetitor | null {
     category: a.category,
     platforms: ["android"],
     price: a.free ? "Free" : a.price,
+    iconUrl: a.thumbnail,
     rating: a.rating ?? 0,
     reviewCount: a.reviews ?? 0,
   };

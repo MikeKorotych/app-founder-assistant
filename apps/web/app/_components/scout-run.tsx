@@ -26,6 +26,7 @@ interface Competitor {
   category: string | null;
   platforms: string | null;
   price: string | null;
+  iconUrl: string | null;
   rating: number;
   reviewCount: number;
   compatibilityScore: number | null;
@@ -389,7 +390,17 @@ function SourceTable({ source, items }: { source: string; items: Competitor[] })
               {items.map((c) => (
                 <tr key={c.id} className="border-t border-border/60 align-top">
                   <td className="px-3 py-2.5">
-                    <div className="flex flex-col gap-0.5">
+                    <div className="flex items-start gap-2.5">
+                      {c.iconUrl && (
+                        // biome-ignore lint/performance/noImgElement: external store CDN icon, not a Next-optimizable asset
+                        <img
+                          src={c.iconUrl}
+                          alt=""
+                          loading="lazy"
+                          className="mt-0.5 h-7 w-7 shrink-0 rounded-md border border-border/60 object-cover"
+                        />
+                      )}
+                      <div className="flex min-w-0 flex-col gap-0.5">
                       {c.url ? (
                         <a
                           href={c.url}
@@ -412,6 +423,7 @@ function SourceTable({ source, items }: { source: string; items: Competitor[] })
                         </span>
                         {c.price && <span>{c.price}</span>}
                       </span>
+                      </div>
                     </div>
                   </td>
                   <td className="px-3 py-2.5 text-center">

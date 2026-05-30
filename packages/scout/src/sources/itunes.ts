@@ -18,6 +18,10 @@ interface ItunesResult {
   trackViewUrl?: string;
   averageUserRating?: number;
   userRatingCount?: number;
+  // Apple returns artwork in several sizes; we keep the smallest available.
+  artworkUrl60?: string;
+  artworkUrl100?: string;
+  artworkUrl512?: string;
 }
 
 function toCompetitor(r: ItunesResult): RawCompetitor | null {
@@ -32,6 +36,7 @@ function toCompetitor(r: ItunesResult): RawCompetitor | null {
     category: r.primaryGenreName,
     platforms: ["ios"],
     price: r.formattedPrice,
+    iconUrl: r.artworkUrl60 ?? r.artworkUrl100 ?? r.artworkUrl512,
     rating: r.averageUserRating ?? 0,
     reviewCount: r.userRatingCount ?? 0,
   };

@@ -40,6 +40,8 @@ export interface RawCompetitor {
   platforms: string[];
   /** Human-readable price ("Free", "$4.99"). */
   price?: string;
+  /** App icon URL — the smallest artwork the source offers (60px iTunes / Play thumbnail). */
+  iconUrl?: string;
   rating: number;
   reviewCount: number;
 }
