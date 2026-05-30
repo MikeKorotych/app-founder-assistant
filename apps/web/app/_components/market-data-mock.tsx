@@ -77,7 +77,7 @@ export function MarketDataMock({ competitors }: { competitors: MarketCompetitor[
             <div className="flex flex-wrap items-center gap-2">
               <CardTitle className="text-base">Дані ринку та виручка конкурентів</CardTitle>
               <span className="rounded-full border border-border/60 bg-muted/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                demo · mock
+                mock
               </span>
             </div>
             <p className="text-sm text-muted-foreground">

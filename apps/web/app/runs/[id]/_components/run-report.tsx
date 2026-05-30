@@ -100,9 +100,8 @@ export function RunReport({ id }: { id: string }) {
   const { run } = state;
   return (
     <main className="flex flex-1 flex-col gap-6">
-      <div className="animate-enter flex items-center gap-2">
+      <div className="animate-enter flex justify-end">
         <NewRunLink />
-        <span className="text-sm text-muted-foreground">Нова ідея</span>
       </div>
       <header className="animate-enter flex flex-wrap items-start gap-3">
         <div className="space-y-1">

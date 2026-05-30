@@ -109,15 +109,15 @@ function RunTopBar({
 }) {
   const restart = () => (onRestart ? onRestart() : window.location.assign("/"));
   return (
-    <div className="animate-enter flex flex-wrap items-start justify-between gap-4">
-      <div className="min-w-0 space-y-1">
+    <div className="animate-enter flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="min-w-0 flex-1 space-y-1">
         <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {mode === "real" ? "Реальний прогін · Demo" : "Мок-прогін · Demo"}
+          {mode === "real" ? "Реальний прогін" : "Мок-прогін"}
         </p>
         <p className="max-w-3xl truncate text-sm text-muted-foreground">{idea}</p>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="ml-auto flex shrink-0 items-center gap-3">
         <div className="inline-flex rounded-md border border-border/60 bg-background/35 p-1 backdrop-blur">
           {(["real", "mock"] as const).map((item) => (
             <button
@@ -136,16 +136,15 @@ function RunTopBar({
           ))}
         </div>
         <Button
-          aria-label="Нова ідея"
+          aria-label="Новий прогін"
           className="h-9 w-9 shrink-0 text-muted-foreground [&_svg]:size-5"
           onClick={restart}
           size="icon"
-          title="Нова ідея"
+          title="Новий прогін"
           variant="ghost"
         >
           <RestartIcon />
         </Button>
-        <span className="hidden text-sm text-muted-foreground sm:inline">Нова ідея</span>
       </div>
     </div>
   );
@@ -447,7 +446,7 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
           onRestart={onRestart}
         />
         <p className="animate-enter text-sm text-muted-foreground">
-          Реальний прогін зупинився: {phase.message}. Показую мок-аналіз, щоб демо не ламалось.
+          Реальний прогін зупинився: {phase.message}. Показую мок-аналіз.
         </p>
         <ReportBody run={run} />
       </div>
