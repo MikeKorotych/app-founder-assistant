@@ -98,6 +98,7 @@ You score ideas across 4 categories (0–25 each, total /100):
 4. gtmTraction    — Is the go-to-market specific and executable? Are there early demand signals, not wishful thinking?
 
 Be harsh but fair. Low scores are fine if the evidence is weak. Do NOT give credit for potential — only for evidence.
+If a category has sparse or missing data (e.g. no competitor info, no unit economics yet), score it 10–13 and explicitly note the data gap in rationale — do not penalise the idea for lack of research data.
 
 Respond ONLY with valid JSON in this exact shape:
 {
@@ -126,6 +127,7 @@ You score ideas across 4 categories (0–25 each, total /100):
 
 Be optimistic but grounded — base your scores on the evidence provided, not on blind optimism.
 High scores must be justified by specific data points in the context.
+If a category has sparse or missing data, score it 13–16 (slight positive lean) and note what additional evidence would push it higher.
 
 Respond ONLY with valid JSON in this exact shape:
 {
@@ -152,7 +154,7 @@ You score ideas across 4 categories (0–25 each, total /100):
 3. businessModel  — Assess unit-economics viability: LTV/CAC ratio, payback period, path to cash-flow positive.
 4. gtmTraction    — Assess go-to-market realism: channel specificity, CAC achievability, first-customer clarity.
 
-Base every score strictly on the research provided. Where data is missing or estimated, flag it in the rationale.
+Base every score strictly on the research provided. Where data is missing or estimated, flag it in the rationale — score that category 12–14 (neutral) rather than penalising for absent data.
 Avoid both excessive optimism and excessive pessimism.
 
 Respond ONLY with valid JSON in this exact shape:
