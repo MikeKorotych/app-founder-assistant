@@ -12,11 +12,11 @@ LLM_TIMEOUT_MS=120000
 
 # Scout — competitor discovery sources (Worker secrets). Both optional: if unset,
 # that source degrades to empty and Scout still runs on the others.
-#   SEARCH_API_KEY    — SerpApi key (google_play engine) for Android results.
+#   GOOGLE_SEARCH_API_KEY — SerpApi key (google_play engine) for Android results.
 #                       Get it at serpapi.com → Dashboard → "Your API Key".
 #   PRODUCTHUNT_TOKEN — Product Hunt API v2 developer token (Bearer).
 #                       producthunt.com/v2/oauth/applications → Add app → Create Token.
-SEARCH_API_KEY=
+GOOGLE_SEARCH_API_KEY=
 PRODUCTHUNT_TOKEN=
 
 # Appfigures — app market intelligence (Bearer = PAT). See docs/sources/appfigures.md.

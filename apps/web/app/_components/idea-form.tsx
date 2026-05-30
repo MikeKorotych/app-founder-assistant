@@ -89,7 +89,7 @@ export function IdeaForm() {
               id="idea"
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
-              placeholder="e.g. An AI co-pilot for indie iOS founders that drafts App Store keywords and creatives from a single product description."
+              placeholder="Your idea in one sentence — e.g. AI study buddy that turns lectures into flashcards"
               rows={4}
               className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               required
