@@ -81,7 +81,7 @@ export function PlatformPie({ sources }: { sources: string[] }) {
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
         Конкуренти за платформою
       </p>
-      <div className="flex flex-wrap items-center gap-6">
+      <div className="flex flex-wrap items-center justify-center gap-6">
         <svg
           width={size}
           height={size}
