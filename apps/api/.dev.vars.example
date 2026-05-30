@@ -25,3 +25,6 @@ PRODUCTHUNT_TOKEN=
 APPFIGURES_PAT=
 APPFIGURES_CLIENT_KEY=
 APPFIGURES_SECRET_KEY=
+
+# SerpApi (serpapi.com) — Google Play Store search for Scout (competitor discovery).
+GOOGLE_SEARCH_API_KEY=
