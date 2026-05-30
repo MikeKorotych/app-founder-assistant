@@ -246,7 +246,7 @@ function GameWhileGenerating({ phase, validation }: { phase: Phase; validation: 
 
   return (
     <Card className="animate-enter overflow-hidden border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-      <CardContent className="grid gap-6 py-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+      <CardContent className="flex flex-col gap-6 py-5">
         <div className="flex flex-col gap-3">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Поки генерується аналіз
@@ -257,7 +257,7 @@ function GameWhileGenerating({ phase, validation }: { phase: Phase; validation: 
             з'являються по мірі готовності.
           </p>
         </div>
-        <div className="justify-self-center">
+        <div className="self-center">
           <Game2048 />
         </div>
       </CardContent>
