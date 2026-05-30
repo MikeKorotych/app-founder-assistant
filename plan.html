@@ -370,6 +370,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"12:40", "author":"Mykhailo", "workstream":"C", "summary":"C1: ported funnel-analyzer design system into packages/ui (@hahaton/ui) — shadcn primitives + theme (Tailwind v4 'caffeine') + StatusPill/Badge + AppBackground + EmotionArcChart; relative imports, no app collision. Drops into the OpenNext apps/web shell (see README).", "commit":"—" },
   { "date":"2026-05-30", "time":"12:30", "author":"Anton", "workstream":"A", "summary":"Add packages/scout/PLAN.md — spec for the Scout sub-agent (fan-out → fan-in → fan-out): plan sources from the frozen @hahaton/integrations registry, build concrete HTTP requests, query sources in parallel (Firecrawl fallback), aggregate, then LLM per-source reports. Researched live no-auth APIs (HN Algolia, iTunes, Reddit) + Firecrawl. Added roadmap A13–A17.", "commit":"6578056" },
   { "date":"2026-05-30", "time":"12:25", "author":"Anton", "workstream":"—", "summary":"CLAUDE.md: require a claim-commit pushed at session start (before any code) — update plan.html JSON islands or an empty commit (git commit --allow-empty) announcing the sub-task, so the team sees who works on what BEFORE the task is done.", "commit":"—" },
   { "date":"2026-05-30", "time":"12:20", "author":"Ruslan", "workstream":"D", "summary":"🔨 started D3: migrate stack to Cloudflare on the phasekit pattern — Hono Worker (apps/api), D1+Drizzle (packages/db), OpenNext surface (apps/web), Biome, and CI deploy.yml.", "commit":"—" },
@@ -421,7 +422,7 @@
   { "id":"B4", "group":"B", "title_uk":"Роздача статики UI + plan.html", "title_en":"Serve static UI + plan.html", "owner":"—", "status":"todo" },
   { "id":"B5", "group":"B", "title_uk":"Spend cap, бюджети по кроках, обробка помилок", "title_en":"Spend cap, per-step budgets, error handling", "owner":"—", "status":"todo" },
 
-  { "id":"C1", "group":"C", "title_uk":"Вибір UI-стека + скафолд apps/web (Next.js + shadcn)", "title_en":"Pick UI stack + scaffold apps/web (Next.js + shadcn)", "owner":"Mykhailo", "status":"in-progress" },
+  { "id":"C1", "group":"C", "title_uk":"Вибір UI-стека + скафолд apps/web (Next.js + shadcn)", "title_en":"Pick UI stack + scaffold apps/web (Next.js + shadcn)", "owner":"Mykhailo", "status":"review" },
   { "id":"C2", "group":"C", "title_uk":"Форма вводу (ідея + регіон + бюджет)", "title_en":"Input form (idea + region + budget)", "owner":"—", "status":"todo" },
   { "id":"C3", "group":"C", "title_uk":"Живий research-timeline (SSE)", "title_en":"Live research timeline (SSE)", "owner":"—", "status":"todo" },
   { "id":"C4", "group":"C", "title_uk":"Секції звіту (ринок/конкуренти/canvas/GTM/ризики/синтез)", "title_en":"Report sections (market/competitors/canvas/GTM/risks/synthesis)", "owner":"—", "status":"todo" },

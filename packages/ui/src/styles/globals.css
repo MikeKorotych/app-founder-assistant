@@ -1,0 +1,241 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─── Caffeine theme tokens (via tweakcn.com/themes/caffeine) ────────
+   Warm cream + coffee-brown palette. Replaces the original slate +
+   blue. Token names are shadcn-standard so all primitives still drop in.
+*/
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  /* Pattern + glow — warm cream defaults for the caffeine palette */
+  --bg-pattern-color: oklch(0.78 0.015 70 / 0.35);
+  --bg-glow-1: oklch(0.9 0.06 70 / 0.55);
+  --bg-glow-2: oklch(0.88 0.05 50 / 0.4);
+
+  --background: oklch(0.9821 0 0);
+  --foreground: oklch(0.2435 0 0);
+
+  --card: oklch(0.9911 0 0);
+  --card-foreground: oklch(0.2435 0 0);
+
+  --popover: oklch(0.9911 0 0);
+  --popover-foreground: oklch(0.2435 0 0);
+
+  --primary: oklch(0.4341 0.0392 41.9938);
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.92 0.0651 74.3695);
+  --secondary-foreground: oklch(0.3499 0.0685 40.8288);
+
+  --muted: oklch(0.9521 0 0);
+  --muted-foreground: oklch(0.5032 0 0);
+
+  --accent: oklch(0.931 0 0);
+  --accent-foreground: oklch(0.2435 0 0);
+
+  --destructive: oklch(0.6271 0.1936 33.339);
+  --destructive-foreground: oklch(1 0 0);
+
+  --success: oklch(0.62 0.16 145);
+
+  --border: oklch(0.8822 0 0);
+  --input: oklch(0.8822 0 0);
+  --ring: oklch(0.4341 0.0392 41.9938);
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  --bg-pattern-color: oklch(0.42 0.018 70 / 0.5);
+  --bg-glow-1: oklch(0.42 0.06 60 / 0.45);
+  --bg-glow-2: oklch(0.4 0.04 80 / 0.35);
+
+  --background: oklch(0.1776 0 0);
+  --foreground: oklch(0.9491 0 0);
+
+  --card: oklch(0.2134 0 0);
+  --card-foreground: oklch(0.9491 0 0);
+
+  --popover: oklch(0.2134 0 0);
+  --popover-foreground: oklch(0.9491 0 0);
+
+  --primary: oklch(0.9247 0.0524 66.1732);
+  --primary-foreground: oklch(0.2029 0.024 200.1962);
+
+  --secondary: oklch(0.3163 0.019 63.6992);
+  --secondary-foreground: oklch(0.9247 0.0524 66.1732);
+
+  --muted: oklch(0.252 0 0);
+  --muted-foreground: oklch(0.7699 0 0);
+
+  --accent: oklch(0.285 0 0);
+  --accent-foreground: oklch(0.9491 0 0);
+
+  --destructive: oklch(0.6271 0.1936 33.339);
+  --destructive-foreground: oklch(1 0 0);
+
+  --success: oklch(0.72 0.16 145);
+
+  --border: oklch(0.2351 0.0115 91.7467);
+  --input: oklch(0.4017 0 0);
+  --ring: oklch(0.9247 0.0524 66.1732);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family:
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      'Helvetica Neue',
+      Arial,
+      'Noto Sans',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Layer 1 · dotted texture, faded by a radial mask so the WebGL veil stays soft. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    background-image: radial-gradient(circle, var(--bg-pattern-color) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 25%, black 20%, transparent 82%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 25%, black 20%, transparent 82%);
+    pointer-events: none;
+  }
+
+  /* Layer 2 · subtle page wash behind the animated veil. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      linear-gradient(180deg, var(--bg-glow-1), transparent 42%),
+      linear-gradient(140deg, transparent 0%, var(--bg-glow-2) 55%, transparent 100%);
+    pointer-events: none;
+  }
+}
+
+/* ─── Theme toggle · circular reveal via View Transitions ──────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+  animation: theme-clip 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes theme-clip {
+  from {
+    clip-path: circle(0 at var(--tt-x, 50%) var(--tt-y, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--tt-x, 50%) var(--tt-y, 50%));
+  }
+}
+
+/* ─── Page entrance fade-in-up ─────────────────────────────────────── */
+@keyframes enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-enter {
+  animation: enter-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ─── Status pill · animated ring around the dot ───────────────────── */
+@keyframes pill-ping {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.animate-pill-ping {
+  animation: pill-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
