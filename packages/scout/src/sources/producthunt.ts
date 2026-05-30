@@ -6,17 +6,26 @@ import type { RawCompetitor, ScoutParams } from "../types.js";
  * token (Authorization: Bearer). If no token is set, degrades to empty.
  * Endpoint: https://api.producthunt.com/v2/api/graphql
  *
- * NOTE: PH v2 `posts` has NO free-text search argument. So we pull a batch of
- * the most-upvoted posts and filter client-side by keyword match in the
- * name/tagline/description. Coarse, but honest to what the API exposes.
+ * PH v2 `posts` has NO free-text search argument, but it DOES accept a `topic`
+ * slug. So instead of pulling a global most-upvoted batch (which never matches
+ * a niche keyword), we map each requested category to a PH topic slug and pull
+ * that topic's most-upvoted posts. Relevance comes from the topic itself; the
+ * final compatibility call is left to the downstream LLM ranking step.
+ *
+ * With no categories we fall back to slugified keywords as candidate topics —
+ * most won't be real PH topics (those queries simply return empty), but it lets
+ * a keyword that *is* a topic (e.g. "productivity") still surface results.
  */
 const ENDPOINT = "https://api.producthunt.com/v2/api/graphql";
 
-const QUERY = `query Popular($first: Int!) {
-  posts(order: VOTES, first: $first) {
+const QUERY = `query Topic($slug: String!, $first: Int!) {
+  posts(topic: $slug, order: VOTES, first: $first) {
     edges { node { id name tagline description votesCount url topics(first: 1) { edges { node { name } } } } }
   }
 }`;
+
+/** Cap on distinct topic slugs queried per run (one PH request each). */
+const MAX_TOPICS = 6;
 
 interface PhNode {
   id?: string;
@@ -44,18 +53,36 @@ function toCompetitor(n: PhNode): RawCompetitor | null {
   };
 }
 
-function matchesAnyKeyword(n: PhNode, keywords: string[]): boolean {
-  const haystack = `${n.name ?? ""} ${n.tagline ?? ""} ${n.description ?? ""}`.toLowerCase();
-  return keywords.some((k) => haystack.includes(k.toLowerCase()));
+/**
+ * PH topic slugs are lowercase-hyphenated. Slugify a free-text category and
+ * apply a few aliases for the common name↔slug mismatches.
+ */
+const TOPIC_ALIASES: Record<string, string> = {
+  "health-fitness": "health-and-fitness",
+  health: "health-and-fitness",
+  fitness: "health-and-fitness",
+  finance: "fintech",
+  "dev-tools": "developer-tools",
+  dev: "developer-tools",
+  "artificial-intelligence": "artificial-intelligence",
+  ai: "artificial-intelligence",
+};
+
+function toTopicSlug(category: string): string {
+  const base = category
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return TOPIC_ALIASES[base] ?? base;
 }
 
-export async function fetchProductHunt(
-  params: ScoutParams,
-  token: string | undefined,
-): Promise<RawCompetitor[]> {
-  if (!token) return [];
-  // One batch, generous size, then keyword-filter locally.
-  const first = Math.min(100, (params.limitPerSource ?? 15) * params.keywords.length + 20);
+/**
+ * Pull one topic's most-upvoted posts. HTTP-level failures throw so the
+ * workflow step retries; an unknown topic comes back as a 200 with a GraphQL
+ * error and null `posts`, which we treat as simply "no results" and skip.
+ */
+async function fetchTopic(slug: string, first: number, token: string): Promise<RawCompetitor[]> {
   const res = await fetch(ENDPOINT, {
     method: "POST",
     headers: {
@@ -63,12 +90,26 @@ export async function fetchProductHunt(
       Accept: "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ query: QUERY, variables: { first } }),
+    body: JSON.stringify({ query: QUERY, variables: { slug, first } }),
   });
   if (!res.ok) throw new Error(`Product Hunt ${res.status}`);
-  const body = (await res.json()) as { data?: { posts?: { edges?: { node?: PhNode }[] } } };
-  const nodes = (body.data?.posts?.edges ?? [])
-    .map((e) => e.node)
-    .filter((n): n is PhNode => !!n && matchesAnyKeyword(n, params.keywords));
-  return dedupeById(nodes.map(toCompetitor).filter((c): c is RawCompetitor => c !== null));
+  const body = (await res.json()) as {
+    data?: { posts?: { edges?: { node?: PhNode }[] } };
+  };
+  const nodes = (body.data?.posts?.edges ?? []).map((e) => e.node).filter((n): n is PhNode => !!n);
+  return nodes.map(toCompetitor).filter((c): c is RawCompetitor => c !== null);
+}
+
+export async function fetchProductHunt(
+  params: ScoutParams,
+  token: string | undefined,
+): Promise<RawCompetitor[]> {
+  if (!token) return [];
+  const source = params.categories?.length ? params.categories : params.keywords;
+  const slugs = Array.from(new Set(source.map(toTopicSlug).filter(Boolean))).slice(0, MAX_TOPICS);
+  if (slugs.length === 0) return [];
+
+  const first = Math.min(50, params.limitPerSource ?? 15);
+  const perTopic = await Promise.all(slugs.map((slug) => fetchTopic(slug, first, token)));
+  return dedupeById(perTopic.flat());
 }

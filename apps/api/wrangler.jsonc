@@ -12,7 +12,7 @@
 
   "vars": {
     "APP_ENV": "production",
-    "SURFACE_BASE_URL": "https://hahaton-web.pages.dev"
+    "SURFACE_BASE_URL": "https://hahaton-web.phasekit.workers.dev"
   },
 
   "d1_databases": [
@@ -36,7 +36,7 @@
     "prod": {
       "vars": {
         "APP_ENV": "production",
-        "SURFACE_BASE_URL": "https://hahaton-web.pages.dev",
+        "SURFACE_BASE_URL": "https://hahaton-web.phasekit.workers.dev",
         "LLM_GATEWAY_BASE_URL": "REPLACE_WITH_LITELLM_PROXY_URL"
       },
       "d1_databases": [
