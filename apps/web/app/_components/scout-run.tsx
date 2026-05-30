@@ -404,28 +404,28 @@ function SourceTable({ source, items }: { source: string; items: Competitor[] })
                         />
                       )}
                       <div className="flex min-w-0 flex-col gap-0.5">
-                      {c.url ? (
-                        <a
-                          href={c.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-medium underline-offset-2 hover:underline"
-                        >
-                          {c.name}
-                        </a>
-                      ) : (
-                        <span className="font-medium">{c.name}</span>
-                      )}
-                      <span className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
-                        {c.developer && <span>{c.developer}</span>}
-                        <span>{c.rating > 0 ? `★ ${c.rating.toFixed(1)}` : "★ N/A"}</span>
-                        <span>
-                          {c.reviewCount > 0
-                            ? `${c.reviewCount.toLocaleString()} відгуків`
-                            : "Відгуки: N/A"}
+                        {c.url ? (
+                          <a
+                            href={c.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium underline-offset-2 hover:underline"
+                          >
+                            {c.name}
+                          </a>
+                        ) : (
+                          <span className="font-medium">{c.name}</span>
+                        )}
+                        <span className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+                          {c.developer && <span>{c.developer}</span>}
+                          <span>{c.rating > 0 ? `★ ${c.rating.toFixed(1)}` : "★ N/A"}</span>
+                          <span>
+                            {c.reviewCount > 0
+                              ? `${c.reviewCount.toLocaleString()} відгуків`
+                              : "Відгуки: N/A"}
+                          </span>
+                          {c.price && <span>{c.price}</span>}
                         </span>
-                        {c.price && <span>{c.price}</span>}
-                      </span>
                       </div>
                     </div>
                   </td>
