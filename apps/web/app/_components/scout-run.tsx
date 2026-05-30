@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { apiUrl } from "../_lib/api";
 import { ValidationSection } from "../runs/[id]/_components/validation-section";
 import { Game2048 } from "./game-2048";
+import { MarketDataMock } from "./market-data-mock";
 import { randomMockRun } from "./mock-run";
 import { PlatformPie } from "./platform-pie";
 import { ReportBody } from "./report-body";
@@ -537,6 +538,9 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
           hint="Multi-LLM панель оцінює ідею: Скептик · Адвокат · Аналітик."
         />
       )}
+
+      {/* Market & revenue data (mock until paid market-intel APIs are connected). */}
+      {phase.kind === "done" && <MarketDataMock competitors={phase.competitors} />}
     </div>
   );
 }
