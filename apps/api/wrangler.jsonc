@@ -18,8 +18,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "hahaton-prod",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_name": "hahaton",
+      "database_id": "2bf49a4c-5ded-4ad6-ad79-e10513933e7a",
       "migrations_dir": "../../packages/db/migrations"
     }
   ],
@@ -35,8 +35,8 @@
       "d1_databases": [
         {
           "binding": "DB",
-          "database_name": "hahaton-prod",
-          "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+          "database_name": "hahaton",
+          "database_id": "2bf49a4c-5ded-4ad6-ad79-e10513933e7a",
           "migrations_dir": "../../packages/db/migrations"
         }
       ]
