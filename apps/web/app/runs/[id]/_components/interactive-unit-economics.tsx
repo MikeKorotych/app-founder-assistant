@@ -180,14 +180,6 @@ export function InteractiveUnitEconomics({
           <Metric label="Місячний burn" value={fmtNumber(derived.monthlyBurn)} />
         </div>
       </div>
-
-      {derived.warnings.length > 0 && (
-        <ul className="space-y-1 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-          {derived.warnings.map((w, i) => (
-            <li key={i}>⚠ {w}</li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }

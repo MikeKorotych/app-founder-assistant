@@ -101,7 +101,7 @@ export function Game2048() {
       // spawn a new tile in an empty cell
       const empty: [number, number][] = [];
       for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (!grid[r][c]) empty.push([r, c]);
-      const next = [...live];
+      const next: Tile[] = [...live];
       if (empty.length) {
         const [sr, sc] = empty[Math.floor(Math.random() * empty.length)];
         const tile: Tile = { id: nid(), value: Math.random() < 0.9 ? 2 : 4, r: sr, c: sc, spawn: true };
