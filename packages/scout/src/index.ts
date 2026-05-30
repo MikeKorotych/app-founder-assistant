@@ -14,7 +14,7 @@ import { fetchAlternativeTo } from "./sources/alternativeto.js";
 import { fetchGooglePlay } from "./sources/googleplay.js";
 import { fetchItunes } from "./sources/itunes.js";
 import { fetchProductHunt } from "./sources/producthunt.js";
-import type { ScoutParams, ScoutSummary } from "./types.js";
+import type { RawCompetitor, ScoutParams, ScoutSummary } from "./types.js";
 
 export { dedupeById } from "./normalize.js";
 export { listCompetitors, persistCompetitors } from "./persist.js";
@@ -50,12 +50,18 @@ export async function runScout(
   params: ScoutParams,
 ): Promise<ScoutSummary> {
   const country = params.country ?? "us";
-  const settled = await Promise.allSettled([
-    fetchItunes(params, country),
-    fetchGooglePlay(params, deps.searchApiKey, country),
-    fetchProductHunt(params, deps.productHuntToken),
-    fetchAlternativeTo(params),
-  ]);
+  const sources: [string, Promise<RawCompetitor[]>][] = [
+    ["itunes", fetchItunes(params, country)],
+    ["googleplay", fetchGooglePlay(params, deps.searchApiKey, country)],
+    ["producthunt", fetchProductHunt(params, deps.productHuntToken)],
+    ["alternativeto", fetchAlternativeTo(params)],
+  ];
+  const settled = await Promise.allSettled(sources.map(([, p]) => p));
+  const warnings = settled.flatMap((r, i) =>
+    r.status === "rejected"
+      ? [`${sources[i][0]}: ${r.reason instanceof Error ? r.reason.message : String(r.reason)}`]
+      : [],
+  );
   const candidates = dedupeById(settled.flatMap((r) => (r.status === "fulfilled" ? r.value : [])));
   const scored = await rankCompetitors(deps.llm, params, candidates);
   await persistCompetitors(deps.db, runId, scored);
@@ -64,5 +70,6 @@ export async function runScout(
     discovered: candidates.length,
     ranked: scored.length,
     topCompetitorId: scored[0]?.id,
+    warnings,
   };
 }

@@ -25,29 +25,51 @@ const SOURCE_RETRY = {
   timeout: "30 seconds" as const,
 };
 
+/** A source's outcome: its competitors, plus a warning if it gave up. */
+interface SourceResult {
+  items: RawCompetitor[];
+  warning?: string;
+}
+
+/**
+ * Run one source as a retried step and contain its failure. After the retry
+ * limit is exhausted the step throws — we catch it here so a single dead source
+ * (e.g. AlternativeTo 403) degrades to an empty result + a warning instead of
+ * failing the whole run. Sources that succeed are unaffected.
+ */
+async function runSource(
+  step: WorkflowStep,
+  name: string,
+  fetcher: () => Promise<RawCompetitor[]>,
+): Promise<SourceResult> {
+  try {
+    const items = await step.do(`fetch:${name}`, SOURCE_RETRY, fetcher);
+    return { items };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn(`scout: source "${name}" failed after retries — ${message}`);
+    return { items: [], warning: `${name}: ${message}` };
+  }
+}
+
 export class CompetitorDiscoveryWorkflow extends WorkflowEntrypoint<Bindings, ScoutParams> {
   async run(event: WorkflowEvent<ScoutParams>, step: WorkflowStep): Promise<ScoutSummary> {
     const params = event.payload;
     const country = params.country ?? "us";
 
-    // Fan-out: four isolated, independently-retried source steps.
-    const [itunes, googleplay, producthunt, alternativeto] = await Promise.all([
-      step.do("fetch:itunes", SOURCE_RETRY, () => fetchItunes(params, country)),
-      step.do("fetch:googleplay", SOURCE_RETRY, () =>
+    // Fan-out: four isolated, independently-retried source steps. A source that
+    // exhausts its retries contributes [] + a warning rather than aborting the run.
+    const results = await Promise.all([
+      runSource(step, "itunes", () => fetchItunes(params, country)),
+      runSource(step, "googleplay", () =>
         fetchGooglePlay(params, this.env.GOOGLE_SEARCH_API_KEY, country),
       ),
-      step.do("fetch:producthunt", SOURCE_RETRY, () =>
-        fetchProductHunt(params, this.env.PRODUCTHUNT_TOKEN),
-      ),
-      step.do("fetch:alternativeto", SOURCE_RETRY, () => fetchAlternativeTo(params)),
+      runSource(step, "producthunt", () => fetchProductHunt(params, this.env.PRODUCTHUNT_TOKEN)),
+      runSource(step, "alternativeto", () => fetchAlternativeTo(params)),
     ]);
 
-    const candidates: RawCompetitor[] = dedupeById([
-      ...itunes,
-      ...googleplay,
-      ...producthunt,
-      ...alternativeto,
-    ]);
+    const warnings = results.map((r) => r.warning).filter((w): w is string => w !== undefined);
+    const candidates: RawCompetitor[] = dedupeById(results.flatMap((r) => r.items));
 
     // Rank by compatibility with the idea (LLM), then persist (D1 upsert).
     const scored = await step.do(
@@ -65,6 +87,7 @@ export class CompetitorDiscoveryWorkflow extends WorkflowEntrypoint<Bindings, Sc
       discovered: candidates.length,
       ranked: scored.length,
       topCompetitorId: scored[0]?.id,
+      warnings,
     };
   }
 }

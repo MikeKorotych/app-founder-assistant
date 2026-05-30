@@ -58,4 +58,10 @@ export interface ScoutSummary {
   discovered: number;
   ranked: number;
   topCompetitorId?: string;
+  /**
+   * One entry per source that failed after exhausting its retries. The run
+   * still completes on the surviving sources — these are surfaced so the
+   * caller knows the result set is partial. Empty when every source succeeded.
+   */
+  warnings: string[];
 }
