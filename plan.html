@@ -370,6 +370,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"13:00", "author":"Mykhailo", "workstream":"C", "summary":"C1 → done (we don't run a review step). 🔨 claimed C2/C4/C5 in parallel — input form + static report-section shells (driven by @hahaton/contracts Run shape) + interactive unit-economics sliders calling /unit-economics; will iterate visuals on the running UI.", "commit":"—" },
   { "date":"2026-05-30", "time":"12:45", "author":"Anton", "workstream":"A", "summary":"Scout plan: drop Firecrawl as a source/fallback — Scout queries structured source APIs only (HN + iTunes + Reddit no-auth). Sources without a usable keyword API (AlternativeTo, Indiegogo) are skipped, never scraped. Updated A15 roadmap title.", "commit":"—" },
   { "date":"2026-05-30", "time":"12:40", "author":"Mykhailo", "workstream":"C", "summary":"C1: ported funnel-analyzer design system into packages/ui (@hahaton/ui) — shadcn primitives + theme (Tailwind v4 'caffeine') + StatusPill/Badge + AppBackground + EmotionArcChart; relative imports, no app collision. Drops into the OpenNext apps/web shell (see README).", "commit":"—" },
   { "date":"2026-05-30", "time":"12:30", "author":"Anton", "workstream":"A", "summary":"Add packages/scout/PLAN.md — spec for the Scout sub-agent (fan-out → fan-in → fan-out): plan sources from the frozen @hahaton/integrations registry, build concrete HTTP requests, query sources in parallel (Firecrawl fallback), aggregate, then LLM per-source reports. Researched live no-auth APIs (HN Algolia, iTunes, Reddit) + Firecrawl. Added roadmap A13–A17.", "commit":"6578056" },
@@ -423,11 +424,11 @@
   { "id":"B4", "group":"B", "title_uk":"Роздача статики UI + plan.html", "title_en":"Serve static UI + plan.html", "owner":"—", "status":"todo" },
   { "id":"B5", "group":"B", "title_uk":"Spend cap, бюджети по кроках, обробка помилок", "title_en":"Spend cap, per-step budgets, error handling", "owner":"—", "status":"todo" },
 
-  { "id":"C1", "group":"C", "title_uk":"Вибір UI-стека + скафолд apps/web (Next.js + shadcn)", "title_en":"Pick UI stack + scaffold apps/web (Next.js + shadcn)", "owner":"Mykhailo", "status":"review" },
-  { "id":"C2", "group":"C", "title_uk":"Форма вводу (ідея + регіон + бюджет)", "title_en":"Input form (idea + region + budget)", "owner":"—", "status":"todo" },
+  { "id":"C1", "group":"C", "title_uk":"Вибір UI-стека + скафолд apps/web (Next.js + shadcn)", "title_en":"Pick UI stack + scaffold apps/web (Next.js + shadcn)", "owner":"Mykhailo", "status":"done" },
+  { "id":"C2", "group":"C", "title_uk":"Форма вводу (ідея + регіон + бюджет)", "title_en":"Input form (idea + region + budget)", "owner":"Mykhailo", "status":"in-progress" },
   { "id":"C3", "group":"C", "title_uk":"Живий research-timeline (SSE)", "title_en":"Live research timeline (SSE)", "owner":"—", "status":"todo" },
-  { "id":"C4", "group":"C", "title_uk":"Секції звіту (ринок/конкуренти/canvas/GTM/ризики/синтез)", "title_en":"Report sections (market/competitors/canvas/GTM/risks/synthesis)", "owner":"—", "status":"todo" },
-  { "id":"C5", "group":"C", "title_uk":"Інтерактивна юніт-економіка (слайдери → перерахунок)", "title_en":"Interactive unit economics (sliders → recompute)", "owner":"—", "status":"todo" },
+  { "id":"C4", "group":"C", "title_uk":"Секції звіту (ринок/конкуренти/canvas/GTM/ризики/синтез)", "title_en":"Report sections (market/competitors/canvas/GTM/risks/synthesis)", "owner":"Mykhailo", "status":"in-progress" },
+  { "id":"C5", "group":"C", "title_uk":"Інтерактивна юніт-економіка (слайдери → перерахунок)", "title_en":"Interactive unit economics (sliders → recompute)", "owner":"Mykhailo", "status":"in-progress" },
   { "id":"C6", "group":"C", "title_uk":"Scorecard валідації (4×25 + gaps + панель)", "title_en":"Validation scorecard (4×25 + gaps + panel)", "owner":"—", "status":"todo" },
   { "id":"C7", "group":"C", "title_uk":"Цитати (inline + sources appendix)", "title_en":"Citations (inline + sources appendix)", "owner":"—", "status":"todo" },
   { "id":"C8", "group":"C", "title_uk":"Полірування — монохром/Linear", "title_en":"Polish — monochrome/Linear style", "owner":"—", "status":"todo" },
