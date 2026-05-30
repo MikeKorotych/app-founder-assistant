@@ -151,6 +151,24 @@
   .rm-task[data-s="done"] .tt{color:var(--faint); text-decoration:line-through; text-decoration-color:var(--dim)}
   @media(max-width:620px){ .rm-task{flex-wrap:wrap; gap:7px} .rm-task .tt{flex-basis:100%; order:3} }
 
+  /* flow — node diagram */
+  .flow{display:flex; flex-direction:column; align-items:center; margin:8px 0 4px}
+  .fnode{width:100%; max-width:600px; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px 16px}
+  .fnode .fn{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+  .fnode .ft{font-size:14.5px; font-weight:600; letter-spacing:-0.01em; margin-top:3px}
+  .fnode .fd{font-size:12.5px; color:var(--muted); margin-top:5px; line-height:1.5}
+  .fchips{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+  .fchip{font-size:11px; color:var(--mono); border:1px solid var(--border); border-radius:6px; padding:2px 8px;
+    font-family:"SF Mono",ui-monospace,monospace}
+  .fside{font-size:11.5px; color:var(--faint); margin-top:10px; border-top:1px dashed var(--border-soft); padding-top:8px; line-height:1.5}
+  .fconn{width:1px; height:24px; background:var(--border); position:relative}
+  .fconn::after{content:""; position:absolute; left:-3.5px; bottom:1px; width:7px; height:7px;
+    border-right:1px solid var(--muted); border-bottom:1px solid var(--muted); transform:rotate(45deg)}
+  .flow-steps dt{font-weight:600; color:var(--text); font-size:13.5px; margin-top:13px}
+  .flow-steps dt code{color:var(--mono)}
+  .flow-steps dd{margin:3px 0 0; color:var(--muted); font-size:12.5px; line-height:1.55}
+  .flow-ol{margin:0; padding-left:20px} .flow-ol li{margin:7px 0; color:#d3d4d7; line-height:1.55}
+
   /* progress timeline */
   .log{position:relative; margin-top:6px; padding-left:22px}
   .log::before{content:""; position:absolute; left:4px; top:6px; bottom:6px; width:1px; background:var(--border)}
@@ -220,6 +238,7 @@
     <button class="tab" data-tab="status" data-i18n="toc_status"></button>
     <button class="tab" data-tab="roadmap" data-i18n="toc_roadmap"></button>
     <button class="tab" data-tab="concept" data-i18n="toc_concept"></button>
+    <button class="tab" data-tab="flow" data-i18n="toc_flow"></button>
     <button class="tab" data-tab="validation" data-i18n="toc_validation"></button>
     <button class="tab" data-tab="pipeline" data-i18n="toc_pipeline"></button>
     <button class="tab" data-tab="demo" data-i18n="toc_demo"></button>
@@ -257,6 +276,43 @@
     <div class="pillar"><span class="idx">02</span><div><b data-i18n="pillar2_t"></b><span class="sub" data-i18n="pillar2_d"></span></div></div>
     <div class="pillar"><span class="idx">03</span><div><b data-i18n="pillar3_t"></b><span class="sub" data-i18n="pillar3_d"></span></div></div>
     <div class="pillar"><span class="idx">04</span><div><b data-i18n="pillar4_t"></b><span class="sub" data-i18n="pillar4_d"></span></div></div>
+  </section>
+
+  <!-- ===================== FLOW ===================== -->
+  <section id="flow" data-panel="flow">
+    <p class="label" data-i18n="flow_label"></p>
+    <h2 data-i18n="flow_h"></h2>
+    <p class="sub" data-i18n="flow_sub"></p>
+
+    <div class="flow">
+      <div class="fnode"><span class="fn">1 · Input</span><div class="ft" data-i18n="flow_input_t"></div><div class="fd" data-i18n="flow_input_d"></div></div>
+      <div class="fconn"></div>
+      <div class="fnode">
+        <span class="fn">2 · Orchestrator · DAG</span>
+        <div class="ft" data-i18n="flow_orch_t"></div>
+        <div class="fd" data-i18n="flow_orch_d"></div>
+        <div class="fchips">
+          <span class="fchip">brief</span><span class="fchip">market</span><span class="fchip">competitors</span>
+          <span class="fchip">canvas</span><span class="fchip">gtm</span><span class="fchip">unitEconomics</span>
+          <span class="fchip">risks</span><span class="fchip">synthesis</span><span class="fchip">validation</span>
+        </div>
+        <div class="fside" data-i18n="flow_orch_side"></div>
+      </div>
+      <div class="fconn"></div>
+      <div class="fnode"><span class="fn">3 · Validation panel</span><div class="ft" data-i18n="flow_val_t"></div><div class="fd" data-i18n="flow_val_d"></div></div>
+      <div class="fconn"></div>
+      <div class="fnode"><span class="fn">4 · Persist</span><div class="ft" data-i18n="flow_persist_t"></div><div class="fd" data-i18n="flow_persist_d"></div></div>
+      <div class="fconn"></div>
+      <div class="fnode"><span class="fn">5 · Report UI</span><div class="ft" data-i18n="flow_report_t"></div><div class="fd" data-i18n="flow_report_d"></div></div>
+      <div class="fconn"></div>
+      <div class="fnode"><span class="fn">6 · Export</span><div class="ft" data-i18n="flow_export_t"></div><div class="fd" data-i18n="flow_export_d"></div></div>
+    </div>
+
+    <h3 data-i18n="flow_steps_h"></h3>
+    <dl class="flow-steps" data-i18n="flow_steps_body"></dl>
+
+    <h3 data-i18n="flow_textual_h"></h3>
+    <div data-i18n="flow_textual_body"></div>
   </section>
 
   <!-- ===================== VALIDATION ===================== -->
@@ -420,6 +476,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"16:00", "author":"Mykhailo", "workstream":"—", "summary":"plan.html: new Flow tab — bilingual node diagram of the whole pipeline (Input → Orchestrator DAG[9 steps] → Validation panel → Persist/D1 → Report → Export, with LLM gateway + grounding/Scout side-notes), a what/why per step, and a textual step-by-step flow. Pure-CSS nodes, no external libs; JS/JSON validated.", "commit":"—" },
   { "date":"2026-05-30", "time":"14:53", "author":"Anton", "workstream":"A", "summary":"✅ A15 (PH fix): Product Hunt now queries posts(topic: $slug, order: VOTES) per category — slugified + aliased (e.g. Health & Fitness → health-and-fitness), capped at 6 topics, falls back to slugified keywords when no categories. Drops the broken global top-VOTES batch + local substring filter that made niche keywords always return empty. HTTP errors throw (step retries); unknown topics degrade to empty. +4 fetchProductHunt tests (stubbed fetch); scout 8/8, typecheck + biome clean.", "commit":"—" },
   { "date":"2026-05-30", "time":"14:49", "author":"Anton", "workstream":"A", "summary":"🔨 started A15 (PH fix): Product Hunt always returned empty — it pulled a global top-VOTES batch and substring-filtered locally, so niche keywords never matched. Reworking producthunt.ts to query posts(topic: $slug, order: VOTES) per mapped category/topic slug.", "commit":"—" },
   { "date":"2026-05-30", "time":"15:45", "author":"Mykhailo", "workstream":"C", "summary":"Fix report page: server-side fetch defaulted to http://localhost:3000 (nothing there) → every /runs/:id 500'd locally. Changed default to :8787 (matches next.config API_URL). /runs/golden-dogfood now renders 200 with the full report (verified: brief/market/competitors/canvas/gtm/UE/risks/synthesis/validation + citations).", "commit":"—" },
@@ -524,7 +581,27 @@
       pill_priority:"Пріоритет <b>бізнес-цінність + чисте демо</b>", pill_stack:"Стек <b>Express · Claude API · Cloudflare</b>",
       toc_status:"Статус", toc_progress:"Прогрес", toc_concept:"Концепція", toc_validation:"Валідація",
       toc_pipeline:"Пайплайн", toc_demo:"Демо", toc_risks:"Ризики", toc_stack:"Стек", toc_sources:"Джерела",
-      toc_roadmap:"Roadmap", toc_integrations:"Інтеграції",
+      toc_roadmap:"Roadmap", toc_integrations:"Інтеграції", toc_flow:"Flow",
+      flow_label:"Наскрізний флоу",
+      flow_h:"Як агент перетворює ідею на валідований план",
+      flow_sub:"Один оркестрований прогін: 9 grounded-кроків → оцінка Multi-LLM панелі → збережений, реплеїбельний звіт.",
+      flow_input_t:"💡 Ідея (одне речення)",
+      flow_input_d:"Користувач надсилає ідею (або «Suggest an idea»). POST /pipeline (чи /agent/stream для live-подій).",
+      flow_orch_t:"⚙️ Оркестратор проганяє DAG із 9 кроків",
+      flow_orch_d:"Кожен крок — типізований вихід; незалежні кроки йдуть паралельно; кожен крок стрімить SSE-подію для live-таймлайну.",
+      flow_orch_side:"Усі виклики моделей — через LLM-gateway (LiteLLM). Grounding: web_search + Scout (iTunes / Google Play / Product Hunt / AlternativeTo) → Citations.",
+      flow_val_t:"⚖️ Multi-LLM панель валідації",
+      flow_val_d:"Скептик / Адвокат / Аналітик оцінюють 4 категорії ×25; Синтезатор усереднює → /100 і помічає розбіжності >5 балів як питання для CustDev.",
+      flow_persist_t:"💾 Збереження Run",
+      flow_persist_d:"Повний Run (усі секції + цитати + події) пишеться в D1 → миттєвий реплей через GET /runs/:id (страховка демо).",
+      flow_report_t:"📊 UI звіту",
+      flow_report_d:"/runs/:id рендерить усі секції + інтерактивну юніт-економіку (слайдери рахують локально) + scorecard валідації + inline-цитати.",
+      flow_export_t:"📄 Експорт",
+      flow_export_d:"PDF / дек інвесторського рівня з додатком джерел.",
+      flow_steps_h:"Що робить кожен крок і навіщо",
+      flow_steps_body:"<dt><code>1 · brief</code> — Sonnet</dt><dd>Нормалізує сиру ідею: проблема / клієнт / value prop / гео + дослідницькі питання для наступних кроків. Навіщо: чіткий бриф фокусує весь ресерч.</dd><dt><code>2 · market</code> — Opus + web_search</dt><dd>TAM/SAM/SOM з цитованими джерелами. Навіщо: доводить, що ринок реальний і достатній (Problem × Market).</dd><dt><code>3 · competitors</code> — Sonnet + Scout</dt><dd>4–8 реальних конкурентів через iTunes/Play/PH/AlternativeTo з джерелами. Навіщо: диференціація і хто вже має тягу (Solution × Differentiation).</dd><dt><code>4 · canvas</code> — Sonnet</dt><dd>Business Model Canvas, 9 блоків. Навіщо: перетворює ідею на зв'язну бізнес-модель.</dd><dt><code>5 · gtm</code> — Sonnet</dt><dd>Канали + план 30/60/90 + гіпотези. Навіщо: як беремо перших клієнтів (GTM × Traction).</dd><dt><code>6 · unitEconomics</code> — Opus</dt><dd>Редаговані припущення (Facts); математика — у computeUnitEconomics (чистий TS). Навіщо: чи сходиться математика — LTV/CAC, breakeven (Business Model × UE).</dd><dt><code>7 · risks</code> — Sonnet</dt><dd>Реєстр ризиків: ймовірність / вплив / мітигація. Навіщо: чесно про те, що може вбити проект.</dd><dt><code>8 · synthesis</code> — Opus</dt><dd>Executive summary + наратив + скелет дека. Навіщо: пакує все у пітч.</dd><dt><code>9 · validation</code> — Multi-LLM</dt><dd>Оцінює весь план із 3 перспектив → /100 + gaps. Навіщо: шар довіри + питання для CustDev перед пітчем.</dd>",
+      flow_textual_h:"Поетапний флоу",
+      flow_textual_body:"<ol class='flow-ol'><li>Користувач вводить ідею одним реченням на головній → надсилає.</li><li>Веб викликає API (POST /pipeline; або /agent/stream для live SSE-подій).</li><li>Оркестратор проганяє 9 типізованих кроків; виклики моделей — через gateway; grounded-кроки (market, competitors) звертаються до web_search + Scout і збирають Citations; кожна кількісна цифра — Fact з citationId або estimated:true.</li><li>Multi-LLM панель оцінює зібраний план → /100 + розбіжності (питання для CustDev).</li><li>Повний Run зберігається в D1 (реплей через /runs/:id).</li><li>UI звіту рендерить усі секції + інтерактивну юніт-економіку + scorecard + цитати.</li><li>Експорт у PDF/дек для пітчу.</li></ol>",
       int_label:"Стан інтеграцій зовнішніх API",
       int_sub:"Контракт існує у трьох формах: <code>generated</code> (авто з OpenAPI-URL), <code>handwritten</code> (рукописні типи з доків) і <code>local</code> (чекає на vendored-спеку). Звірено 2026-05-30 · 18 джерел.",
       int_ready_h:"✅ Готово — можна ковиряти API (10/18)",
@@ -604,7 +681,27 @@
       pill_priority:"Priority <b>business value + clean demo</b>", pill_stack:"Stack <b>Express · Claude API · Cloudflare</b>",
       toc_status:"Status", toc_progress:"Progress", toc_concept:"Concept", toc_validation:"Validation",
       toc_pipeline:"Pipeline", toc_demo:"Demo", toc_risks:"Risks", toc_stack:"Stack", toc_sources:"Sources",
-      toc_roadmap:"Roadmap", toc_integrations:"Integrations",
+      toc_roadmap:"Roadmap", toc_integrations:"Integrations", toc_flow:"Flow",
+      flow_label:"End-to-end flow",
+      flow_h:"How the agent turns an idea into a validated plan",
+      flow_sub:"One orchestrated run: 9 grounded steps → a Multi-LLM validation score → a persisted, replayable report.",
+      flow_input_t:"💡 Idea (one sentence)",
+      flow_input_d:"User submits an idea (or “Suggest an idea”). POST /pipeline (or /agent/stream for live events).",
+      flow_orch_t:"⚙️ Orchestrator runs the 9-step DAG",
+      flow_orch_d:"Each step is one typed output; independent steps run in parallel; every step streams an SSE event for the live timeline.",
+      flow_orch_side:"All model calls route through the LLM gateway (LiteLLM). Grounding: web_search + Scout (iTunes / Google Play / Product Hunt / AlternativeTo) → Citations.",
+      flow_val_t:"⚖️ Multi-LLM validation panel",
+      flow_val_d:"Skeptic / Advocate / Analyst each score 4 categories ×25; a Synthesizer averages → /100 and flags >5-pt disagreements as CustDev questions.",
+      flow_persist_t:"💾 Persist the Run",
+      flow_persist_d:"The full Run (all sections + citations + events) is saved to D1 → instant replay via GET /runs/:id (demo safety net).",
+      flow_report_t:"📊 Report UI",
+      flow_report_d:"/runs/:id renders all sections + interactive unit economics (sliders recompute locally) + the validation scorecard + inline citations.",
+      flow_export_t:"📄 Export",
+      flow_export_d:"Investor-grade PDF / deck with a sources appendix.",
+      flow_steps_h:"What each step does & why",
+      flow_steps_body:"<dt><code>1 · brief</code> — Sonnet</dt><dd>Normalize the raw idea: problem / customer / value prop / geography + the research questions later steps must answer. Why: a sharp brief focuses all grounding.</dd><dt><code>2 · market</code> — Opus + web_search</dt><dd>TAM/SAM/SOM with cited sources. Why: proves the market is real and big enough (Problem × Market).</dd><dt><code>3 · competitors</code> — Sonnet + Scout</dt><dd>4–8 real competitors via iTunes/Play/PH/AlternativeTo with sources. Why: differentiation and who already has traction (Solution × Differentiation).</dd><dt><code>4 · canvas</code> — Sonnet</dt><dd>Business Model Canvas, 9 blocks. Why: turns the idea into a coherent business model.</dd><dt><code>5 · gtm</code> — Sonnet</dt><dd>Channels + 30/60/90 plan + hypotheses. Why: how we get the first customers (GTM × Traction).</dd><dt><code>6 · unitEconomics</code> — Opus</dt><dd>Editable assumptions (Facts); math lives in computeUnitEconomics (pure TS). Why: does the math work — LTV/CAC, breakeven (Business Model × UE).</dd><dt><code>7 · risks</code> — Sonnet</dt><dd>Risk register: likelihood / impact / mitigation. Why: honest about what can kill it.</dd><dt><code>8 · synthesis</code> — Opus</dt><dd>Executive summary + narrative + deck outline. Why: packages everything into a pitch.</dd><dt><code>9 · validation</code> — Multi-LLM</dt><dd>Scores the whole plan from 3 perspectives → /100 + gaps. Why: the credibility layer + CustDev questions before pitching.</dd>",
+      flow_textual_h:"Step-by-step flow",
+      flow_textual_body:"<ol class='flow-ol'><li>User enters a one-sentence idea on the home page → submits.</li><li>Web calls the API (POST /pipeline; or /agent/stream for live SSE events).</li><li>The orchestrator runs the 9 typed steps; model calls go through the gateway; grounded steps (market, competitors) call web_search + Scout and collect Citations; every quantitative figure is a Fact with citationId or estimated:true.</li><li>The Multi-LLM panel scores the assembled plan → /100 + disagreements (CustDev questions).</li><li>The full Run is persisted to D1 (replayable via /runs/:id).</li><li>The report UI renders all sections + interactive unit economics + scorecard + citations.</li><li>Export to PDF/deck for the pitch.</li></ol>",
       int_label:"External API integration status",
       int_sub:"A contract exists in three forms: <code>generated</code> (auto from an OpenAPI URL), <code>handwritten</code> (hand types from docs) and <code>local</code> (awaiting a vendored spec). Reconciled 2026-05-30 · 18 sources.",
       int_ready_h:"✅ Ready — you can hit the API (10/18)",
