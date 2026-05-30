@@ -7,9 +7,9 @@ import { EmptyState, SectionShell } from "./section-shell";
 
 const CATEGORY_LABELS: Record<keyof ValidationScore, string> = {
   problemMarket: "Проблема × Ринок",
-  solutionDiff: "Рішення × Диф.",
-  businessModel: "Модель × Юніт-ек.",
-  gtmTraction: "GTM × Тяга",
+  solutionDiff: "Рішення × Диференціація",
+  businessModel: "Бізнес-модель × Юніт-ек.",
+  gtmTraction: "GTM × Перші клієнти",
 };
 
 const PERSONA_META: Record<
