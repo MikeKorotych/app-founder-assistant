@@ -2,7 +2,6 @@
 
 import type { AgentEvent, Run } from "@hahaton/contracts";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@hahaton/ui";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Game2048 } from "./game-2048";
@@ -12,8 +11,32 @@ import { MOCK_RUN } from "./mock-run";
 import { ReportBody } from "./report-body";
 
 const LIVE_EVENTS = [
-  "run_started", "step_started", "tool_call", "source_found", "step_completed", "run_completed", "error",
+  "run_started",
+  "step_started",
+  "tool_call",
+  "source_found",
+  "step_completed",
+  "run_completed",
+  "error",
 ] as const;
+
+function RestartIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M3 12a9 9 0 1 0 3-6.7" />
+      <path d="M3 4v6h6" />
+    </svg>
+  );
+}
 
 /**
  * Drives the "analysing" view: tries the real SSE pipeline and, on ANY failure
@@ -103,16 +126,24 @@ export function RunStream({ idea, demo = false }: { idea: string; demo?: boolean
   if (report) {
     return (
       <div className="flex flex-1 flex-col gap-6">
-        <header className="flex flex-wrap items-baseline justify-between gap-3">
+        <header className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
               Звіт{mocked ? " · demo" : ""}
             </p>
             <p className="text-sm text-muted-foreground">{report.input.idea}</p>
           </div>
-          <Link href="/">
-            <Button variant="outline">Новий прогін</Button>
-          </Link>
+          <Button
+            aria-label="Новий прогін"
+            className="h-11 w-11 shrink-0 [&_svg]:size-5"
+            onClick={() => window.location.assign("/")}
+            size="icon"
+            title="Новий прогін"
+            type="button"
+            variant="outline"
+          >
+            <RestartIcon />
+          </Button>
         </header>
         <ReportBody run={report} />
       </div>

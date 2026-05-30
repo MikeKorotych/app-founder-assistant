@@ -21,6 +21,34 @@ const STATUS_LABEL: Record<Run["status"], string> = {
   failed: "Помилка",
 };
 
+function RestartIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M3 12a9 9 0 1 0 3-6.7" />
+      <path d="M3 4v6h6" />
+    </svg>
+  );
+}
+
+function NewRunLink() {
+  return (
+    <Button asChild className="h-11 w-11 shrink-0 [&_svg]:size-5" size="icon" variant="outline">
+      <Link aria-label="Новий прогін" href="/" title="Новий прогін">
+        <RestartIcon />
+      </Link>
+    </Button>
+  );
+}
+
 type State =
   | { kind: "loading" }
   | { kind: "missing" }
@@ -64,9 +92,7 @@ export function RunReport({ id }: { id: string }) {
     return (
       <div className="flex flex-col gap-4">
         <p className="text-sm text-muted-foreground">Прогін не знайдено.</p>
-        <Link href="/">
-          <Button variant="outline">Новий прогін</Button>
-        </Link>
+        <NewRunLink />
       </div>
     );
   }
@@ -77,7 +103,7 @@ export function RunReport({ id }: { id: string }) {
   const { run } = state;
   return (
     <main className="flex flex-1 flex-col gap-6">
-      <header className="flex flex-wrap items-baseline justify-between gap-3">
+      <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Прогін
@@ -88,9 +114,7 @@ export function RunReport({ id }: { id: string }) {
             <span className="text-foreground/85">{run.input.idea}</span>
           </p>
         </div>
-        <Link href="/">
-          <Button variant="outline">Новий прогін</Button>
-        </Link>
+        <NewRunLink />
       </header>
 
       <div className="flex flex-col gap-5">
