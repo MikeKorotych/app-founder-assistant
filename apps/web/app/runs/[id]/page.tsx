@@ -22,9 +22,9 @@ async function fetchRun(id: string): Promise<Run | null> {
 }
 
 const STATUS_LABEL: Record<Run["status"], string> = {
-  running: "Running",
-  completed: "Completed",
-  failed: "Failed",
+  running: "Виконується",
+  completed: "Завершено",
+  failed: "Помилка",
 };
 
 export default async function RunPage({ params }: { params: Promise<{ id: string }> }) {
@@ -37,16 +37,16 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
       <header className="flex flex-wrap items-baseline justify-between gap-3">
         <div className="space-y-1">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Run
+            Прогін
           </p>
           <h1 className="font-mono text-lg">{run.id}</h1>
           <p className="text-sm text-muted-foreground">
-            {STATUS_LABEL[run.status]} · idea:{" "}
+            {STATUS_LABEL[run.status]} · ідея:{" "}
             <span className="text-foreground/85">{run.input.idea}</span>
           </p>
         </div>
         <Link href="/">
-          <Button variant="outline">New run</Button>
+          <Button variant="outline">Новий прогін</Button>
         </Link>
       </header>
 

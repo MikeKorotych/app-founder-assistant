@@ -19,12 +19,12 @@ interface Field {
 // LTV:CAC and payback don't jump in big jagged steps.
 const FIELDS: Field[] = [
   { key: "arpu", label: "ARPU", min: 0, max: 500, step: 1, unit: "USD/mo" },
-  { key: "grossMarginPct", label: "Gross margin", min: 0, max: 100, step: 1, unit: "%" },
+  { key: "grossMarginPct", label: "Валова маржа", min: 0, max: 100, step: 1, unit: "%" },
   { key: "cac", label: "CAC", min: 0, max: 1000, step: 5, unit: "USD" },
-  { key: "monthlyChurnPct", label: "Monthly churn", min: 0, max: 30, step: 0.5, unit: "%" },
-  { key: "conversionPct", label: "Conversion", min: 0, max: 100, step: 0.5, unit: "%" },
-  { key: "fixedMonthlyCost", label: "Fixed cost / mo", min: 0, max: 50000, step: 100, unit: "USD" },
-  { key: "funnelVolume", label: "Funnel / mo", min: 0, max: 100000, step: 100, unit: "users" },
+  { key: "monthlyChurnPct", label: "Місячний churn", min: 0, max: 30, step: 0.5, unit: "%" },
+  { key: "conversionPct", label: "Конверсія", min: 0, max: 100, step: 0.5, unit: "%" },
+  { key: "fixedMonthlyCost", label: "Фікс. витрати / міс", min: 0, max: 50000, step: 100, unit: "USD" },
+  { key: "funnelVolume", label: "Воронка / міс", min: 0, max: 100000, step: 100, unit: "users" },
 ];
 
 const compactFmt = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
@@ -92,11 +92,11 @@ export function InteractiveUnitEconomics({
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h4 className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-          Assumptions {dirty && <span className="text-foreground">· modified</span>}
+          Припущення {dirty && <span className="text-foreground">· змінено</span>}
         </h4>
         {dirty && (
           <Button variant="outline" size="sm" onClick={() => setValues(original)}>
-            Reset to agent values
+            Скинути до значень агента
           </Button>
         )}
       </div>
@@ -156,7 +156,7 @@ export function InteractiveUnitEconomics({
 
       <div>
         <h4 className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-          Derived
+          Похідні
         </h4>
         <div className="grid gap-3 sm:grid-cols-3">
           <Metric label="LTV" value={fmtNumber(derived.ltv)} />
@@ -165,19 +165,19 @@ export function InteractiveUnitEconomics({
             value={Number.isFinite(derived.ltvCacRatio) ? derived.ltvCacRatio.toFixed(1) : "∞"}
           />
           <Metric
-            label="Payback"
+            label="Окупність"
             value={
               Number.isFinite(derived.paybackMonths)
-                ? `${derived.paybackMonths.toFixed(0)} mo`
+                ? `${derived.paybackMonths.toFixed(0)} міс`
                 : "∞"
             }
           />
           <Metric
-            label="Contribution / customer"
+            label="Внесок / клієнт"
             value={fmtNumber(derived.contributionPerCustomer)}
           />
-          <Metric label="Break-even customers" value={fmtNumber(derived.breakEvenCustomers)} />
-          <Metric label="Monthly burn" value={fmtNumber(derived.monthlyBurn)} />
+          <Metric label="Клієнтів до беззбитковості" value={fmtNumber(derived.breakEvenCustomers)} />
+          <Metric label="Місячний burn" value={fmtNumber(derived.monthlyBurn)} />
         </div>
       </div>
 

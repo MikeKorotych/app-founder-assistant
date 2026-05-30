@@ -34,17 +34,17 @@ export function GtmSection({ gtm }: { gtm: GtmPlan | undefined }) {
   return (
     <SectionShell
       step="5 · gtm"
-      title="Go-to-market"
-      description="Channels and the first 30 / 60 / 90 days of execution."
+      title="Вихід на ринок (GTM)"
+      description="Канали та перші 30 / 60 / 90 днів виконання."
     >
       {!gtm || !hasAny ? (
-        <EmptyState message="The GTM plan has not been generated yet." />
+        <EmptyState message="GTM-план ще не згенеровано." />
       ) : (
         <div className="flex flex-col gap-5">
           {gtm.channels.length > 0 && (
             <div>
               <h4 className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                Channels
+                Канали
               </h4>
               <div className="flex flex-wrap gap-1.5">
                 {gtm.channels.map((ch, i) => (
@@ -59,14 +59,14 @@ export function GtmSection({ gtm }: { gtm: GtmPlan | undefined }) {
             </div>
           )}
           <div className="grid gap-3 sm:grid-cols-3">
-            <PlanColumn title="Day 0–30" items={gtm.plan30} />
-            <PlanColumn title="Day 31–60" items={gtm.plan60} />
-            <PlanColumn title="Day 61–90" items={gtm.plan90} />
+            <PlanColumn title="День 0–30" items={gtm.plan30} />
+            <PlanColumn title="День 31–60" items={gtm.plan60} />
+            <PlanColumn title="День 61–90" items={gtm.plan90} />
           </div>
           {gtm.hypotheses.length > 0 && (
             <div>
               <h4 className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                Hypotheses to test
+                Гіпотези для перевірки
               </h4>
               <ul className="list-disc space-y-1 pl-5 text-sm">
                 {gtm.hypotheses.map((h, i) => (

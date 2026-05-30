@@ -6,10 +6,10 @@ import { EmptyState, SectionShell } from "./section-shell";
 // ---------------------------------------------------------------------------
 
 const CATEGORY_LABELS: Record<keyof ValidationScore, string> = {
-  problemMarket: "Problem × Market",
-  solutionDiff: "Solution × Diff.",
-  businessModel: "Biz Model × UE",
-  gtmTraction: "GTM × Traction",
+  problemMarket: "Проблема × Ринок",
+  solutionDiff: "Рішення × Диф.",
+  businessModel: "Модель × Юніт-ек.",
+  gtmTraction: "GTM × Тяга",
 };
 
 const PERSONA_META: Record<
@@ -17,19 +17,19 @@ const PERSONA_META: Record<
   { label: string; color: string; bg: string; border: string }
 > = {
   skeptic: {
-    label: "Skeptic investor",
+    label: "Скептик-інвестор",
     color: "text-red-500",
     bg: "bg-red-500/10",
     border: "border-red-500/30",
   },
   advocate: {
-    label: "Advocate",
+    label: "Адвокат",
     color: "text-teal-500",
     bg: "bg-teal-500/10",
     border: "border-teal-500/30",
   },
   analyst: {
-    label: "Neutral analyst",
+    label: "Нейтральний аналітик",
     color: "text-violet-500",
     bg: "bg-violet-500/10",
     border: "border-violet-500/30",
@@ -127,7 +127,7 @@ function ConsensusRow({
       <td className="px-3 py-2.5 text-center">
         {spread > 5 ? (
           <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-500">
-            ⚡ {spread} pts
+            ⚡ {spread} балів
           </span>
         ) : (
           <span className="text-[11px] text-muted-foreground">—</span>
@@ -147,7 +147,7 @@ function DisagreementsPanel({ result }: { result: ValidationResult }) {
   return (
     <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
       <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-amber-500">
-        ⚡ Key risks — close these before pitching
+        ⚡ Ключові ризики — закрий їх до пітчу
       </p>
       <ul className="flex flex-col gap-2.5">
         {result.disagreements.map((d) => (
@@ -173,10 +173,10 @@ export function ValidationSection({ validation }: { validation: ValidationResult
     return (
       <SectionShell
         step="9 · validation"
-        title="Multi-LLM validation panel"
-        description="Three AI personas score the idea across 4 categories (×25 → /100)."
+        title="Multi-LLM панель валідації"
+        description="Три AI-персони оцінюють ідею за 4 категоріями (×25 → /100)."
       >
-        <EmptyState message="Validation not available yet." />
+        <EmptyState message="Валідація поки недоступна." />
       </SectionShell>
     );
   }
@@ -186,16 +186,16 @@ export function ValidationSection({ validation }: { validation: ValidationResult
   return (
     <SectionShell
       step="9 · validation"
-      title="Multi-LLM validation panel"
-      description="Three AI personas independently score the idea. Where they disagree (spread > 5 pts) marks your biggest CustDev questions."
+      title="Multi-LLM панель валідації"
+      description="Три AI-персони незалежно оцінюють ідею. Там, де розкид > 5 балів — твої головні питання для CustDev."
     >
       <div className="flex flex-col gap-6">
         {/* Total score */}
         <div className="flex items-center gap-4">
           <span className="text-5xl font-black tabular-nums">{validation.totalScore}</span>
           <div className="flex flex-col">
-            <span className="text-sm text-muted-foreground">Consensus score</span>
-            <span className="text-xs text-muted-foreground">out of 100</span>
+            <span className="text-sm text-muted-foreground">Консенсус-оцінка</span>
+            <span className="text-xs text-muted-foreground">зі 100</span>
           </div>
         </div>
 
@@ -211,14 +211,14 @@ export function ValidationSection({ validation }: { validation: ValidationResult
           <table className="w-full text-sm">
             <thead className="bg-muted/30 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left font-medium">Category</th>
+                <th className="px-3 py-2 text-left font-medium">Категорія</th>
                 {validation.personas.map((p) => (
                   <th key={p.persona} className={`px-3 py-2 text-center font-medium ${PERSONA_META[p.persona].color}`}>
                     {PERSONA_META[p.persona].label.split(" ")[0]}
                   </th>
                 ))}
-                <th className="px-3 py-2 text-center font-medium">Avg</th>
-                <th className="px-3 py-2 text-center font-medium">Spread</th>
+                <th className="px-3 py-2 text-center font-medium">Сер.</th>
+                <th className="px-3 py-2 text-center font-medium">Розкид</th>
               </tr>
             </thead>
             <tbody>

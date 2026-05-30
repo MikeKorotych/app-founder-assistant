@@ -35,7 +35,7 @@ export function FactValue<T>({ fact, citations, size = "sm" }: Props<T>) {
         {display}
         {fact.estimated && (
           <span className="ml-2 rounded-full border border-border/60 bg-muted/50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground align-middle">
-            est.
+            оцінка
           </span>
         )}
       </div>

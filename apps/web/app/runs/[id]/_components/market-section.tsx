@@ -12,15 +12,15 @@ export function MarketSection({
   return (
     <SectionShell
       step="2 · market"
-      title="Market sizing"
-      description="TAM / SAM / SOM. Every figure is grounded in a source or explicitly flagged as an estimate."
+      title="Розмір ринку"
+      description="TAM / SAM / SOM. Кожна цифра підкріплена джерелом або явно позначена як оцінка."
     >
       {!market ? (
-        <EmptyState message="Market sizing has not been computed yet." />
+        <EmptyState message="Розмір ринку ще не обчислено." />
       ) : (
         <div className="flex flex-col gap-5">
           <span className="w-fit rounded-full border border-border/60 bg-muted/50 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-            Method · {market.method}
+            Метод · {market.method}
           </span>
           <div className="grid gap-6 sm:grid-cols-3">
             <div className="flex flex-col gap-1.5">

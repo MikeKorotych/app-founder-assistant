@@ -26,22 +26,22 @@ export function BriefSection({ brief }: { brief: StructuredBrief | undefined }) 
   return (
     <SectionShell
       step="1 · brief"
-      title="Structured brief"
-      description="The idea normalized into the questions the rest of the pipeline must answer."
+      title="Структурований бриф"
+      description="Ідея, зведена до питань, на які мають відповісти решта кроків пайплайна."
     >
       {!brief || !hasContent(brief) ? (
-        <EmptyState message="The agent has not produced a structured brief yet." />
+        <EmptyState message="Агент ще не сформував структурований бриф." />
       ) : (
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="Problem" value={brief.problem} />
-          <Field label="Customer" value={brief.customer} />
-          <Field label="Value proposition" value={brief.valueProp} />
-          <Field label="Geography" value={brief.geography} />
-          {brief.budget && <Field label="Budget" value={brief.budget} />}
+          <Field label="Проблема" value={brief.problem} />
+          <Field label="Клієнт" value={brief.customer} />
+          <Field label="Ціннісна пропозиція" value={brief.valueProp} />
+          <Field label="Географія" value={brief.geography} />
+          {brief.budget && <Field label="Бюджет" value={brief.budget} />}
           {brief.researchQuestions.length > 0 && (
             <div className="sm:col-span-2">
               <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                Research questions
+                Дослідницькі питання
               </span>
               <ol className="mt-1.5 list-decimal space-y-1 pl-5 text-sm">
                 {brief.researchQuestions.map((q, i) => (

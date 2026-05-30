@@ -14,7 +14,7 @@ export function SectionShell({ step, title, description, children }: Props) {
       <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <CardHeader className="gap-1.5">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Step · {step}
+            Крок · {step}
           </p>
           <CardTitle className="text-xl">{title}</CardTitle>
           {description && <p className="text-sm text-muted-foreground">{description}</p>}

@@ -7,14 +7,14 @@ import { useState } from "react";
 
 /** Sample ideas for the "Suggest an idea" button — specific & demo-friendly. */
 const SAMPLE_IDEAS = [
-  "A subscription that delivers vet-formulated fresh dog food to pet owners in Poland.",
-  "An AI co-pilot for indie iOS founders that drafts App Store keywords and creatives from a product description.",
-  "A meditation app for night-shift workers that adapts sessions to irregular sleep schedules.",
-  "A budgeting app for freelancers that automatically sets aside taxes from each invoice.",
-  "A B2B tool that turns customer-support tickets into a prioritized product backlog.",
-  "A language-learning app that teaches a language only through the lyrics of songs you like.",
-  "A marketplace connecting small cafes with local bakeries for same-day pastry supply.",
-  "An AI study buddy that turns lecture recordings into spaced-repetition flashcards.",
+  "Підписка на доставку ветеринарно-сформульованого свіжого корму для собак у Польщі.",
+  "AI-копілот для indie iOS-фаундерів, що генерує ключі та креативи для App Store з опису продукту.",
+  "Застосунок медитацій для працівників нічних змін, що адаптує сесії до нерегулярного сну.",
+  "Застосунок бюджетування для фрилансерів, що автоматично відкладає податки з кожного інвойсу.",
+  "B2B-інструмент, що перетворює тикети підтримки на пріоритезований продуктовий беклог.",
+  "Застосунок вивчення мови лише через тексти пісень, які тобі подобаються.",
+  "Маркетплейс, що з'єднує малі кав'ярні з локальними пекарнями для поставок випічки того ж дня.",
+  "AI-помічник для навчання, що перетворює записи лекцій на флешкартки з інтервальним повторенням.",
 ];
 
 type Status =
@@ -41,7 +41,7 @@ export function IdeaForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (idea.trim().length === 0) {
-      setStatus({ kind: "error", message: "Describe your idea in one sentence." });
+      setStatus({ kind: "error", message: "Опишіть свою ідею одним реченням." });
       return;
     }
 
@@ -69,27 +69,27 @@ export function IdeaForm() {
   return (
     <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <CardHeader>
-        <CardTitle>Describe your idea</CardTitle>
+        <CardTitle>Опишіть свою ідею</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="idea">Idea</Label>
+              <Label htmlFor="idea">Ідея</Label>
               <button
                 type="button"
                 onClick={suggestIdea}
                 disabled={submitting}
                 className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50"
               >
-                ✨ Suggest an idea
+                ✨ Запропонувати ідею
               </button>
             </div>
             <textarea
               id="idea"
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
-              placeholder="Your idea in one sentence — e.g. AI study buddy that turns lectures into flashcards"
+              placeholder="Ваша ідея одним реченням — напр. AI-помічник, що перетворює лекції на флешкартки"
               rows={4}
               className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               required
@@ -105,11 +105,11 @@ export function IdeaForm() {
 
           <div className="flex flex-col items-center gap-2">
             <Button type="submit" disabled={submitting}>
-              {submitting ? "Running pipeline…" : "Generate plan"}
+              {submitting ? "Виконується…" : "Згенерувати план"}
             </Button>
             {submitting && (
               <p className="text-sm text-muted-foreground">
-                The agent is running 8 steps. This can take ~60–90 seconds.
+                Агент виконує 9 кроків. Це може зайняти ~60–90 секунд.
               </p>
             )}
           </div>

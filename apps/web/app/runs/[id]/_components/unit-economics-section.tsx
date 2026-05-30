@@ -24,11 +24,11 @@ export function UnitEconomicsSection({
   return (
     <SectionShell
       step="6 · unit economics"
-      title="Unit economics"
-      description="LLM-produced assumptions; derived metrics computed deterministically. Drag any slider to stress-test the model."
+      title="Юніт-економіка"
+      description="Припущення від LLM; похідні метрики рахуються детерміновано. Тягни будь-який слайдер, щоб стрес-тестувати модель."
     >
       {!assumptions || isAssumptionsEmpty(assumptions) ? (
-        <EmptyState message="Unit-economics assumptions have not been produced yet." />
+        <EmptyState message="Припущення юніт-економіки ще не сформовано." />
       ) : (
         <InteractiveUnitEconomics assumptions={assumptions} citations={citations} />
       )}

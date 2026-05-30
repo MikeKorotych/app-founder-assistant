@@ -13,11 +13,11 @@ export function CompetitorsSection({
   return (
     <SectionShell
       step="3 · competitors"
-      title="Competitor scan"
-      description="Real companies in the space, sourced from web research."
+      title="Скан конкурентів"
+      description="Реальні компанії в ніші, знайдені через веб-ресерч."
     >
       {competitors.length === 0 ? (
-        <EmptyState message="No competitors surfaced yet." />
+        <EmptyState message="Конкурентів поки не знайдено." />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {competitors.map((c, i) => {
@@ -38,7 +38,7 @@ export function CompetitorsSection({
                       rel="noreferrer"
                       className="text-[11px] text-muted-foreground underline decoration-dotted underline-offset-2 hover:text-foreground"
                     >
-                      site ↗
+                      сайт ↗
                     </a>
                   )}
                 </div>
@@ -46,22 +46,22 @@ export function CompetitorsSection({
                 <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
                   {c.pricing && (
                     <>
-                      <dt className="text-muted-foreground">Pricing</dt>
+                      <dt className="text-muted-foreground">Ціни</dt>
                       <dd className="font-medium">
                         {String(c.pricing.value)}
                         {c.pricing.estimated && (
-                          <span className="ml-1 text-muted-foreground">(est.)</span>
+                          <span className="ml-1 text-muted-foreground">(оцінка)</span>
                         )}
                       </dd>
                     </>
                   )}
                   {c.funding && (
                     <>
-                      <dt className="text-muted-foreground">Funding</dt>
+                      <dt className="text-muted-foreground">Фінансування</dt>
                       <dd className="font-medium">
                         {String(c.funding.value)}
                         {c.funding.estimated && (
-                          <span className="ml-1 text-muted-foreground">(est.)</span>
+                          <span className="ml-1 text-muted-foreground">(оцінка)</span>
                         )}
                       </dd>
                     </>
@@ -74,7 +74,7 @@ export function CompetitorsSection({
                     rel="noreferrer"
                     className="text-[11px] text-muted-foreground underline decoration-dotted underline-offset-2 hover:text-foreground"
                   >
-                    source ↗
+                    джерело ↗
                   </a>
                 )}
               </div>

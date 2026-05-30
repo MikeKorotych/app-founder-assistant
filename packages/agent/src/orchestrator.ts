@@ -1,6 +1,7 @@
 import type { AgentEvent, Run, RunInput } from "@hahaton/contracts";
 import type { LlmProvider } from "@hahaton/llm";
 import { errorMeta } from "./error-meta";
+import { withOutputLanguage } from "./llm-language";
 import {
   briefStep,
   canvasStep,
@@ -56,7 +57,9 @@ export async function runPipeline(input: RunInput, opts: RunPipelineOptions): Pr
     onEvent(e);
   };
 
-  const ctx: StepContext = { run, llm, emit };
+  // Wrap so every step's LLM call asks for Ukrainian free-text output (scoped
+  // to the pipeline — search-intent/scout keep their original-language terms).
+  const ctx: StepContext = { run, llm: withOutputLanguage(llm), emit };
 
   emit({ type: "run_started", runId: run.id, input, at: nowIso() });
 

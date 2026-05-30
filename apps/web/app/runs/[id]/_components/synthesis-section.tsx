@@ -11,17 +11,17 @@ export function SynthesisSection({ synthesis }: { synthesis: PitchSynthesis | un
   return (
     <SectionShell
       step="8 · synthesis"
-      title="Pitch synthesis"
-      description="Executive summary, narrative, and a deck outline ready to present."
+      title="Синтез пітчу"
+      description="Короткий підсумок, наратив і структура дека, готові до презентації."
     >
       {!synthesis || !hasAny ? (
-        <EmptyState message="The pitch has not been synthesized yet." />
+        <EmptyState message="Пітч ще не синтезовано." />
       ) : (
         <div className="flex flex-col gap-6">
           {synthesis.executiveSummary.trim() !== "" && (
             <div>
               <h4 className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                Executive summary
+                Короткий підсумок
               </h4>
               <p className="text-base leading-relaxed">{synthesis.executiveSummary}</p>
             </div>
@@ -29,7 +29,7 @@ export function SynthesisSection({ synthesis }: { synthesis: PitchSynthesis | un
           {synthesis.narrative.trim() !== "" && (
             <div>
               <h4 className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                Narrative
+                Наратив
               </h4>
               <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/85">
                 {synthesis.narrative}
@@ -39,7 +39,7 @@ export function SynthesisSection({ synthesis }: { synthesis: PitchSynthesis | un
           {synthesis.deckOutline.length > 0 && (
             <div>
               <h4 className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                Deck outline
+                Структура дека
               </h4>
               <ol className="grid gap-3 sm:grid-cols-2">
                 {synthesis.deckOutline.map((slide, i) => (

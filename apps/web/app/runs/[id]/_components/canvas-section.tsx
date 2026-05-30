@@ -2,15 +2,15 @@ import type { BusinessModelCanvas } from "@hahaton/contracts";
 import { EmptyState, SectionShell } from "./section-shell";
 
 const BLOCKS: { key: keyof BusinessModelCanvas; label: string }[] = [
-  { key: "customerSegments", label: "Customer segments" },
-  { key: "valuePropositions", label: "Value propositions" },
-  { key: "channels", label: "Channels" },
-  { key: "customerRelationships", label: "Customer relationships" },
-  { key: "revenueStreams", label: "Revenue streams" },
-  { key: "keyResources", label: "Key resources" },
-  { key: "keyActivities", label: "Key activities" },
-  { key: "keyPartnerships", label: "Key partnerships" },
-  { key: "costStructure", label: "Cost structure" },
+  { key: "customerSegments", label: "Сегменти клієнтів" },
+  { key: "valuePropositions", label: "Ціннісні пропозиції" },
+  { key: "channels", label: "Канали" },
+  { key: "customerRelationships", label: "Стосунки з клієнтами" },
+  { key: "revenueStreams", label: "Потоки доходу" },
+  { key: "keyResources", label: "Ключові ресурси" },
+  { key: "keyActivities", label: "Ключові активності" },
+  { key: "keyPartnerships", label: "Ключові партнерства" },
+  { key: "costStructure", label: "Структура витрат" },
 ];
 
 export function CanvasSection({ canvas }: { canvas: BusinessModelCanvas | undefined }) {
@@ -19,11 +19,11 @@ export function CanvasSection({ canvas }: { canvas: BusinessModelCanvas | undefi
   return (
     <SectionShell
       step="4 · canvas"
-      title="Business model canvas"
-      description="Nine canvas blocks derived from the brief and market."
+      title="Бізнес-модель (Canvas)"
+      description="Дев'ять блоків canvas, виведених із брифу та ринку."
     >
       {!canvas || totalItems === 0 ? (
-        <EmptyState message="The canvas has not been generated yet." />
+        <EmptyState message="Canvas ще не згенеровано." />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {BLOCKS.map((b) => {
