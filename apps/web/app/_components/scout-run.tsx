@@ -274,7 +274,11 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
         </p>
       )}
 
-      {phase.kind === "done" && <CompetitorList competitors={phase.competitors} />}
+      {phase.kind === "done" && (
+        <div className="animate-enter">
+          <CompetitorList competitors={phase.competitors} />
+        </div>
+      )}
 
       {/* Validate step — chained automatically after Scout. */}
       {validation.kind === "running" && (
@@ -289,7 +293,11 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
         </p>
       )}
 
-      {validation.kind === "done" && <ValidationSection validation={validation.result} />}
+      {validation.kind === "done" && (
+        <div className="animate-enter">
+          <ValidationSection validation={validation.result} />
+        </div>
+      )}
 
       {onRestart && phase.kind === "done" && (
         <div className="flex justify-center pt-2">
@@ -311,7 +319,7 @@ function CompetitorList({ competitors }: { competitors: Competitor[] }) {
     );
   }
   return (
-    <div className="flex flex-col gap-3">
+    <div className="stagger-enter flex flex-col gap-3">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
         Конкуренти · {competitors.length}
       </p>
