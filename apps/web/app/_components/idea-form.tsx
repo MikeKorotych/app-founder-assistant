@@ -106,48 +106,64 @@ export function IdeaForm() {
   }
 
   return (
-    <Card className="animate-enter border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-      <CardContent className="pt-6">
-        <form onSubmit={onSubmit} className="flex flex-col gap-5">
-          <div className="relative">
-            <textarea
-              ref={textareaRef}
-              id="idea"
-              value={idea}
-              onChange={(e) => {
-                setIdea(e.target.value);
-                fitTextareaHeight(e.target);
-              }}
-              placeholder="Напр. AI-тренер англійської через голосові"
-              rows={1}
-              className="min-h-12 w-full resize-none overflow-hidden rounded-md border border-input bg-background px-3 py-3 pr-12 text-sm leading-6 shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              required
-            />
-            {idea.trim().length === 0 && (
-              <button
-                type="button"
-                onClick={suggestIdea}
-                aria-label="Запропонувати ідею"
-                className="absolute right-2 top-1.5 inline-flex h-9 w-9 items-center justify-center rounded-md text-base text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                ✨
-              </button>
-            )}
-          </div>
+    <div className="flex flex-col gap-10">
+      <header className="flex flex-col items-center space-y-3 text-center">
+        <p className="animate-enter text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          Хакатон 2026 · AI-співробітник
+        </p>
+        <h1 className="animate-enter animate-enter-delay-1 text-3xl font-semibold tracking-tight sm:text-4xl">
+          Від ідеї в одне речення — до обґрунтованого бізнес-плану.
+        </h1>
+        <p className="animate-enter animate-enter-delay-2 mx-auto max-w-2xl text-muted-foreground">
+          Розмір ринку, реальні конкуренти, Business Model Canvas, GTM, жива юніт-економіка, реєстр
+          ризиків і пітч — із цитатами. Готово за ~90 секунд.
+        </p>
+      </header>
+      <div className="animate-enter animate-enter-delay-3 mx-auto w-full max-w-3xl">
+        <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+          <CardContent className="pt-6">
+            <form onSubmit={onSubmit} className="flex flex-col gap-5">
+              <div className="relative">
+                <textarea
+                  ref={textareaRef}
+                  id="idea"
+                  value={idea}
+                  onChange={(e) => {
+                    setIdea(e.target.value);
+                    fitTextareaHeight(e.target);
+                  }}
+                  placeholder="Напр. AI-тренер англійської через голосові"
+                  rows={1}
+                  className="min-h-12 w-full resize-none overflow-hidden rounded-md border border-input bg-background px-3 py-3 pr-12 text-sm leading-6 shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  required
+                />
+                {idea.trim().length === 0 && (
+                  <button
+                    type="button"
+                    onClick={suggestIdea}
+                    aria-label="Запропонувати ідею"
+                    className="absolute right-2 top-1.5 inline-flex h-9 w-9 items-center justify-center rounded-md text-base text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    ✨
+                  </button>
+                )}
+              </div>
 
-          {error && (
-            <p className="text-sm text-destructive" role="alert">
-              {error}
-            </p>
-          )}
+              {error && (
+                <p className="text-sm text-destructive" role="alert">
+                  {error}
+                </p>
+              )}
 
-          <div className="flex flex-col items-center gap-2">
-            <RainbowButton type="submit" size="lg">
-              Згенерувати план
-            </RainbowButton>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+              <div className="flex flex-col items-center gap-2">
+                <RainbowButton type="submit" size="lg">
+                  Згенерувати план
+                </RainbowButton>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }
