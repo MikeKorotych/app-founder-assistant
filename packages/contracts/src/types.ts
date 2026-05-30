@@ -159,6 +159,52 @@ export interface PitchSynthesis {
 }
 
 // ---------------------------------------------------------------------------
+// Step 9 — Multi-LLM validation panel
+// ---------------------------------------------------------------------------
+
+/** Scores for one validation persona across 4 categories, each 0–25. */
+export interface ValidationScore {
+  /** Problem × Market: is the pain real? TAM/ICP confirmed? */
+  problemMarket: number;
+  /** Solution × Differentiation: unique? defensible? */
+  solutionDiff: number;
+  /** Business Model × Unit Economics: LTV/CAC viable? path to breakeven? */
+  businessModel: number;
+  /** GTM × First Traction: clear channel? early signals? */
+  gtmTraction: number;
+}
+
+export type ValidationPersona = "skeptic" | "advocate" | "analyst";
+
+export interface ValidationPersonaResult {
+  persona: ValidationPersona;
+  scores: ValidationScore;
+  /** Total out of 100 */
+  total: number;
+  /** Key reasoning per category — shown in UI alongside scores */
+  rationale: Record<keyof ValidationScore, string>;
+}
+
+export interface ValidationResult {
+  personas: ValidationPersonaResult[];
+  /** Averaged scores across all 3 personas */
+  consensus: ValidationScore;
+  /** Averaged total /100 */
+  totalScore: number;
+  /**
+   * Categories where spread between persona scores > 5 pts.
+   * These are flagged as key risks / CustDev questions.
+   */
+  disagreements: Array<{
+    category: keyof ValidationScore;
+    min: number;
+    max: number;
+    /** Concrete CustDev question to answer before pitching */
+    custDevQuestion: string;
+  }>;
+}
+
+// ---------------------------------------------------------------------------
 // Run + streaming events
 // ---------------------------------------------------------------------------
 
@@ -170,7 +216,8 @@ export type StepId =
   | "gtm"
   | "unitEconomics"
   | "risks"
-  | "synthesis";
+  | "synthesis"
+  | "validation";
 
 export interface RunInput {
   idea: string;
@@ -197,6 +244,8 @@ export interface Run {
   assumptions?: Assumptions;
   risks?: RiskRegister;
   synthesis?: PitchSynthesis;
+  /** Step 9 — Multi-LLM validation panel result. */
+  validation?: ValidationResult;
 
   /** All sources, deduped by URL, referenced by Fact.citationId. */
   citations: Citation[];

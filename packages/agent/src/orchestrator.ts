@@ -11,6 +11,7 @@ import {
   type StepContext,
   synthesisStep,
   unitEconomicsStep,
+  validationStep,
 } from "./steps/index";
 
 /** Model routing — LiteLLM `model_list` aliases. Re-exported for callers. */
@@ -71,6 +72,8 @@ export async function runPipeline(input: RunInput, opts: RunPipelineOptions): Pr
     await unitEconomicsStep(ctx);
     await risksStep(ctx);
     await synthesisStep(ctx);
+    // Step 9 — runs 3 LLM personas in parallel, uses all prior research as context.
+    await validationStep(ctx);
 
     run.status = "completed";
     emit({ type: "run_completed", runId: run.id, at: nowIso() });
