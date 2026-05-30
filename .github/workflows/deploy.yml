@@ -138,7 +138,10 @@ jobs:
       - name: Build web
         run: pnpm --filter @hahaton/web exec opennextjs-cloudflare build
         env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}
+          # next.config.ts rewrites + the runs/[id] server fetch read process.env.API_URL
+          # (server-side, so no NEXT_PUBLIC_ prefix). Mismatched names baked
+          # http://localhost:8787 into the prod rewrite → /api/* returned 500.
+          API_URL: ${{ secrets.API_URL }}
 
       - name: Deploy web
         run: pnpm --filter @hahaton/web exec opennextjs-cloudflare deploy
