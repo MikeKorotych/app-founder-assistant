@@ -1,7 +1,9 @@
 "use client";
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@hahaton/ui";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { UnitEconomicsSection } from "../runs/[id]/_components/unit-economics-section";
+import { randomMockRun } from "./mock-run";
 
 // Minimal shape we need from a discovered competitor (decoupled from scout-run's
 // local Competitor row so this block stays self-contained).
@@ -54,6 +56,9 @@ function compact(n: number): string {
  */
 export function MarketDataMock({ competitors }: { competitors: MarketCompetitor[] }) {
   const [open, setOpen] = useState(false);
+  // Real scout runs carry no unit-economics, so reuse a (memoized) mock run's
+  // assumptions for the interactive model — same demo-safe approach as the rest.
+  const mock = useMemo(() => randomMockRun(), []);
 
   if (competitors.length === 0) return null;
 
@@ -72,100 +77,105 @@ export function MarketDataMock({ competitors }: { competitors: MarketCompetitor[
       </div>
 
       {open && (
-        <Card className="animate-enter border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-          <CardHeader className="gap-1.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <CardTitle className="text-base">Дані ринку та виручка конкурентів</CardTitle>
-              <span className="rounded-full border border-border/60 bg-muted/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                mock
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Орієнтовні оцінки на основі публічних сигналів (відгуки, рейтинг). Точні дані
-              завантажень і виручки зʼявляться тут після підключення платних API — Appfigures,
-              Sensor Tower, data.ai.
-            </p>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              <div className="rounded-md border border-border/60 bg-muted/40 px-3 py-2">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-                  Виручка ніші · міс
-                </p>
-                <p className="text-lg font-semibold tabular-nums">~${compact(totalRevenue)}</p>
+        <div className="flex flex-col gap-5">
+          <div className="animate-enter">
+            <UnitEconomicsSection assumptions={mock.assumptions} citations={mock.citations ?? []} />
+          </div>
+          <Card className="animate-enter border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+            <CardHeader className="gap-1.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <CardTitle className="text-base">Дані ринку та виручка конкурентів</CardTitle>
+                <span className="rounded-full border border-border/60 bg-muted/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  mock
+                </span>
               </div>
-              <div className="rounded-md border border-border/60 bg-muted/40 px-3 py-2">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-                  Завантаження · міс
-                </p>
-                <p className="text-lg font-semibold tabular-nums">~{compact(totalInstalls)}</p>
+              <p className="text-sm text-muted-foreground">
+                Орієнтовні оцінки на основі публічних сигналів (відгуки, рейтинг). Точні дані
+                завантажень і виручки зʼявляться тут після підключення платних API — Appfigures,
+                Sensor Tower, data.ai.
+              </p>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <div className="rounded-md border border-border/60 bg-muted/40 px-3 py-2">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                    Виручка ніші · міс
+                  </p>
+                  <p className="text-lg font-semibold tabular-nums">~${compact(totalRevenue)}</p>
+                </div>
+                <div className="rounded-md border border-border/60 bg-muted/40 px-3 py-2">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                    Завантаження · міс
+                  </p>
+                  <p className="text-lg font-semibold tabular-nums">~{compact(totalInstalls)}</p>
+                </div>
+                <div className="col-span-2 rounded-md border border-border/60 bg-muted/40 px-3 py-2 sm:col-span-1">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                    Гравців у вибірці
+                  </p>
+                  <p className="text-lg font-semibold tabular-nums">{rows.length}</p>
+                </div>
               </div>
-              <div className="col-span-2 rounded-md border border-border/60 bg-muted/40 px-3 py-2 sm:col-span-1">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-                  Гравців у вибірці
-                </p>
-                <p className="text-lg font-semibold tabular-nums">{rows.length}</p>
-              </div>
-            </div>
 
-            <div className="overflow-hidden rounded-md border border-border/60">
-              <div className="max-h-[34rem] overflow-y-auto">
-                <table className="w-full text-sm">
-                  <thead className="sticky top-0 z-10 bg-muted/95 text-[10px] uppercase tracking-[0.14em] text-muted-foreground backdrop-blur">
-                    <tr>
-                      <th className="px-3 py-2 text-left font-medium">Конкурент</th>
-                      <th className="w-28 px-3 py-2 text-right font-medium">Завантаж./міс</th>
-                      <th className="w-28 px-3 py-2 text-right font-medium">Виручка/міс</th>
-                      <th className="w-32 px-3 py-2 text-right font-medium">Частка ринку</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map(({ c, installs, revenue }) => {
-                      const share = totalRevenue > 0 ? (revenue / totalRevenue) * 100 : 0;
-                      return (
-                        <tr key={c.id} className="border-t border-border/60 align-middle">
-                          <td className="px-3 py-2.5">
-                            {c.url ? (
-                              <a
-                                href={c.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium underline-offset-2 hover:underline"
-                              >
-                                {c.name}
-                              </a>
-                            ) : (
-                              <span className="font-medium">{c.name}</span>
-                            )}
-                          </td>
-                          <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
-                            ~{compact(installs)}
-                          </td>
-                          <td className="px-3 py-2.5 text-right font-medium tabular-nums">
-                            ~${compact(revenue)}
-                          </td>
-                          <td className="px-3 py-2.5">
-                            <div className="flex items-center justify-end gap-2">
-                              <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
-                                <div
-                                  className="h-full rounded-full bg-primary/70"
-                                  style={{ width: `${Math.min(100, share)}%` }}
-                                />
+              <div className="overflow-hidden rounded-md border border-border/60">
+                <div className="max-h-[34rem] overflow-y-auto">
+                  <table className="w-full text-sm">
+                    <thead className="sticky top-0 z-10 bg-muted/95 text-[10px] uppercase tracking-[0.14em] text-muted-foreground backdrop-blur">
+                      <tr>
+                        <th className="px-3 py-2 text-left font-medium">Конкурент</th>
+                        <th className="w-28 px-3 py-2 text-right font-medium">Завантаж./міс</th>
+                        <th className="w-28 px-3 py-2 text-right font-medium">Виручка/міс</th>
+                        <th className="w-32 px-3 py-2 text-right font-medium">Частка ринку</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map(({ c, installs, revenue }) => {
+                        const share = totalRevenue > 0 ? (revenue / totalRevenue) * 100 : 0;
+                        return (
+                          <tr key={c.id} className="border-t border-border/60 align-middle">
+                            <td className="px-3 py-2.5">
+                              {c.url ? (
+                                <a
+                                  href={c.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-medium underline-offset-2 hover:underline"
+                                >
+                                  {c.name}
+                                </a>
+                              ) : (
+                                <span className="font-medium">{c.name}</span>
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
+                              ~{compact(installs)}
+                            </td>
+                            <td className="px-3 py-2.5 text-right font-medium tabular-nums">
+                              ~${compact(revenue)}
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <div className="flex items-center justify-end gap-2">
+                                <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
+                                  <div
+                                    className="h-full rounded-full bg-primary/70"
+                                    style={{ width: `${Math.min(100, share)}%` }}
+                                  />
+                                </div>
+                                <span className="w-10 text-right tabular-nums text-muted-foreground">
+                                  {share.toFixed(0)}%
+                                </span>
                               </div>
-                              <span className="w-10 text-right tabular-nums text-muted-foreground">
-                                {share.toFixed(0)}%
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );
