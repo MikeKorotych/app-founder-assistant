@@ -3,6 +3,13 @@
   "compatibility_date": "2026-04-05",
   "compatibility_flags": ["nodejs_compat"],
   "main": ".open-next/worker.js",
+
+  // Runtime env for the OpenNext worker. The /api/[...path] proxy route and the
+  // runs/[id] server fetch read process.env.API_URL at request time — without
+  // this var it falls back to localhost. Must point at the API Worker.
+  "vars": {
+    "API_URL": "https://hahaton-api.phasekit.workers.dev"
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"

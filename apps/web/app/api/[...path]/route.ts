@@ -7,10 +7,15 @@ async function proxy(req: Request, path: string[]): Promise<Response> {
   const { search } = new URL(req.url);
   const target = `${API_URL}/${path.join("/")}${search}`;
 
+  // Drop the inbound Host (hahaton-web …) — fetch must set Host from the target
+  // URL, or Cloudflare rejects the cross-host request with 1003.
+  const headers = new Headers(req.headers);
+  headers.delete("host");
+
   const hasBody = req.method !== "GET" && req.method !== "HEAD";
   const res = await fetch(target, {
     method: req.method,
-    headers: req.headers,
+    headers,
     body: hasBody ? req.body : undefined,
     // Required when streaming a request body to an upstream fetch.
     ...(hasBody ? { duplex: "half" } : {}),
