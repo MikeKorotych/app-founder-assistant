@@ -16,7 +16,7 @@
        status: "todo" | "in-progress" | "review" | "done"
 
     2. #data-progress — progress log. PREPEND a new entry on every meaningful push:
-       { "date":"YYYY-MM-DD", "author":"name", "workstream":"A|B|C|D",
+       { "date":"YYYY-MM-DD", "time":"HH:MM", "author":"name", "workstream":"A|B|C|D",
          "summary":"one line, IN ENGLISH", "commit":"<short-sha>" }
 
   Workflow: git pull --rebase -> change code -> update the JSON island here ->
@@ -343,11 +343,11 @@
 </script>
 <script type="application/json" id="data-progress">
 [
-  { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"plan.html: content split into large prominent tabs (one section per tab); status+progress grouped.", "commit":"—" },
-  { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"plan.html: JS smooth-scroll TOC (works in iframe/preview) + responsive layout for small screens.", "commit":"f2d9d62" },
-  { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"Bilingual plan.html (UA/EN) with a language switch; agents read the English version.", "commit":"—" },
-  { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"CLAUDE.md: mandatory loop — pull + read plan before work, update status + push after.", "commit":"a467749" },
-  { "date":"2026-05-30", "author":"scaffold", "workstream":"A/B", "summary":"Type contract, orchestrator, 8 step stubs, unit-economics engine (verified). Typecheck clean.", "commit":"fa5ef47" }
+  { "date":"2026-05-30", "time":"11:25", "author":"scaffold", "workstream":"—", "summary":"plan.html: content split into large prominent tabs (one section per tab); status+progress grouped.", "commit":"—" },
+  { "date":"2026-05-30", "time":"11:20", "author":"scaffold", "workstream":"—", "summary":"plan.html: JS smooth-scroll TOC (works in iframe/preview) + responsive layout for small screens.", "commit":"f2d9d62" },
+  { "date":"2026-05-30", "time":"11:18", "author":"scaffold", "workstream":"—", "summary":"Bilingual plan.html (UA/EN) with a language switch; agents read the English version.", "commit":"—" },
+  { "date":"2026-05-30", "time":"11:13", "author":"scaffold", "workstream":"—", "summary":"CLAUDE.md: mandatory loop — pull + read plan before work, update status + push after.", "commit":"a467749" },
+  { "date":"2026-05-30", "time":"11:05", "author":"scaffold", "workstream":"A/B", "summary":"Type contract, orchestrator, 8 step stubs, unit-economics engine (verified). Typecheck clean.", "commit":"fa5ef47" }
 ]
 </script>
 
@@ -510,7 +510,7 @@
       el.className = "entry";
       el.innerHTML =
         `<div class="head">
-           <span class="date">${e.date}</span>
+           <span class="date">${e.date}${e.time ? " " + e.time : ""}</span>
            <span class="who">${e.author}</span>
            ${e.workstream && e.workstream !== "—" ? `<span class="wsbadge">WS ${e.workstream}</span>` : ""}
            ${e.commit && e.commit !== "—" ? `<span class="sha">${e.commit}</span>` : ""}
