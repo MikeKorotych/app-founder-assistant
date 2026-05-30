@@ -10,7 +10,7 @@ apps, and standalone apps that run as services in parallel.
 ```
 hahaton-2026/
 ├── apps/
-│   └── api/                  @hahaton/api             Express HTTP service (deployed to Railway)
+│   └── api/                  @hahaton/api             Express HTTP service (deployed to Cloudflare)
 ├── packages/
 │   ├── contracts/            @hahaton/contracts       Frozen shared types — the single source of truth
 │   ├── unit-economics/       @hahaton/unit-economics  Pure deterministic econ engine (reused by API + UI)
@@ -90,10 +90,13 @@ for which sources work out of the box vs. need a vendored spec file.
 - **A new service/app:** same, under `apps/<name>/`, with `dev`/`build`/`start`
   scripts. `turbo run dev` will run it alongside the others automatically.
 
-## Deploy to Railway (the `api` service)
+## Deploy to Cloudflare (the `api` service)
+
+Target platform is **Cloudflare** (Workers/Pages). The port is in progress — the
+Express server is being adapted to the Workers runtime (filesystem `store` → KV/R2,
+long pipeline → Workflows/Durable Object, secrets → Worker bindings). See the
+migration notes in the plan.
 
 1. Push to GitHub.
-2. Railway → **New Project → Deploy from GitHub repo**, pick this repo.
-3. Add `ANTHROPIC_API_KEY` under the service's **Variables** tab.
-4. `railway.json` pins the build to `turbo run build --filter=@hahaton/api`
-   and start to `pnpm --filter @hahaton/api start`. `PORT` is injected by Railway.
+2. Configure `wrangler` for `@hahaton/api` and connect the repo to Cloudflare.
+3. Provide `ANTHROPIC_API_KEY` as a Worker secret (`wrangler secret put ANTHROPIC_API_KEY`).
