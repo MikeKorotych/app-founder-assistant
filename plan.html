@@ -370,6 +370,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"12:45", "author":"Anton", "workstream":"A", "summary":"Scout plan: drop Firecrawl as a source/fallback — Scout queries structured source APIs only (HN + iTunes + Reddit no-auth). Sources without a usable keyword API (AlternativeTo, Indiegogo) are skipped, never scraped. Updated A15 roadmap title.", "commit":"—" },
   { "date":"2026-05-30", "time":"12:40", "author":"Mykhailo", "workstream":"C", "summary":"C1: ported funnel-analyzer design system into packages/ui (@hahaton/ui) — shadcn primitives + theme (Tailwind v4 'caffeine') + StatusPill/Badge + AppBackground + EmotionArcChart; relative imports, no app collision. Drops into the OpenNext apps/web shell (see README).", "commit":"—" },
   { "date":"2026-05-30", "time":"12:30", "author":"Anton", "workstream":"A", "summary":"Add packages/scout/PLAN.md — spec for the Scout sub-agent (fan-out → fan-in → fan-out): plan sources from the frozen @hahaton/integrations registry, build concrete HTTP requests, query sources in parallel (Firecrawl fallback), aggregate, then LLM per-source reports. Researched live no-auth APIs (HN Algolia, iTunes, Reddit) + Firecrawl. Added roadmap A13–A17.", "commit":"6578056" },
   { "date":"2026-05-30", "time":"12:25", "author":"Anton", "workstream":"—", "summary":"CLAUDE.md: require a claim-commit pushed at session start (before any code) — update plan.html JSON islands or an empty commit (git commit --allow-empty) announcing the sub-task, so the team sees who works on what BEFORE the task is done.", "commit":"—" },
@@ -412,7 +413,7 @@
 
   { "id":"A13", "group":"A", "title_uk":"Scout: каркас пакета + контракти (packages/scout)", "title_en":"Scout: package scaffold + contracts (packages/scout)", "owner":"—", "status":"todo" },
   { "id":"A14", "group":"A", "title_uk":"Scout: планувальник джерел + шаблони HTTP-запитів", "title_en":"Scout: source planner + HTTP request templates", "owner":"—", "status":"todo" },
-  { "id":"A15", "group":"A", "title_uk":"Scout: паралельний fetch джерел + Firecrawl-фолбек", "title_en":"Scout: parallel source fetch + Firecrawl fallback", "owner":"—", "status":"todo" },
+  { "id":"A15", "group":"A", "title_uk":"Scout: паралельний fetch джерел (timeout + skip без API)", "title_en":"Scout: parallel source fetch (timeout + skip if no API)", "owner":"—", "status":"todo" },
   { "id":"A16", "group":"A", "title_uk":"Scout: агрегація + звіт по кожному джерелу (LLM)", "title_en":"Scout: aggregate + per-source report (LLM)", "owner":"—", "status":"todo" },
   { "id":"A17", "group":"A", "title_uk":"Scout: /scout ендпоінт + інтеграція в крок конкурентів/ринку", "title_en":"Scout: /scout endpoint + wire into competitors/market step", "owner":"—", "status":"todo" },
 

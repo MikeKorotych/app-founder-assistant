@@ -30,7 +30,7 @@
  ┌───────┐  ┌───────┐   ┌───────┐   ┌───────┐   PHASE 2 · QUERY (parallel)
  │source │  │source │   │source │   │source │   each: do the HTTP call with the
  │  A    │  │  B    │   │  C    │   │  D    │   provided request → raw output
- └───┬───┘  └───┬───┘   └───┬───┘   └───┬───┘   (Firecrawl fallback if no API)
+ └───┬───┘  └───┬───┘   └───┬───┘   └───┬───┘   (skip if no usable API)
      └──────────┴─────┬─────┴───────────┘
                       ▼
         ┌──────────────────────────────┐         PHASE 3 · AGGREGATE (barrier)
@@ -70,8 +70,9 @@ So Phase 1 does **not** re-discover contracts from scratch. It:
 2. **Picks the relevant subset** for the idea (LLM ranks by `researchValue` + idea fit).
 3. **Builds a concrete request** per chosen source from a small per-source
    **request template** (Section 5) — filling in the idea's keywords/query terms.
-4. Uses `web_search` / Firecrawl **only as a fallback** to discover an exact endpoint or
-   to scrape when a source has no usable JSON API.
+4. Optionally uses `web_search` **only to confirm an exact endpoint/param** when a
+   registry entry is ambiguous — never to scrape. A source with no usable keyword API
+   is skipped, not scraped (scraping is out of scope — see Section 3).
 
 This keeps the contract frozen and the demo grounded, instead of letting the agent
 hallucinate endpoints live. Honest, reproducible, and fast.
@@ -89,16 +90,19 @@ and the registry's `canUseWithoutAuth` flag.
 | **Hacker News** (Algolia) | none ✅ | `GET https://hn.algolia.com/api/v1/search?query=<kw>&tags=story&hitsPerPage=20` | ✅ |
 | **iTunes Search** | none ✅ | `GET https://itunes.apple.com/search?term=<kw>&media=software&country=US&limit=25` | ✅ |
 | **Reddit** (public) | none ✅ (UA header) | `GET https://www.reddit.com/search.json?q=<kw>&sort=top&t=year&limit=25` | ✅ |
-| **Firecrawl search** | API key (cheap) | `POST https://api.firecrawl.dev/v2/search` `{query, limit, scrapeOptions}` | ✅ (web + scrape) |
 | Reddit (OAuth), Product Hunt, G2, Capterra, Crunchbase, Trustpilot, Similarweb, App Store Connect, Google Play, Appfigures, Apptopia, data.ai, AppTweak, AppBrain, BigIdeasDB, Indiegogo, Kickstarter | requires creds | from registry + per-source template | mixed |
 
-**Honest caveats from research (encode as `unavailable`/`fallback` in templates):**
-- **AlternativeTo** — no public API; use Firecrawl scrape fallback or drop.
-- **Indiegogo** — public API is fetch-by-ID only, **no keyword search** → Firecrawl fallback.
+**Scope note.** Scout queries **structured source APIs only**. Firecrawl (and any
+generic web-scraping tool) is a **separate instrument we don't use for scouting** — no
+scrape fallback. A source with no usable keyword API is simply **skipped**, not scraped.
+
+**Honest caveats from research (encode as `unavailable`/`skip` in templates):**
+- **AlternativeTo** — no public API → **skip** (no scout coverage).
+- **Indiegogo** — public API is fetch-by-ID only, **no keyword search** → **skip**.
 - **Product Hunt / Reddit-OAuth / Kickstarter** — OAuth; skip in demo-safe mode.
 - **Reddit public `.json`** — must send a descriptive `User-Agent` or it throttles.
 
-The 4 no-auth sources (HN + iTunes + Reddit + Firecrawl) are enough for a believable live run.
+The 3 no-auth sources (HN + iTunes + Reddit) are enough for a believable live run.
 
 ---
 
@@ -119,8 +123,7 @@ packages/scout/
     ├── scout.ts              orchestrator: the 5 phases, event emission
     ├── plan-sources.ts       PHASE 1 — LLM picks sources + builds SourceRequest[]
     ├── request-templates.ts  per-source concrete request builders (Section 5)
-    ├── fetch-source.ts       PHASE 2 — execute one SourceRequest (auth inject + Firecrawl fallback)
-    ├── firecrawl.ts          thin Firecrawl /search + /scrape client (fallback)
+    ├── fetch-source.ts       PHASE 2 — execute one SourceRequest (auth inject + timeout)
     ├── aggregate.ts          PHASE 3 — fan-in: collect + dedupe + normalize
     └── report-source.ts      PHASE 4 — LLM: one source's raw data → SourceReport
 ```
@@ -143,14 +146,12 @@ export const TEMPLATES: Record<string, (kw: string[], src: ApiSource) => SourceR
     rationale: "Founder/builder discussion + show-hn launches around the idea.",
     http: { method: "GET",
       url: `https://hn.algolia.com/api/v1/search?query=${enc(kw[0])}&tags=story&hitsPerPage=20` },
-    fallback: "none",
   }),
   itunessearch: (kw) => ({
     sourceId: "itunessearch", label: "iTunes Search",
     rationale: "Existing iOS apps in the space → competitors, prices, ratings.",
     http: { method: "GET",
       url: `https://itunes.apple.com/search?term=${enc(kw.join(" "))}&media=software&country=US&limit=25` },
-    fallback: "none",
   }),
   reddit: (kw) => ({
     sourceId: "reddit", label: "Reddit (public)",
@@ -158,16 +159,6 @@ export const TEMPLATES: Record<string, (kw: string[], src: ApiSource) => SourceR
     http: { method: "GET",
       url: `https://www.reddit.com/search.json?q=${enc(kw.join(" "))}&sort=top&t=year&limit=25`,
       headers: { "User-Agent": "hahaton-2026-scout/0.1 (research)" } },
-    fallback: "firecrawl-search",
-  }),
-  // Fallback / paid (built but gated by canUseWithoutAuth) --------------------
-  firecrawl: (kw) => ({
-    sourceId: "firecrawl", label: "Firecrawl search",
-    rationale: "Web-wide discovery + scraped content in one call (fallback + breadth).",
-    http: { method: "POST", url: "https://api.firecrawl.dev/v2/search",
-      headers: { Authorization: "Bearer ${FIRECRAWL_API_KEY}" },  // resolved at fetch time
-      body: { query: kw.join(" "), limit: 8, scrapeOptions: { formats: ["markdown"], onlyMainContent: true } } },
-    fallback: "none",
   }),
   // …auth'd sources reuse @hahaton/integrations auth.ts for header injection.
 };
@@ -207,16 +198,15 @@ export interface SourceRequest {
     headers?: Record<string, string>;     // ${ENV} placeholders, resolved at fetch
     body?: unknown;
   };
-  fallback: "firecrawl-search" | "firecrawl-scrape" | "none";
 }
 
 /** PHASE 2 output — one per source. */
 export interface SourceResult {
   sourceId: string;
   ok: boolean;
-  via: "api" | "firecrawl" | "skipped";
+  via: "api" | "skipped";
   status?: number;
-  data?: unknown;          // raw JSON or scraped markdown
+  data?: unknown;          // raw JSON from the source API
   error?: { kind: string; message: string; retryable: boolean };
   fetchedAt: string;
   citations: Citation[];   // URLs touched (deduped into ScoutReport.citations)
@@ -337,9 +327,9 @@ inline footnotes with zero extra UI work.
   `src/index.ts`. `pnpm typecheck` green. Wire deps (`contracts`, `integrations`).
 - **A14 — Phase 1 planner + templates.** `plan-sources.ts` + `request-templates.ts` for the
   4 no-auth sources. Unit-test: idea → expected `SourceRequest[]` (deterministic URLs).
-- **A15 — Phase 2 fetch + Firecrawl fallback.** `fetch-source.ts`, `firecrawl.ts`, auth
-  injection from the registry, per-source timeout, `allSettled` degrade. Live smoke test
-  against HN + iTunes + Reddit (no creds).
+- **A15 — Phase 2 fetch.** `fetch-source.ts`: auth injection from the registry,
+  per-source `AbortController` timeout, `allSettled` degrade, skip sources with no usable
+  API. Live smoke test against HN + iTunes + Reddit (no creds).
 - **A16 — Phase 3 + 4.** `aggregate.ts` (dedupe citations) + `report-source.ts` (LLM →
   `SourceReport`, honesty rule: every metric grounded or `estimated:true`). Emit events.
 - **A17 — Wire-in.** `POST /scout` + SSE in `apps/api`; feed `competitorsStep`/`marketStep`;
@@ -353,8 +343,8 @@ inline footnotes with zero extra UI work.
    no-auth set; demo-safe mode excludes credentialed sources.
 2. **Live fan-out:** `runScout` against the demo idea hits HN + iTunes + Reddit, returns
    ≥3 `ok` results, one slow/failing source degrades (not the whole run).
-3. **Firecrawl fallback:** a source with `fallback:"firecrawl-search"` and no API recovers
-   content via Firecrawl when the primary call fails.
+3. **Graceful skip:** a source with no usable keyword API (AlternativeTo, Indiegogo) is
+   reported `via:"skipped"`, never scraped, and never blocks the run.
 4. **Aggregation barrier:** Phase 4 starts only after all Phase-2 tasks settle; citations
    deduped by URL.
 5. **Honesty:** every `ScoutSignal.metric` carries a `citationId` or `estimated:true`;
@@ -368,8 +358,6 @@ inline footnotes with zero extra UI work.
 1. **LLM client.** Use `@anthropic-ai/sdk` now, or wait for the `LlmProvider` shim from
    `specs/llm-gateway-plan.md`? (Lean: SDK now, swap later — same one-line change as the
    main pipeline.)
-2. **Firecrawl key.** Free tier is 1,000 credits/mo, 5 `/search`/min — fine for demo. Add
-   `FIRECRAWL_API_KEY` to `.env.example`? Without it, scout still runs on the 3 no-auth APIs.
-3. **Keyword extraction.** Fold into the Phase-1 planner call, or reuse step-1 `brief`?
+2. **Keyword extraction.** Fold into the Phase-1 planner call, or reuse step-1 `brief`?
    (Lean: if a `brief` exists, derive keywords from it; else a small Haiku call.)
-4. **Promote scout types into `@hahaton/contracts`** — needs a team-sync (frozen contract).
+3. **Promote scout types into `@hahaton/contracts`** — needs a team-sync (frozen contract).
