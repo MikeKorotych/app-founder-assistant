@@ -1,37 +1,99 @@
 # hahaton-2026
 
-Basic agentic workflow service (Node + TypeScript), deployable to Railway.
+AI CEO / Founder Strategist — an agentic **Idea → Business Plan** pipeline.
+
+Structured as a **Turborepo + pnpm** monorepo: reusable packages shared across
+apps, and standalone apps that run as services in parallel.
+
+## Layout
+
+```
+hahaton-2026/
+├── apps/
+│   └── api/                  @hahaton/api             Express HTTP service (deployed to Railway)
+├── packages/
+│   ├── contracts/            @hahaton/contracts       Frozen shared types — the single source of truth
+│   ├── unit-economics/       @hahaton/unit-economics  Pure deterministic econ engine (reused by API + UI)
+│   ├── agent/                @hahaton/agent           Orchestrator + pipeline steps
+│   ├── store/                @hahaton/store           JSON-on-disk run persistence
+│   └── integrations/         @hahaton/integrations    External API source/auth contracts + OpenAPI codegen
+├── turbo.json                Task graph (build/dev/typecheck ordering + caching)
+├── pnpm-workspace.yaml       Workspace globs (apps/*, packages/*)
+└── tsconfig.base.json        Compiler options every workspace extends
+```
+
+**Dependency direction** (apps depend on packages; packages depend on `contracts`):
+
+```
+@hahaton/api ─┬─> @hahaton/agent ──────> @hahaton/contracts
+              ├─> @hahaton/store ──────> @hahaton/contracts
+              └─> @hahaton/unit-economics ─> @hahaton/contracts
+
+@hahaton/integrations (standalone — consumed by data-fetching services)
+```
 
 ## Stack
-- Node 20, TypeScript (ESM)
-- Express HTTP server
-- `@anthropic-ai/sdk` for the agent
+- Node 20, TypeScript (ESM, `NodeNext`)
+- pnpm workspaces + Turborepo
+- Express HTTP server, `@anthropic-ai/sdk` for the agent
 
-## Local development
+## Quick start
+
 ```bash
-npm install
-cp .env.example .env   # add your ANTHROPIC_API_KEY
-npm run dev            # hot-reload on http://localhost:3000
+pnpm install
+cp .env.example apps/api/.env   # add your ANTHROPIC_API_KEY
+pnpm dev                        # turbo runs every package's watch + the api server in parallel
 ```
 
-Test it:
+Test it (api defaults to http://localhost:3000):
+
 ```bash
-curl -X POST http://localhost:3000/agent \
-  -H "content-type: application/json" \
-  -d '{"prompt":"hello"}'
+curl -X POST http://localhost:3000/agent    -H 'content-type: application/json' -d '{"prompt":"hello"}'
+curl -X POST http://localhost:3000/pipeline  -H 'content-type: application/json' -d '{"idea":"AI tutor for kids","region":"EU"}'
+curl      http://localhost:3000/runs/<id>    # replay a persisted run
 ```
 
-## Endpoints
-- `GET /health` — healthcheck (used by Railway)
-- `POST /agent` — `{ "prompt": "..." }` → `{ "reply": "..." }`
+## Commands (run from the repo root)
 
-## Deploy to Railway
-1. Push this repo to GitHub.
-2. In Railway: **New Project → Deploy from GitHub repo**, pick this repo.
-3. Add the `ANTHROPIC_API_KEY` variable under the service's **Variables** tab.
-4. Railway auto-builds via Nixpacks (`railway.json` pins build/start/healthcheck).
-   `PORT` is injected by Railway automatically.
+| Command                      | What it does                                                        |
+| ---------------------------- | ------------------------------------------------------------------- |
+| `pnpm dev`                   | `turbo run dev` — all package watchers + the api server, in parallel |
+| `pnpm build`                 | `turbo run build` — builds the whole graph in dependency order      |
+| `pnpm typecheck`             | `turbo run typecheck` across every workspace                        |
+| `pnpm generate:contracts`    | regenerate external API types (see `@hahaton/integrations`)         |
+| `pnpm clean`                 | clear build outputs + `node_modules`                                |
 
-## Where to build next
-- `src/agent.ts` — add tool definitions and a tool-use loop for real agentic behavior.
-- `src/index.ts` — add webhook routes (Telegram/Slack/Discord) if this is a bot.
+Scope any task to one workspace with a filter:
+
+```bash
+pnpm --filter @hahaton/api dev
+pnpm --filter @hahaton/integrations generate:contracts -- googleplay
+pnpm --filter @hahaton/agent... build      # the package and everything it depends on
+```
+
+## Generating external API contracts
+
+`@hahaton/integrations` declares every external API and its auth in
+[`packages/integrations/src/sources.ts`](packages/integrations/src/sources.ts).
+The codegen fetches/reads each OpenAPI doc and emits typed clients into
+`packages/integrations/src/generated/` (git-ignored), exposed as
+`@hahaton/integrations/generated`. See
+[`packages/integrations/specs/README.md`](packages/integrations/specs/README.md)
+for which sources work out of the box vs. need a vendored spec file.
+
+## Adding a new workspace
+
+- **A reusable package:** create `packages/<name>/` with a `package.json`
+  (`"name": "@hahaton/<name>"`, `exports` → `./dist`), a `tsconfig.json` that
+  `extends: "../../tsconfig.base.json"`, and `src/index.ts`. Depend on it from
+  an app with `"@hahaton/<name>": "workspace:*"`, then `pnpm install`.
+- **A new service/app:** same, under `apps/<name>/`, with `dev`/`build`/`start`
+  scripts. `turbo run dev` will run it alongside the others automatically.
+
+## Deploy to Railway (the `api` service)
+
+1. Push to GitHub.
+2. Railway → **New Project → Deploy from GitHub repo**, pick this repo.
+3. Add `ANTHROPIC_API_KEY` under the service's **Variables** tab.
+4. `railway.json` pins the build to `turbo run build --filter=@hahaton/api`
+   and start to `pnpm --filter @hahaton/api start`. `PORT` is injected by Railway.

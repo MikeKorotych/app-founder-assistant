@@ -1,0 +1,34 @@
+{
+  "name": "@hahaton/integrations",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "External API source + auth contracts, and the openapi-typescript codegen that types them.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./generated": {
+      "types": "./dist/generated/index.d.ts",
+      "default": "./dist/generated/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch --preserveWatchOutput",
+    "typecheck": "tsc --noEmit",
+    "generate:contracts": "tsx scripts/generate-contracts.ts",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "openapi-typescript": "^7.13.0",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.0"
+  }
+}

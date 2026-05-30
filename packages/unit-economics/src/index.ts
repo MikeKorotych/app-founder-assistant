@@ -1,4 +1,4 @@
-import type { Assumptions, UnitEconomics } from "./types.js";
+import type { Assumptions, UnitEconomics } from "@hahaton/contracts";
 
 /**
  * Deterministic unit-economics engine. This is the single source of truth for

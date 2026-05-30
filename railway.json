@@ -2,10 +2,10 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npm run build"
+    "buildCommand": "pnpm turbo run build --filter=@hahaton/api"
   },
   "deploy": {
-    "startCommand": "npm run start",
+    "startCommand": "pnpm --filter @hahaton/api start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",

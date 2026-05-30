@@ -1,0 +1,30 @@
+{
+  "name": "@hahaton/store",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "JSON-on-disk persistence for runs — the demo replay safety net.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch --preserveWatchOutput",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@hahaton/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.0"
+  }
+}

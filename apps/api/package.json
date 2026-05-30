@@ -1,0 +1,29 @@
+{
+  "name": "@hahaton/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "HTTP service exposing the agent pipeline. Deployed to Railway.",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env src/index.ts",
+    "build": "tsc",
+    "start": "node --env-file-if-exists=.env dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@hahaton/agent": "workspace:*",
+    "@hahaton/contracts": "workspace:*",
+    "@hahaton/store": "workspace:*",
+    "@hahaton/unit-economics": "workspace:*",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.0",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.0"
+  }
+}

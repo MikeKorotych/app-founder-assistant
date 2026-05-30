@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import type { AgentEvent, Fact, Run, StepId } from "../../shared/types.js";
+import type { AgentEvent, Fact, Run, StepId } from "@hahaton/contracts";
 
 /**
  * Shared context every step receives. A step reads prior outputs from `run`,

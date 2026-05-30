@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { randomUUID } from "node:crypto";
-import type { AgentEvent, Run, RunInput } from "../shared/types.js";
+import type { AgentEvent, Run, RunInput } from "@hahaton/contracts";
 import {
   briefStep,
   marketStep,
