@@ -70,8 +70,19 @@
     background:var(--panel); padding:5px 11px; border-radius:999px}
   .pill b{color:var(--text); font-weight:600}
 
+  /* tabs */
+  .tabs{display:flex; flex-wrap:wrap; gap:9px; margin:30px 0 4px}
+  .tab{appearance:none; cursor:pointer; font:inherit; font-size:15px; font-weight:500;
+    letter-spacing:-0.01em; color:var(--muted); background:var(--panel);
+    border:1px solid var(--border); border-radius:11px; padding:13px 22px;
+    transition:background .12s ease,color .12s ease,border-color .12s ease}
+  .tab:hover{color:var(--text); border-color:var(--dim); background:var(--panel-2)}
+  .tab[aria-selected="true"]{color:#0a0a0b; background:var(--text); border-color:var(--text); font-weight:600}
+
   /* section */
-  section{margin-top:54px}
+  section{margin-top:30px}
+  section[data-panel]{animation:fade .18s ease}
+  @keyframes fade{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
   .label{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint);
     display:flex; align-items:center; gap:12px; margin:0 0 18px}
   .label::after{content:""; flex:1; height:1px; background:var(--border-soft)}
@@ -144,9 +155,6 @@
   .files .p{font-family:"SF Mono",ui-monospace,monospace; color:var(--mono); white-space:nowrap}
   .files .d{color:var(--muted)}
   footer{margin-top:72px; padding-top:22px; border-top:1px solid var(--border-soft); color:var(--faint); font-size:12.5px}
-  .toc{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:18px; font-size:13px}
-  .toc a{color:var(--muted); border:0; cursor:pointer}
-  .toc a:hover{color:var(--text)}
 
   /* ---- responsive ---- */
   @media(max-width:860px){
@@ -159,7 +167,8 @@
     section{margin-top:42px}
     .grid.c4,.grid.c2{grid-template-columns:1fr}
     .board{grid-template-columns:1fr}
-    .toc{gap:8px 12px; font-size:12.5px}
+    .tabs{gap:7px}
+    .tab{padding:10px 15px; font-size:13.5px}
     th,td{padding:8px 9px; font-size:13px}
     td:first-child{white-space:normal}
     .files div{flex-direction:column; gap:2px; align-items:flex-start}
@@ -187,32 +196,31 @@
     <span class="pill" data-i18n="pill_stack"></span>
   </div>
 
-  <div class="toc">
-    <a href="#status" data-i18n="toc_status"></a>
-    <a href="#progress" data-i18n="toc_progress"></a>
-    <a href="#concept" data-i18n="toc_concept"></a>
-    <a href="#validation" data-i18n="toc_validation"></a>
-    <a href="#pipeline" data-i18n="toc_pipeline"></a>
-    <a href="#demo" data-i18n="toc_demo"></a>
-    <a href="#risks" data-i18n="toc_risks"></a>
-    <a href="#stack" data-i18n="toc_stack"></a>
-    <a href="#sources" data-i18n="toc_sources"></a>
-  </div>
+  <nav class="tabs" id="tabs" role="tablist">
+    <button class="tab" data-tab="status" data-i18n="toc_status"></button>
+    <button class="tab" data-tab="concept" data-i18n="toc_concept"></button>
+    <button class="tab" data-tab="validation" data-i18n="toc_validation"></button>
+    <button class="tab" data-tab="pipeline" data-i18n="toc_pipeline"></button>
+    <button class="tab" data-tab="demo" data-i18n="toc_demo"></button>
+    <button class="tab" data-tab="risks" data-i18n="toc_risks"></button>
+    <button class="tab" data-tab="stack" data-i18n="toc_stack"></button>
+    <button class="tab" data-tab="sources" data-i18n="toc_sources"></button>
+  </nav>
 
   <!-- ===================== LIVE STATUS ===================== -->
-  <section id="status">
+  <section id="status" data-panel="status">
     <p class="label" data-i18n="status_label"></p>
     <div class="board" id="board"></div>
     <div class="note" data-i18n="status_note"></div>
   </section>
 
-  <section id="progress">
+  <section id="progress" data-panel="status">
     <p class="label" data-i18n="progress_label"></p>
     <div class="log" id="log"></div>
   </section>
 
   <!-- ===================== CONCEPT ===================== -->
-  <section id="concept">
+  <section id="concept" data-panel="concept">
     <p class="label" data-i18n="concept_label"></p>
     <h2 data-i18n="concept_h"></h2>
     <p class="sub" data-i18n="concept_sub"></p>
@@ -223,7 +231,7 @@
   </section>
 
   <!-- ===================== VALIDATION ===================== -->
-  <section id="validation">
+  <section id="validation" data-panel="validation">
     <p class="label" data-i18n="val_label"></p>
     <h2 data-i18n="val_h"></h2>
     <p class="sub" data-i18n="val_sub"></p>
@@ -247,7 +255,7 @@
   </section>
 
   <!-- ===================== PIPELINE ===================== -->
-  <section id="pipeline">
+  <section id="pipeline" data-panel="pipeline">
     <p class="label" data-i18n="pipe_label"></p>
     <table>
       <thead><tr><th>#</th><th data-i18n="pipe_th_step"></th><th data-i18n="pipe_th_model"></th><th>web_search</th></tr></thead>
@@ -266,7 +274,7 @@
   </section>
 
   <!-- ===================== DEMO ===================== -->
-  <section id="demo">
+  <section id="demo" data-panel="demo">
     <p class="label" data-i18n="demo_label"></p>
     <div class="grid c2">
       <div class="card"><span class="n">0:00</span><h3 data-i18n="demo1_t"></h3><p class="sub" data-i18n="demo1_d"></p></div>
@@ -280,7 +288,7 @@
   </section>
 
   <!-- ===================== RISKS ===================== -->
-  <section id="risks">
+  <section id="risks" data-panel="risks">
     <p class="label" data-i18n="risk_label"></p>
     <table>
       <thead><tr><th data-i18n="risk_th1"></th><th data-i18n="risk_th2"></th></tr></thead>
@@ -295,7 +303,7 @@
   </section>
 
   <!-- ===================== STACK ===================== -->
-  <section id="stack">
+  <section id="stack" data-panel="stack">
     <p class="label" data-i18n="stack_label"></p>
     <p class="sub" data-i18n="stack_sub"></p>
     <div class="files">
@@ -310,7 +318,7 @@
   </section>
 
   <!-- ===================== SOURCES ===================== -->
-  <section id="sources">
+  <section id="sources" data-panel="sources">
     <p class="label" data-i18n="src_label"></p>
     <div class="grid c2">
       <div class="card"><h3>kuchin/awesome-ceo</h3><p class="sub" data-i18n="src1"></p></div>
@@ -335,7 +343,8 @@
 </script>
 <script type="application/json" id="data-progress">
 [
-  { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"plan.html: JS smooth-scroll TOC (works in iframe/preview) + responsive layout for small screens.", "commit":"—" },
+  { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"plan.html: content split into large prominent tabs (one section per tab); status+progress grouped.", "commit":"—" },
+  { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"plan.html: JS smooth-scroll TOC (works in iframe/preview) + responsive layout for small screens.", "commit":"f2d9d62" },
   { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"Bilingual plan.html (UA/EN) with a language switch; agents read the English version.", "commit":"—" },
   { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"CLAUDE.md: mandatory loop — pull + read plan before work, update status + push after.", "commit":"a467749" },
   { "date":"2026-05-30", "author":"scaffold", "workstream":"A/B", "summary":"Type contract, orchestrator, 8 step stubs, unit-economics engine (verified). Typecheck clean.", "commit":"fa5ef47" }
@@ -528,12 +537,21 @@
   document.querySelectorAll(".seg button").forEach(b =>
     b.addEventListener("click", () => applyLang(b.dataset.lang)));
 
-  // Smooth-scroll TOC — works even where hash navigation is blocked (iframe/preview).
-  document.querySelectorAll('.toc a[href^="#"]').forEach(a =>
-    a.addEventListener("click", ev => {
-      const el = document.getElementById(a.getAttribute("href").slice(1));
-      if (el) { ev.preventDefault(); el.scrollIntoView({ behavior:"smooth", block:"start" }); }
-    }));
+  // Tabs — show one section panel at a time.
+  const PANELS = Array.from(document.querySelectorAll("section[data-panel]"));
+  const TABS = Array.from(document.querySelectorAll(".tab"));
+  function showTab(key){
+    if (!TABS.some(b => b.dataset.tab === key)) key = "status";
+    TABS.forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === key)));
+    PANELS.forEach(s => { s.style.display = (s.dataset.panel === key) ? "" : "none"; });
+    try { localStorage.setItem("planTab", key); } catch {}
+  }
+  TABS.forEach(b => b.addEventListener("click", () => {
+    showTab(b.dataset.tab);
+    document.getElementById("tabs").scrollIntoView({ behavior:"smooth", block:"start" });
+  }));
+  let savedTab = null; try { savedTab = localStorage.getItem("planTab"); } catch {}
+  showTab(savedTab || "status");
 
   // initial language: ?lang= > localStorage > default uk
   const urlLang = new URLSearchParams(location.search).get("lang");
