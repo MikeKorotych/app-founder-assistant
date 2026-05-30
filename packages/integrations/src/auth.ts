@@ -28,12 +28,16 @@ export interface OAuth2Auth {
   expiresAt?: number;
 }
 
-/** Plain API key — paid/partner APIs such as G2, Capterra, Appfigures, data.ai, AppTweak. */
+/** Plain API key — paid/partner APIs such as G2, AppMagic, Sensor Tower, AppTweak. */
 export interface ApiKeyAuth {
   kind: "apiKey";
   apiKey: string;
+  /** Where the key is sent. Some APIs use query params (`token=...`). */
+  placement: "header" | "query";
   /** Header the key is sent in (e.g. "x-rapidapi-key", "Authorization"). */
-  header: string;
+  header?: string;
+  /** Query param the key is sent in (e.g. "token"). */
+  queryParam?: string;
   /** Optional prefix, e.g. "Bearer " or "Token ". */
   prefix?: string;
   /** RapidAPI also wants the host header. */

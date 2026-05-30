@@ -7,3 +7,4 @@
  */
 export * from "./sources.js";
 export * from "./auth.js";
+export * from "./credentials.js";

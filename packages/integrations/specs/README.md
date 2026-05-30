@@ -21,6 +21,14 @@ There are three kinds of source:
 
 ## Works once you set env vars
 
+- **AppMagic** — set `APPMAGIC_API_KEY`. Premium API access is required; no
+  bot/UI is needed once the key exists.
+- **Sensor Tower** — set `SENSOR_TOWER_API_KEY`. Access is through Sensor
+  Tower Connect / enterprise API.
+- **AppTweak** — set `APPTWEAK_API_KEY`. The token is available in the account
+  API tab / dashboard API settings.
+- **Mobile Action** — set `MOBILE_ACTION_API_KEY`. Runtime requests inject it
+  as `token=...`; `/api-key` can verify remaining credits.
 - **BigIdeasDB** (Supabase) — set `BIGIDEASDB_URL` and `BIGIDEASDB_KEY`.
   Newer Supabase projects don't expose the OpenAPI doc to the anon key, so use a
   key that can read it (service_role in dev).
@@ -34,6 +42,8 @@ There are three kinds of source:
 | `capterra.openapi.yaml`     | Capterra      | hand-write from their API docs                        |
 | `kickstarter.openapi.yaml`  | Kickstarter   | hand-write from their API docs                        |
 | `appfigures.openapi.yaml`   | Appfigures    | hand-write / export from their API docs               |
+| `appmagic.openapi.yaml`     | AppMagic      | hand-write / export from paid API docs                |
+| `sensortower.openapi.yaml`  | Sensor Tower  | hand-write / export from Connect API docs             |
 | `apptopia.openapi.yaml`     | Apptopia      | hand-write from their API docs                        |
 | `dataai.openapi.yaml`       | data.ai       | hand-write from their API docs                        |
 | `apptweak.openapi.yaml`     | AppTweak      | hand-write from their API docs                        |
@@ -41,6 +51,7 @@ There are three kinds of source:
 | `trustpilot.openapi.yaml`   | Trustpilot    | hand-write / export from their API docs               |
 | `similarweb.openapi.yaml`   | Similarweb    | hand-write / export from their API docs               |
 | `appbrain.openapi.yaml`     | AppBrain      | hand-write / export from their API docs               |
+| `mobileaction.openapi.yaml` | Mobile Action | hand-write / export from their API docs               |
 
 ## Skipped on purpose
 
