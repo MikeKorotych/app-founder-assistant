@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI CEO / Founder Strategist — План</title>
+
+<!--
+  ============================================================================
+  АГЕНТАМ КОМАНДЫ — КАК ОБНОВЛЯТЬ ЭТУ СТРАНИЦУ
+  ----------------------------------------------------------------------------
+  Эта страница — живой статус проекта. НЕ редактируйте разметку/CSS.
+  Обновляйте ТОЛЬКО два JSON-острова ниже (по id):
+
+    1. #data-workstreams — статус воркстримов. Меняйте "status" и "owner".
+       status: "todo" | "in-progress" | "review" | "done"
+
+    2. #data-progress — лог прогресса. ДОБАВЛЯЙТЕ новую запись В НАЧАЛО массива
+       при каждом значимом push:
+       { "date":"YYYY-MM-DD", "author":"имя", "workstream":"A|B|C|D",
+         "summary":"что сделано одной строкой", "commit":"<short-sha>" }
+
+  Рабочий цикл: git pull --rebase → внести изменения в код → обновить нужный
+  JSON-остров здесь → git add -A → commit → push. JSON редактируется легко и
+  почти не даёт merge-конфликтов. Контентные секции плана статичны (зеркало PLAN.md).
+  ============================================================================
+-->
+
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-soft:#0e0e10; --panel:#111114; --panel-2:#15161a;
+    --border:#1e1f23; --border-soft:#191a1e;
+    --text:#ededef; --muted:#9a9da3; --faint:#6b6e74; --dim:#4a4d53;
+    --mono:#c9ccd1;
+    --r:11px; --maxw:880px;
+    --dot-done:#e6e7e9; --dot-prog:#9a9da3; --dot-review:#6b6e74; --dot-todo:#3a3c42;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:
+      radial-gradient(900px 420px at 50% -160px, #161619 0%, rgba(0,0,0,0) 70%),
+      var(--bg);
+    color:var(--text);
+    font:15px/1.62 "Inter","SF Pro Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    letter-spacing:-0.006em;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:72px 24px 120px}
+  a{color:var(--text); text-decoration:none; border-bottom:1px solid var(--dim)}
+  a:hover{border-color:var(--muted)}
+  code{font-family:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,monospace;
+    font-size:.86em; color:var(--mono); background:var(--panel-2);
+    border:1px solid var(--border-soft); padding:.08em .42em; border-radius:6px}
+
+  /* hero */
+  .eyebrow{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); margin:0 0 18px}
+  h1{font-size:34px; line-height:1.12; font-weight:600; letter-spacing:-0.025em; margin:0 0 14px}
+  .lede{font-size:16px; color:var(--muted); max-width:62ch; margin:0 0 26px}
+  .meta{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px}
+  .pill{font-size:12px; color:var(--muted); border:1px solid var(--border);
+    background:var(--panel); padding:5px 11px; border-radius:999px}
+  .pill b{color:var(--text); font-weight:600}
+
+  /* section */
+  section{margin-top:54px}
+  .label{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint);
+    display:flex; align-items:center; gap:12px; margin:0 0 18px}
+  .label::after{content:""; flex:1; height:1px; background:var(--border-soft)}
+  h2{font-size:21px; font-weight:600; letter-spacing:-0.02em; margin:0 0 8px}
+  h3{font-size:15px; font-weight:600; margin:22px 0 8px; color:var(--text)}
+  p{margin:0 0 12px; color:#d3d4d7}
+  .sub{color:var(--muted)}
+  ul{margin:0 0 12px; padding-left:18px} li{margin:4px 0; color:#d3d4d7}
+  strong{color:#fff; font-weight:600}
+
+  /* cards */
+  .grid{display:grid; gap:12px}
+  .grid.c2{grid-template-columns:1fr 1fr}
+  .grid.c4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:720px){.grid.c2,.grid.c4{grid-template-columns:1fr}}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:var(--r); padding:16px 18px}
+  .card h3{margin-top:0}
+  .card .n{font-size:11px; color:var(--faint); letter-spacing:.14em; text-transform:uppercase}
+
+  /* pillars */
+  .pillar{display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--border-soft)}
+  .pillar:last-child{border-bottom:0}
+  .pillar .idx{font-variant-numeric:tabular-nums; color:var(--faint); font-size:13px; width:22px; flex:none; padding-top:1px}
+  .pillar b{display:block; margin-bottom:2px}
+
+  /* table */
+  table{width:100%; border-collapse:collapse; margin:6px 0 8px; font-size:14px}
+  th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--border-soft); vertical-align:top}
+  th{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); font-weight:500}
+  td:first-child{color:#fff; font-weight:500; white-space:nowrap}
+  tbody tr:hover{background:var(--bg-soft)}
+  .tag{font-size:11px; color:var(--mono); border:1px solid var(--border); border-radius:5px; padding:1px 7px}
+
+  /* status board */
+  .board{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
+  @media(max-width:720px){.board{grid-template-columns:1fr 1fr}}
+  .ws{background:var(--panel); border:1px solid var(--border); border-radius:var(--r); padding:15px}
+  .ws .row{display:flex; align-items:center; gap:8px; justify-content:space-between}
+  .ws .k{font-size:12px; color:var(--faint)}
+  .ws .t{font-size:13.5px; font-weight:600; margin:8px 0 10px; line-height:1.35}
+  .ws .own{font-size:12px; color:var(--muted)}
+  .st{display:inline-flex; align-items:center; gap:7px; font-size:12px; color:var(--muted)}
+  .dot{width:8px; height:8px; border-radius:50%; background:var(--dot-todo); flex:none}
+  .st[data-s="done"] .dot{background:var(--dot-done)} .st[data-s="done"]{color:var(--text)}
+  .st[data-s="in-progress"] .dot{background:var(--dot-prog); box-shadow:0 0 0 3px rgba(154,157,163,.13)}
+  .st[data-s="review"] .dot{background:var(--dot-review)}
+  .st[data-s="todo"] .dot{background:var(--dot-todo)}
+
+  /* progress timeline */
+  .log{position:relative; margin-top:6px; padding-left:22px}
+  .log::before{content:""; position:absolute; left:4px; top:6px; bottom:6px; width:1px; background:var(--border)}
+  .entry{position:relative; padding:0 0 18px}
+  .entry::before{content:""; position:absolute; left:-22px; top:6px; width:9px; height:9px; border-radius:50%;
+    background:var(--panel); border:1px solid var(--muted)}
+  .entry:first-child::before{background:var(--text); border-color:var(--text)}
+  .entry .head{display:flex; gap:10px; align-items:baseline; flex-wrap:wrap}
+  .entry .date{font-variant-numeric:tabular-nums; color:var(--faint); font-size:12.5px}
+  .entry .who{font-size:12.5px; color:var(--mono)}
+  .entry .sha{font-family:"SF Mono",ui-monospace,monospace; font-size:11.5px; color:var(--faint);
+    border:1px solid var(--border-soft); border-radius:5px; padding:0 6px}
+  .entry .sum{color:#d3d4d7; margin-top:3px}
+  .entry .wsbadge{font-size:10.5px; letter-spacing:.06em; color:var(--faint); border:1px solid var(--border);
+    border-radius:5px; padding:1px 6px}
+
+  .note{background:var(--bg-soft); border:1px solid var(--border-soft); border-left:2px solid var(--dim);
+    border-radius:8px; padding:12px 16px; color:var(--muted); font-size:13.5px; margin-top:14px}
+  .files{font-size:13.5px}
+  .files div{display:flex; gap:12px; padding:7px 0; border-bottom:1px solid var(--border-soft)}
+  .files div:last-child{border-bottom:0}
+  .files .p{font-family:"SF Mono",ui-monospace,monospace; color:var(--mono); white-space:nowrap}
+  .files .d{color:var(--muted)}
+  footer{margin-top:72px; padding-top:22px; border-top:1px solid var(--border-soft); color:var(--faint); font-size:12.5px}
+  .toc{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:18px; font-size:13px}
+  .toc a{color:var(--muted); border:0}
+  .toc a:hover{color:var(--text)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Хакатон 2026 · AI-співробітник</p>
+  <h1>AI CEO / Founder Strategist</h1>
+  <p class="lede">Агент, который из одной фразы-идеи собирает обоснованный, цитированный отчёт валидации:
+  оценка по 4 категориям (×25 → /100), живая юнит-экономика и список gaps для CustDev — работа консультанта за $5k и 2 недели, за ~90 секунд.</p>
+  <div class="meta">
+    <span class="pill">Команда <b>3 чел.</b></span>
+    <span class="pill">Срок <b>1–2 дня</b></span>
+    <span class="pill">Приоритет <b>бизнес-ценность + чистое демо</b></span>
+    <span class="pill">Стек <b>Express · Claude API · Railway</b></span>
+  </div>
+
+  <div class="toc">
+    <a href="#status">Статус</a><a href="#progress">Прогресс</a><a href="#concept">Концепция</a>
+    <a href="#validation">Валидация</a><a href="#pipeline">Пайплайн</a><a href="#demo">Демо</a>
+    <a href="#risks">Риски</a><a href="#stack">Стек</a><a href="#sources">Источники</a>
+  </div>
+
+  <!-- ===================== ЖИВОЙ СТАТУС ===================== -->
+  <section id="status">
+    <p class="label">Статус воркстримов</p>
+    <div class="board" id="board"></div>
+    <div class="note">Эта секция и «Прогресс» обновляются автоматически: агенты участников при каждом push
+    редактируют JSON-острова внизу страницы (<code>#data-workstreams</code>, <code>#data-progress</code>) — не верстку.</div>
+  </section>
+
+  <section id="progress">
+    <p class="label">Лог прогресса</p>
+    <div class="log" id="log"></div>
+  </section>
+
+  <!-- ===================== КОНЦЕПЦИЯ ===================== -->
+  <section id="concept">
+    <p class="label">Концепция и дифференциация</p>
+    <h2>Не «обёртка над ChatGPT» — видимый AI-аналитик</h2>
+    <p class="sub">Главный риск концепции — выглядеть как чат-бот. Бьём четырьмя столпами; каждая фича обязана усиливать один из них.</p>
+    <div class="pillar"><span class="idx">01</span><div><b>Grounding</b><span class="sub">Реальный веб-ресёрч через нативный <code>web_search</code> Anthropic — цитаты встроены, кликабельны, не стоят токенов.</span></div></div>
+    <div class="pillar"><span class="idx">02</span><div><b>Transparency</b><span class="sub">Живой research-timeline: видно реальные поисковые запросы и появляющиеся источники, шаг за шагом.</span></div></div>
+    <div class="pillar"><span class="idx">03</span><div><b>Interactivity</b><span class="sub">Редактируемые допущения мгновенно пересчитывают юнит-экономику локально — чат-бот так не умеет.</span></div></div>
+    <div class="pillar"><span class="idx">04</span><div><b>Polished deliverable</b><span class="sub">Экспорт в PDF/дек с Sources appendix — осязаемый артефакт работы.</span></div></div>
+  </section>
+
+  <!-- ===================== ВАЛИДАЦИЯ ===================== -->
+  <section id="validation">
+    <p class="label">Слой валидации + Multi-LLM панель</p>
+    <h2>4 категории × 25 → /100 + gaps для CustDev</h2>
+    <p class="sub">Поверх ресёрч-пайплайна (он собирает grounded-факты) работает скоринговый слой на базе <strong>Lean Canvas</strong> и критериев хакатона.</p>
+    <table>
+      <thead><tr><th>Категория</th><th>Что проверяем</th><th>Данные из шагов</th><th>Балл</th></tr></thead>
+      <tbody>
+        <tr><td>Problem × Market</td><td>Болит ли? Кто платит и сколько? TAM/SAM/SOM, ICP, CustDev</td><td><span class="tag">brief</span> <span class="tag">market</span></td><td>/25</td></tr>
+        <tr><td>Solution × Diff.</td><td>Почему это и почему сейчас? Топ-3 конкурента, unfair advantage</td><td><span class="tag">competitors</span></td><td>/25</td></tr>
+        <tr><td>Business Model × UE</td><td>Сходится ли математика? Монетизация, LTV/CAC, путь к breakeven</td><td><span class="tag">canvas</span> <span class="tag">unitEconomics</span></td><td>/25</td></tr>
+        <tr><td>GTM × Traction</td><td>Как берём первых клиентов? Каналы, первый сегмент, early signals</td><td><span class="tag">gtm</span></td><td>/25</td></tr>
+      </tbody>
+    </table>
+    <h3>Multi-LLM панель (один LLM, разные системные промпты)</h3>
+    <div class="grid c4">
+      <div class="card"><span class="n">Persona</span><h3>Скептик-инвестор</h3><p class="sub">Ищет дыры, слабые места, задаёт жёсткие вопросы.</p></div>
+      <div class="card"><span class="n">Persona</span><h3>Адвокат</h3><p class="sub">Строит strongest case, лучшие аргументы за идею.</p></div>
+      <div class="card"><span class="n">Persona</span><h3>Нейтральный аналитик</h3><p class="sub">Взвешенная оценка без bias.</p></div>
+      <div class="card"><span class="n">Synthesizer</span><h3>Синтезатор</h3><p class="sub">Усредняет баллы → /100. Расхождение >5 баллов = главный риск и вопрос для CustDev.</p></div>
+    </div>
+    <div class="note">Это сильнейший антидот «обёртке»: многоперспективное рассуждение и <strong>честные разногласия</strong> вместо одного монолога.</div>
+  </section>
+
+  <!-- ===================== ПАЙПЛАЙН ===================== -->
+  <section id="pipeline">
+    <p class="label">Пайплайн агента — DAG из 8 шагов</p>
+    <table>
+      <thead><tr><th>#</th><th>Шаг</th><th>Модель</th><th>web_search</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Структурирование идеи</td><td>Sonnet 4.6</td><td>—</td></tr>
+        <tr><td>2</td><td>Sizing рынка TAM/SAM/SOM</td><td>Opus 4.8</td><td>✓</td></tr>
+        <tr><td>3</td><td>Скан конкурентов</td><td>Sonnet 4.6</td><td>✓</td></tr>
+        <tr><td>4</td><td>Business Model Canvas</td><td>Sonnet 4.6</td><td>—</td></tr>
+        <tr><td>5</td><td>GTM / 30-60-90</td><td>Sonnet 4.6</td><td>лёгкий</td></tr>
+        <tr><td>6</td><td>Юнит-экономика (assumptions)</td><td>Opus 4.8</td><td>лёгкий</td></tr>
+        <tr><td>7</td><td>Реестр рисков</td><td>Sonnet 4.6</td><td>—</td></tr>
+        <tr><td>8</td><td>Синтез → питч / one-pager</td><td>Opus 4.8</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><strong>Жёсткое правило:</strong> каждая количественная цифра — это <code>Fact</code> с <code>citationId</code> ИЛИ <code>estimated:true</code> + явное допущение. Никогда не выдумывать цитату. Математика юнит-экономики живёт в чистом TS (<code>computeUnitEconomics</code>), не в LLM.</div>
+  </section>
+
+  <!-- ===================== ДЕМО ===================== -->
+  <section id="demo">
+    <p class="label">Killer demo · 2.5 мин</p>
+    <div class="grid c2">
+      <div class="card"><span class="n">0:00</span><h3>Пре-фрейм</h3><p class="sub">«Market-entry анализ у консультанта — $5k и 2 недели. Смотрите за 90 секунд — и проверяйте источники по ходу».</p></div>
+      <div class="card"><span class="n">0:15</span><h3>Вход</h3><p class="sub">Одна выверенная B2B-идея с проверяемыми данными (напр. свежий корм для собак по подписке, Польша).</p></div>
+      <div class="card"><span class="n">0:30</span><h3>Прогон</h3><p class="sub">План-декомпозиция → live-поиск с кликабельными цитатами → таблица конкурентов в реальном времени → TAM/SAM/SOM funnel.</p></div>
+      <div class="card"><span class="n">1:50 · WOW 1</span><h3>Live-пересчёт</h3><p class="sub">«CAC 40 → 70». Меняем → LTV:CAC, payback, риск-флаг пересчитываются вживую.</p></div>
+      <div class="card"><span class="n">2:10 · WOW 2</span><h3>Экспорт</h3><p class="sub">Клик Export → скачивается PDF/дек с источниками-appendix.</p></div>
+      <div class="card"><span class="n">2:25</span><h3>Закрытие</h3><p class="sub">«Фундируемый план с цитированными источниками и живой финмоделью — за 90 секунд».</p></div>
+    </div>
+    <div class="note">Правило: подаём <strong>доказательства</strong> («вот откуда цифра»), а не прозу. ~90% демо — детерминированный реплей выверенного golden-прогона; live-генерация — на Q&A.</div>
+  </section>
+
+  <!-- ===================== РИСКИ ===================== -->
+  <section id="risks">
+    <p class="label">Риски и митигации</p>
+    <table>
+      <thead><tr><th>Риск</th><th>Митигация</th></tr></thead>
+      <tbody>
+        <tr><td>Live-поиск падает на сцене</td><td>Реплей сохранённого golden-Run (offline); live — только в Q&A. Spend-cap + второй ключ.</td></tr>
+        <tr><td>Галлюцинированные цифры/цитаты</td><td>Schema-enforce <code>citationId</code>, серверная валидация, честный <code>estimated:true</code>. Opus на числах.</td></tr>
+        <tr><td>Долгий агент рвёт стриминг</td><td>Персистентный Express на Railway, SSE с heartbeat, персист событий, per-step бюджеты.</td></tr>
+        <tr><td>Математика ≠ проза LLM</td><td>Математика в тестируемом чистом TS; LLM даёт только допущения. Один источник истины.</td></tr>
+        <tr><td>Schema churn стопорит команду</td><td>Контракт <code>src/shared/types.ts</code> заморожен на kickoff; изменение = тим-синк.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===================== СТЕК ===================== -->
+  <section id="stack">
+    <p class="label">Стек и ключевые файлы</p>
+    <p class="sub">Расширяем существующий бэкенд (Express + TypeScript ESM + <code>@anthropic-ai/sdk</code>, деплой Railway уже настроен), добавляем лёгкий фронт. Без Next.js/Prisma — не окупается за 1–2 дня поверх готового скаффолда.</p>
+    <div class="files">
+      <div><span class="p">src/shared/types.ts</span><span class="d">Замороженный контракт: 8 шагов, Run, AgentEvent (SSE), Fact/Citation</span></div>
+      <div><span class="p">src/shared/unitEconomics.ts</span><span class="d">Чистый детерминированный движок (математика тут, не в LLM)</span></div>
+      <div><span class="p">src/agent/orchestrator.ts</span><span class="d">DAG-раннер: роутинг моделей + эмиссия событий</span></div>
+      <div><span class="p">src/agent/steps/</span><span class="d">Типизированные шаги (1 TODO = 1 задача workstream A)</span></div>
+      <div><span class="p">src/store/runs.ts</span><span class="d">JSON-персист/реплей — страховка демо</span></div>
+      <div><span class="p">src/index.ts</span><span class="d">TODO: SSE /agent/stream + раздача статики + экспорт PDF</span></div>
+      <div><span class="p">web/</span><span class="d">UI (стек TBD): форма, live-timeline, интерактивная юнит-экономика</span></div>
+    </div>
+  </section>
+
+  <!-- ===================== ИСТОЧНИКИ ===================== -->
+  <section id="sources">
+    <p class="label">Knowledge sources (skills)</p>
+    <div class="grid c2">
+      <div class="card"><h3>kuchin/awesome-ceo</h3><p class="sub">Фандрейзинг, питч-деки, юнит-экономика, GTM — для GTM × Traction и тона инвестор-питча.</p></div>
+      <div class="card"><h3>awesome-startup / -tools</h3><p class="sub">Валидация идей, шаблоны бизнес-планов, калькуляторы юнит-экономики.</p></div>
+      <div class="card"><h3>dend/awesome-product-management</h3><p class="sub">PRD-шаблоны, Customer Development, приоритизация — для CustDev и брифа.</p></div>
+      <div class="card"><h3>developer-roadmap (PM)</h3><p class="sub"><strong>Lean Canvas</strong> — каркас одностраничной упаковки идеи, основа слоя валидации.</p></div>
+    </div>
+    <div class="note">Полный план и техдетали — в <a href="PLAN.md">PLAN.md</a> (источник истины; эта страница — его витрина + живой статус).</div>
+  </section>
+
+  <footer>
+    Живой план проекта · обновляется агентами команды при каждом push · зеркало <a href="PLAN.md">PLAN.md</a>
+  </footer>
+</div>
+
+<!-- ===================== JSON-ОСТРОВА (редактируют агенты) ===================== -->
+<script type="application/json" id="data-workstreams">
+[
+  { "id":"A", "title":"Пайплайн агента + grounding", "owner":"—", "status":"in-progress" },
+  { "id":"B", "title":"Стриминг, персист, юнит-экономика", "owner":"—", "status":"in-progress" },
+  { "id":"C", "title":"Report UI + интерактив", "owner":"—", "status":"todo" },
+  { "id":"D", "title":"Экспорт, демо, деплой", "owner":"—", "status":"todo" }
+]
+</script>
+<script type="application/json" id="data-progress">
+[
+  { "date":"2026-05-30", "author":"scaffold", "workstream":"A/B", "summary":"Контракт типов, оркестратор, заглушки 8 шагов, движок юнит-экономики (проверен). Typecheck чистый.", "commit":"fa5ef47" },
+  { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"План проекта (PLAN.md) + витрина plan.html. Концепция: validation-отчёт + Multi-LLM панель.", "commit":"—" }
+]
+</script>
+
+<script>
+  const STATUS_LABEL = { "done":"Done", "in-progress":"In progress", "review":"Review", "todo":"To do" };
+  const read = id => { try { return JSON.parse(document.getElementById(id).textContent); } catch { return []; } };
+
+  // Workstream board
+  const board = document.getElementById("board");
+  read("data-workstreams").forEach(w => {
+    const s = STATUS_LABEL[w.status] || w.status;
+    const el = document.createElement("div");
+    el.className = "ws";
+    el.innerHTML =
+      `<div class="row"><span class="k">Workstream ${w.id}</span>
+        <span class="st" data-s="${w.status}"><span class="dot"></span>${s}</span></div>
+       <div class="t">${w.title}</div>
+       <div class="own">${w.owner && w.owner !== "—" ? "👤 " + w.owner : "не назначен"}</div>`;
+    board.appendChild(el);
+  });
+
+  // Progress timeline (newest first — keep newest at top of the JSON array)
+  const log = document.getElementById("log");
+  read("data-progress").forEach(e => {
+    const el = document.createElement("div");
+    el.className = "entry";
+    el.innerHTML =
+      `<div class="head">
+         <span class="date">${e.date}</span>
+         <span class="who">${e.author}</span>
+         ${e.workstream && e.workstream !== "—" ? `<span class="wsbadge">WS ${e.workstream}</span>` : ""}
+         ${e.commit && e.commit !== "—" ? `<span class="sha">${e.commit}</span>` : ""}
+       </div>
+       <div class="sum">${e.summary}</div>`;
+    log.appendChild(el);
+  });
+</script>
+</body>
+</html>
