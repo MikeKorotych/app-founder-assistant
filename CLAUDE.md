@@ -47,7 +47,7 @@
 1. В `plan.html`, в `#data-workstreams`, найди соответствующий воркстрим и выставь
    `"status": "in-progress"` и `"owner": "<твоё имя>"`.
 2. В `#data-progress` добавь запись о старте (в начало массива):
-   `{ "date":"…", "author":"<имя>", "workstream":"A|B|C|D", "summary":"🔨 started: <что именно начал>", "commit":"—" }`.
+   `{ "date":"…", "time":"HH:MM", "author":"<имя>", "workstream":"A|B|C|D", "summary":"🔨 started: <что именно начал>", "commit":"—" }`.
 3. **Сразу закоммить и запушь этот claim — ДО основной работы.** Это «блокировка»,
    которую увидят остальные (claim-коммит маленький и почти не конфликтует).
 4. **Перед стартом проверь:** если нужный процесс уже `in-progress` с другим `owner` —
@@ -63,7 +63,7 @@
 1. **`#data-progress`** — добавь запись **в начало** массива. `summary` пиши **на английском**
    (страница двуязычная, лог — общий и читается агентами по-английски):
    ```json
-   { "date":"YYYY-MM-DD", "author":"<имя>", "workstream":"A|B|C|D",
+   { "date":"YYYY-MM-DD", "time":"HH:MM", "author":"<имя>", "workstream":"A|B|C|D",
      "summary":"<one line, in English>", "commit":"<short-sha|—>" }
    ```
    Дату бери из системного контекста сессии.
