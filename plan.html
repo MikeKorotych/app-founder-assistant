@@ -10,14 +10,17 @@
   TEAM AGENTS — HOW TO UPDATE THIS PAGE  (read the English content: ?lang=en)
   ----------------------------------------------------------------------------
   This page is the project's live status. Do NOT edit markup/CSS or the I18N
-  dictionary. Update ONLY the two JSON islands below (by id):
+  dictionary. Update ONLY the three JSON islands below (by id):
 
-    1. #data-workstreams — workstream status. Change "status" and "owner".
+    1. #data-workstreams — high-level workstream status. Change "status" and "owner".
        status: "todo" | "in-progress" | "review" | "done"
 
     2. #data-progress — progress log. PREPEND a new entry on every meaningful push:
        { "date":"YYYY-MM-DD", "time":"HH:MM", "author":"name", "workstream":"A|B|C|D",
          "summary":"one line, IN ENGLISH", "commit":"<short-sha>" }
+
+    3. #data-roadmap — sub-task board (Roadmap tab). Claim a sub-task before working:
+       set its "status" + "owner" by "id" (e.g. A3). See CLAUDE.md.
 
   Workflow: git pull --rebase -> change code -> update the JSON island here ->
   git add -A -> commit -> push. JSON edits rarely conflict. The plan prose is
@@ -131,6 +134,22 @@
   .st[data-s="review"] .dot{background:var(--dot-review)}
   .st[data-s="todo"] .dot{background:var(--dot-todo)}
 
+  /* roadmap */
+  .rm-group{margin:20px 0 10px}
+  .rm-group:first-child{margin-top:4px}
+  .rm-gh{display:flex; align-items:baseline; gap:10px; margin-bottom:9px}
+  .rm-gh .gt{font-size:13px; font-weight:600; letter-spacing:.02em; color:var(--text)}
+  .rm-gh .gc{font-size:11.5px; color:var(--faint); font-variant-numeric:tabular-nums}
+  .rm-gh .bar{flex:1; height:3px; background:var(--border); border-radius:2px; overflow:hidden; max-width:160px}
+  .rm-gh .bar i{display:block; height:100%; background:var(--muted)}
+  .rm-task{display:flex; align-items:center; gap:12px; padding:10px 13px; border:1px solid var(--border-soft);
+    border-radius:9px; background:var(--panel); margin-bottom:6px}
+  .rm-task .id{font-family:"SF Mono",ui-monospace,monospace; font-size:11px; color:var(--faint); min-width:30px}
+  .rm-task .tt{flex:1; font-size:13.5px; color:#d3d4d7}
+  .rm-task .own{font-size:12px; color:var(--muted); white-space:nowrap}
+  .rm-task[data-s="done"] .tt{color:var(--faint); text-decoration:line-through; text-decoration-color:var(--dim)}
+  @media(max-width:620px){ .rm-task{flex-wrap:wrap; gap:7px} .rm-task .tt{flex-basis:100%; order:3} }
+
   /* progress timeline */
   .log{position:relative; margin-top:6px; padding-left:22px}
   .log::before{content:""; position:absolute; left:4px; top:6px; bottom:6px; width:1px; background:var(--border)}
@@ -198,6 +217,7 @@
 
   <nav class="tabs" id="tabs" role="tablist">
     <button class="tab" data-tab="status" data-i18n="toc_status"></button>
+    <button class="tab" data-tab="roadmap" data-i18n="toc_roadmap"></button>
     <button class="tab" data-tab="concept" data-i18n="toc_concept"></button>
     <button class="tab" data-tab="validation" data-i18n="toc_validation"></button>
     <button class="tab" data-tab="pipeline" data-i18n="toc_pipeline"></button>
@@ -217,6 +237,13 @@
   <section id="progress" data-panel="status">
     <p class="label" data-i18n="progress_label"></p>
     <div class="log" id="log"></div>
+  </section>
+
+  <!-- ===================== ROADMAP ===================== -->
+  <section id="roadmap" data-panel="roadmap">
+    <p class="label" data-i18n="roadmap_label"></p>
+    <div id="roadmap-board"></div>
+    <div class="note" data-i18n="roadmap_note"></div>
   </section>
 
   <!-- ===================== CONCEPT ===================== -->
@@ -343,11 +370,59 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"11:55", "author":"scaffold", "workstream":"—", "summary":"plan.html: Roadmap tab — 34 sub-tasks (F/A/B/C/D) claimable by id via #data-roadmap; claim now per sub-task.", "commit":"—" },
+  { "date":"2026-05-30", "time":"11:42", "author":"Ruslan", "workstream":"—", "summary":"Doc sync: reconciled CLAUDE.md + plan.html with the monorepo reality and logged the integrations + LLM-gateway work. Typecheck green (10/10).", "commit":"—" },
+  { "date":"2026-05-30", "time":"11:40", "author":"scaffold", "workstream":"—", "summary":"CLAUDE.md: claim-before-start protocol (in-progress + owner, push first); refreshed paths for the pnpm/turbo monorepo.", "commit":"—" },
+  { "date":"2026-05-30", "time":"11:28", "author":"Ruslan", "workstream":"—", "summary":"Migrated flat src/ to pnpm+Turborepo monorepo (apps/api + packages/{contracts,agent,store,unit-economics,integrations}); rewrote README; Railway pinned to @hahaton/api.", "commit":"56e2f7f" },
+  { "date":"2026-05-30", "time":"11:27", "author":"Ruslan", "workstream":"A", "summary":"integrations package: API source/auth contracts for 11 sources + OpenAPI->TS codegen (pnpm generate:contracts); googleplay types generated.", "commit":"56e2f7f" },
+  { "date":"2026-05-30", "time":"11:26", "author":"Ruslan", "workstream":"A", "summary":"specs/llm-gateway-plan.md: plan to port outbound resilience core + LiteLLM provider (openai SDK) sharing only the Outbound* error taxonomy. Not yet implemented.", "commit":"56e2f7f" },
   { "date":"2026-05-30", "time":"11:25", "author":"scaffold", "workstream":"—", "summary":"plan.html: content split into large prominent tabs (one section per tab); status+progress grouped.", "commit":"—" },
   { "date":"2026-05-30", "time":"11:20", "author":"scaffold", "workstream":"—", "summary":"plan.html: JS smooth-scroll TOC (works in iframe/preview) + responsive layout for small screens.", "commit":"f2d9d62" },
   { "date":"2026-05-30", "time":"11:18", "author":"scaffold", "workstream":"—", "summary":"Bilingual plan.html (UA/EN) with a language switch; agents read the English version.", "commit":"—" },
   { "date":"2026-05-30", "time":"11:13", "author":"scaffold", "workstream":"—", "summary":"CLAUDE.md: mandatory loop — pull + read plan before work, update status + push after.", "commit":"a467749" },
   { "date":"2026-05-30", "time":"11:05", "author":"scaffold", "workstream":"A/B", "summary":"Type contract, orchestrator, 8 step stubs, unit-economics engine (verified). Typecheck clean.", "commit":"fa5ef47" }
+]
+</script>
+<script type="application/json" id="data-roadmap">
+[
+  { "id":"F1", "group":"F", "title_uk":"Каркас монорепи (pnpm + turbo)", "title_en":"Monorepo scaffold (pnpm + turbo)", "owner":"—", "status":"done" },
+  { "id":"F2", "group":"F", "title_uk":"Заморожений контракт — packages/contracts", "title_en":"Frozen contract — packages/contracts", "owner":"—", "status":"done" },
+  { "id":"F3", "group":"F", "title_uk":"Рушій юніт-економіки — packages/unit-economics", "title_en":"Unit-economics engine — packages/unit-economics", "owner":"—", "status":"done" },
+  { "id":"F4", "group":"F", "title_uk":"Живий план + статус (plan.html, CLAUDE.md)", "title_en":"Live plan + status (plan.html, CLAUDE.md)", "owner":"—", "status":"done" },
+
+  { "id":"A1", "group":"A", "title_uk":"LLM-gateway + web_search (packages/integrations)", "title_en":"LLM gateway + web_search (packages/integrations)", "owner":"—", "status":"todo" },
+  { "id":"A2", "group":"A", "title_uk":"Крок 1 — структурування ідеї (Sonnet)", "title_en":"Step 1 — idea structuring (Sonnet)", "owner":"—", "status":"todo" },
+  { "id":"A3", "group":"A", "title_uk":"Крок 2 — sizing ринку TAM/SAM/SOM + цитати (Opus)", "title_en":"Step 2 — market sizing TAM/SAM/SOM + citations (Opus)", "owner":"—", "status":"todo" },
+  { "id":"A4", "group":"A", "title_uk":"Крок 3 — скан конкурентів + цитати (Sonnet)", "title_en":"Step 3 — competitor scan + citations (Sonnet)", "owner":"—", "status":"todo" },
+  { "id":"A5", "group":"A", "title_uk":"Крок 4 — Business Model Canvas (Sonnet)", "title_en":"Step 4 — Business Model Canvas (Sonnet)", "owner":"—", "status":"todo" },
+  { "id":"A6", "group":"A", "title_uk":"Крок 5 — GTM / 30-60-90 (Sonnet)", "title_en":"Step 5 — GTM / 30-60-90 (Sonnet)", "owner":"—", "status":"todo" },
+  { "id":"A7", "group":"A", "title_uk":"Крок 6 — припущення юніт-економіки (Opus)", "title_en":"Step 6 — unit-economics assumptions (Opus)", "owner":"—", "status":"todo" },
+  { "id":"A8", "group":"A", "title_uk":"Крок 7 — реєстр ризиків (Sonnet)", "title_en":"Step 7 — risk register (Sonnet)", "owner":"—", "status":"todo" },
+  { "id":"A9", "group":"A", "title_uk":"Крок 8 — синтез → пітч/one-pager (Opus)", "title_en":"Step 8 — synthesis → pitch/one-pager (Opus)", "owner":"—", "status":"todo" },
+  { "id":"A10", "group":"A", "title_uk":"Grounding: enforce citationId + серверна валідація", "title_en":"Grounding: enforce citationId + server validation", "owner":"—", "status":"todo" },
+  { "id":"A11", "group":"A", "title_uk":"Multi-LLM панель + скоринг 4×25 + gaps", "title_en":"Multi-LLM panel + 4×25 scoring + gaps", "owner":"—", "status":"todo" },
+  { "id":"A12", "group":"A", "title_uk":"Роутинг моделей + prompt caching", "title_en":"Model routing + prompt caching", "owner":"—", "status":"todo" },
+
+  { "id":"B1", "group":"B", "title_uk":"SSE /agent/stream (apps/api)", "title_en":"SSE /agent/stream (apps/api)", "owner":"—", "status":"todo" },
+  { "id":"B2", "group":"B", "title_uk":"Схема подій + heartbeats", "title_en":"Event schema + heartbeats", "owner":"—", "status":"todo" },
+  { "id":"B3", "group":"B", "title_uk":"Персист Run + реплей (packages/store)", "title_en":"Run persist + replay (packages/store)", "owner":"—", "status":"todo" },
+  { "id":"B4", "group":"B", "title_uk":"Роздача статики UI + plan.html", "title_en":"Serve static UI + plan.html", "owner":"—", "status":"todo" },
+  { "id":"B5", "group":"B", "title_uk":"Spend cap, бюджети по кроках, обробка помилок", "title_en":"Spend cap, per-step budgets, error handling", "owner":"—", "status":"todo" },
+
+  { "id":"C1", "group":"C", "title_uk":"Вибір UI-стека + скафолд apps/web", "title_en":"Pick UI stack + scaffold apps/web", "owner":"—", "status":"todo" },
+  { "id":"C2", "group":"C", "title_uk":"Форма вводу (ідея + регіон + бюджет)", "title_en":"Input form (idea + region + budget)", "owner":"—", "status":"todo" },
+  { "id":"C3", "group":"C", "title_uk":"Живий research-timeline (SSE)", "title_en":"Live research timeline (SSE)", "owner":"—", "status":"todo" },
+  { "id":"C4", "group":"C", "title_uk":"Секції звіту (ринок/конкуренти/canvas/GTM/ризики/синтез)", "title_en":"Report sections (market/competitors/canvas/GTM/risks/synthesis)", "owner":"—", "status":"todo" },
+  { "id":"C5", "group":"C", "title_uk":"Інтерактивна юніт-економіка (слайдери → перерахунок)", "title_en":"Interactive unit economics (sliders → recompute)", "owner":"—", "status":"todo" },
+  { "id":"C6", "group":"C", "title_uk":"Scorecard валідації (4×25 + gaps + панель)", "title_en":"Validation scorecard (4×25 + gaps + panel)", "owner":"—", "status":"todo" },
+  { "id":"C7", "group":"C", "title_uk":"Цитати (inline + sources appendix)", "title_en":"Citations (inline + sources appendix)", "owner":"—", "status":"todo" },
+  { "id":"C8", "group":"C", "title_uk":"Полірування — монохром/Linear", "title_en":"Polish — monochrome/Linear style", "owner":"—", "status":"todo" },
+
+  { "id":"D1", "group":"D", "title_uk":"Експорт PDF (HTML → PDF + sources appendix)", "title_en":"PDF export (HTML → PDF + sources appendix)", "owner":"—", "status":"todo" },
+  { "id":"D2", "group":"D", "title_uk":"PPTX-дек (stretch)", "title_en":"PPTX deck (stretch)", "owner":"—", "status":"todo" },
+  { "id":"D3", "group":"D", "title_uk":"Hardening деплою Railway", "title_en":"Railway deploy hardening", "owner":"—", "status":"todo" },
+  { "id":"D4", "group":"D", "title_uk":"Golden-прогони (offline-реплей)", "title_en":"Golden demo runs (offline replay)", "owner":"—", "status":"todo" },
+  { "id":"D5", "group":"D", "title_uk":"Демо-сценарій + репетиція", "title_en":"Demo script + rehearsal", "owner":"—", "status":"todo" }
 ]
 </script>
 
@@ -360,6 +435,10 @@
       pill_priority:"Пріоритет <b>бізнес-цінність + чисте демо</b>", pill_stack:"Стек <b>Express · Claude API · Railway</b>",
       toc_status:"Статус", toc_progress:"Прогрес", toc_concept:"Концепція", toc_validation:"Валідація",
       toc_pipeline:"Пайплайн", toc_demo:"Демо", toc_risks:"Ризики", toc_stack:"Стек", toc_sources:"Джерела",
+      toc_roadmap:"Roadmap",
+      roadmap_label:"Roadmap — декомпозиція на саб-таски",
+      roadmap_note:"Це claimable-дошка задач. Беручи саб-таск у роботу, агент у <code>#data-roadmap</code> виставляє йому <code>status</code> + <code>owner</code> (по <code>id</code>) і пушить — щоб інші бачили, що зайнято і ким. Деталі — у CLAUDE.md.",
+      rm_g_F:"Фундамент / контракти", rm_g_A:"A · Пайплайн агента + grounding", rm_g_B:"B · Стрімінг, сервер, персист", rm_g_C:"C · Report UI", rm_g_D:"D · Експорт, демо, деплой",
       status_label:"Статус воркстрімів",
       status_note:"Ця секція та «Прогрес» оновлюються автоматично: агенти учасників за кожного push редагують JSON-острови внизу сторінки (<code>#data-workstreams</code>, <code>#data-progress</code>) — не верстку.",
       progress_label:"Лог прогресу",
@@ -424,6 +503,10 @@
       pill_priority:"Priority <b>business value + clean demo</b>", pill_stack:"Stack <b>Express · Claude API · Railway</b>",
       toc_status:"Status", toc_progress:"Progress", toc_concept:"Concept", toc_validation:"Validation",
       toc_pipeline:"Pipeline", toc_demo:"Demo", toc_risks:"Risks", toc_stack:"Stack", toc_sources:"Sources",
+      toc_roadmap:"Roadmap",
+      roadmap_label:"Roadmap — sub-task breakdown",
+      roadmap_note:"A claimable task board. When you start a sub-task, set its <code>status</code> + <code>owner</code> in <code>#data-roadmap</code> (by <code>id</code>) and push — so others see what's taken and by whom. Details in CLAUDE.md.",
+      rm_g_F:"Foundation / contracts", rm_g_A:"A · Agent pipeline + grounding", rm_g_B:"B · Streaming, server, persistence", rm_g_C:"C · Report UI", rm_g_D:"D · Export, demo, deploy",
       status_label:"Workstream status",
       status_note:"This section and “Progress” auto-update: each member's agent edits the JSON islands at the bottom of the page (<code>#data-workstreams</code>, <code>#data-progress</code>) on every push — not the markup.",
       progress_label:"Progress log",
@@ -518,6 +601,39 @@
          <div class="sum">${e.summary}</div>`;
       log.appendChild(el);
     });
+
+    // roadmap — sub-tasks grouped by F/A/B/C/D
+    const rm = document.getElementById("roadmap-board");
+    if (rm) {
+      rm.innerHTML = "";
+      const tasks = read("data-roadmap");
+      ["F", "A", "B", "C", "D"].forEach(g => {
+        const items = tasks.filter(x => x.group === g);
+        if (!items.length) return;
+        const done = items.filter(x => x.status === "done").length;
+        const pct = Math.round((done / items.length) * 100);
+        const grp = document.createElement("div");
+        grp.className = "rm-group";
+        grp.innerHTML =
+          `<div class="rm-gh"><span class="gt">${t["rm_g_" + g] || g}</span>
+             <span class="gc">${done}/${items.length}</span>
+             <span class="bar"><i style="width:${pct}%"></i></span></div>`;
+        items.forEach(x => {
+          const s = t["st_" + x.status] || x.status;
+          const title = (LANG === "en" ? x.title_en : x.title_uk) || x.title_en || x.title_uk || "";
+          const row = document.createElement("div");
+          row.className = "rm-task";
+          row.setAttribute("data-s", x.status);
+          row.innerHTML =
+            `<span class="id">${x.id}</span>
+             <span class="st" data-s="${x.status}"><span class="dot"></span>${s}</span>
+             <span class="tt">${title}</span>
+             <span class="own">${x.owner && x.owner !== "—" ? "👤 " + x.owner : t.unassigned}</span>`;
+          grp.appendChild(row);
+        });
+        rm.appendChild(grp);
+      });
+    }
   }
 
   function applyLang(lang){
