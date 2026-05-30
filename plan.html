@@ -476,6 +476,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"15:02", "author":"Codex", "workstream":"P", "summary":"✅ P1: added post-MVP Slack loop to PLAN.md + roadmap — completion alerts, scheduled Scout insight/rank digest, product ideas, and CTA to generate a business plan from Slack.", "commit":"—" },
   { "date":"2026-05-30", "time":"15:02", "author":"Anton", "workstream":"A", "summary":"✅ A17 (resilience): isolated Scout source failures. Workflow now wraps each fetch step in runSource() — after its retry limit a dead source (e.g. AlternativeTo 403) degrades to [] + a warning instead of aborting the run via the shared Promise.all. In-process runScout() collects the same warnings from rejected allSettled sources. New required ScoutSummary.warnings[] surfaces partial results to the caller. +1 test (mocked sources: 1 fails → 3 survive, warning captured); scout 9/9, repo typecheck 12/12, biome clean on touched files.", "commit":"—" },
   { "date":"2026-05-30", "time":"15:02", "author":"Codex", "workstream":"P", "summary":"🔨 started P1: add post-MVP Slack alerts + recurring Scout insight digest to PLAN.md and roadmap as future product loop after MVP.", "commit":"—" },
   { "date":"2026-05-30", "time":"14:58", "author":"Anton", "workstream":"A", "summary":"🔨 started A17 (resilience): isolate Scout source failures — right now all four fetch steps sit under one Promise.all, so one source erroring after retries (e.g. AlternativeTo 403) kills the whole run. Making each source degrade to [] after its retry limit + surface warnings in ScoutSummary.", "commit":"—" },
@@ -573,7 +574,11 @@
   { "id":"D4", "group":"D", "title_uk":"Golden-прогони (offline-реплей)", "title_en":"Golden demo runs (offline replay)", "owner":"—", "status":"todo" },
   { "id":"D5", "group":"D", "title_uk":"Демо-сценарій + репетиція", "title_en":"Demo script + rehearsal", "owner":"—", "status":"todo" },
 
-  { "id":"P1", "group":"P", "title_uk":"Post-MVP: Slack alerts + recurring Scout digest — план", "title_en":"Post-MVP: Slack alerts + recurring Scout digest — plan", "owner":"Codex", "status":"in-progress" }
+  { "id":"P1", "group":"P", "title_uk":"Post-MVP: Slack alerts + recurring Scout digest — план", "title_en":"Post-MVP: Slack alerts + recurring Scout digest — plan", "owner":"Codex", "status":"done" },
+  { "id":"P2", "group":"P", "title_uk":"Post-MVP: Slack alert коли Run/Scout готовий", "title_en":"Post-MVP: Slack alert when Run/Scout completes", "owner":"—", "status":"todo" },
+  { "id":"P3", "group":"P", "title_uk":"Post-MVP: регулярний Scout cron + D1 insights", "title_en":"Post-MVP: recurring Scout cron + D1 insights", "owner":"—", "status":"todo" },
+  { "id":"P4", "group":"P", "title_uk":"Post-MVP: Slack digest з ранками, інсайтами та ідеями", "title_en":"Post-MVP: Slack digest with ranks, insights, and product ideas", "owner":"—", "status":"todo" },
+  { "id":"P5", "group":"P", "title_uk":"Post-MVP: CTA зі Slack → створити business plan", "title_en":"Post-MVP: CTA from Slack → create business plan", "owner":"—", "status":"todo" }
 ]
 </script>
 

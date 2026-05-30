@@ -108,6 +108,21 @@
 
 **Stretch (если зелено):** PPTX-дек, «re-evaluate with AI», deep-dive по странице цен конкурента, пресеты регионов, save/share-ссылка.
 
+**Post-MVP (после того, как основной MVP стабилен): Slack + регулярный Scout.** Это не входит в
+обязательное хакатонное демо, но превращает инструмент из разового генератора отчёта в постоянный
+CEO/Founder radar:
+- **Slack alert по готовому ресёрчу:** когда `Run`/Scout job переходит в `completed` или `failed`,
+  backend отправляет сообщение в выбранный Slack channel: название идеи, validation score, top-3 инсайта,
+  warning flags, ссылки на report/PDF/sources. Ошибки тоже приходят в Slack, чтобы не мониторить UI руками.
+- **Регулярный ресёрч:** Cloudflare Cron Trigger / Workflow запускает Scout по расписанию (например daily/weekly)
+  по категориям/регионам/ключевым словам из настроек, обновляет D1-таблицы `competitors`/`insights`/`product_ideas`.
+- **Slack digest с ранками и идеями:** сообщение группирует инсайты по rank/скорингу: rising competitors,
+  recurring user pains, keyword/category shifts, pricing/subscription signals, и 3-5 идей новых продуктов.
+- **CTA “Make business plan”:** у каждой идеи в Slack есть кнопка/ссылка, которая запускает текущий
+  Idea → Business Plan pipeline с уже заполненным prompt/context и возвращает report link обратно в thread.
+- **Минимальный auth:** Slack Bot Token + Signing Secret/Incoming Webhook как secrets; без полноценного user auth
+  до отдельного product hardening этапа.
+
 ---
 
 ## Killer demo script (2.5 мин)
@@ -151,6 +166,8 @@
 4. **Интерактив:** изменить CAC в UI → LTV:CAC/payback/break-even/чарты пересчитываются локально без сети.
 5. **Экспорт:** сгенерировать PDF → открывается, содержит все секции + Sources appendix с URL и accessedAt.
 6. **Offline-тест демо:** прогнать весь сценарий в airplane mode накануне.
+7. **Post-MVP Slack loop:** завершить сохранённый `Run` → в Slack приходит alert с report link; cron-triggered Scout digest
+   публикует ranked insights; CTA по product idea создаёт новый business-plan run и отвечает ссылкой в thread.
 
 ---
 
@@ -163,6 +180,8 @@
 - `src/shared/unitEconomics.ts` — чистый `computeUnitEconomics` + тесты.
 - `src/store/runs.ts` — персист/реплей `Run` (JSON на диск или SQLite).
 - `web/` (новое) — Vite + React SPA: форма ввода, live research-timeline (SSE), секции отчёта, интерактивная панель юнит-экономики, триггер экспорта. Билд в статику, раздаётся Express.
+- Post-MVP Slack loop — добавить `packages/notifications` или `apps/api/src/slack/*`: Slack webhook/client,
+  signed action endpoint, cron-triggered Scout digest, D1 persistence for insights/product ideas.
 
 ## Knowledge sources (skills / репозитории)
 
