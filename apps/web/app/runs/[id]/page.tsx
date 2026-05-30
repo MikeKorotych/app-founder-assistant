@@ -10,6 +10,7 @@ import { MarketSection } from "./_components/market-section";
 import { RisksSection } from "./_components/risks-section";
 import { SynthesisSection } from "./_components/synthesis-section";
 import { UnitEconomicsSection } from "./_components/unit-economics-section";
+import { ValidationSection } from "./_components/validation-section";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3000";
 
@@ -58,6 +59,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
         <UnitEconomicsSection assumptions={run.assumptions} citations={run.citations} />
         <RisksSection register={run.risks} />
         <SynthesisSection synthesis={run.synthesis} />
+        <ValidationSection validation={run.validation} />
       </div>
     </main>
   );
