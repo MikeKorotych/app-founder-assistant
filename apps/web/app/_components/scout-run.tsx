@@ -6,10 +6,11 @@ import type {
   SearchExpansion,
   ValidationResult,
 } from "@hahaton/contracts";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@hahaton/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, cn } from "@hahaton/ui";
 import { useEffect, useRef, useState } from "react";
 import { apiUrl } from "../_lib/api";
 import { ValidationSection } from "../runs/[id]/_components/validation-section";
+import { Game2048 } from "./game-2048";
 import { randomMockRun } from "./mock-run";
 import { PlatformPie } from "./platform-pie";
 import { ReportBody } from "./report-body";
@@ -54,6 +55,9 @@ type Validation =
   | { kind: "done"; result: ValidationResult }
   | { kind: "error"; message: string };
 
+type ViewMode = "real" | "mock";
+type ProgressState = "done" | "active" | "waiting";
+
 const TERMINAL_OK = new Set(["complete", "completed"]);
 const TERMINAL_BAD = new Set(["errored", "terminated", "failed"]);
 
@@ -79,13 +83,254 @@ function Chips({ items, tone }: { items: string[]; tone: "keyword" | "category" 
       ? "border-primary/40 bg-primary/10 text-foreground"
       : "border-border/60 bg-muted/60 text-muted-foreground";
   return (
-    <div className="stagger-enter flex flex-wrap gap-2">
-      {items.map((item) => (
-        <span key={item} className={`rounded-full border px-3 py-1 text-sm ${cls}`}>
+    <div className="flex flex-wrap gap-2">
+      {items.map((item, index) => (
+        <span
+          key={item}
+          className={`animate-enter rounded-full border px-3 py-1 text-sm ${cls}`}
+          style={{ animationDelay: `${90 + index * 44}ms` }}
+        >
           {item}
         </span>
       ))}
     </div>
+  );
+}
+
+function RestartIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M3 12a9 9 0 1 0 3-6.7" />
+      <path d="M3 4v6h6" />
+    </svg>
+  );
+}
+
+function RunTopBar({
+  idea,
+  mode,
+  onModeChange,
+  onRestart,
+}: {
+  idea: string;
+  mode: ViewMode;
+  onModeChange: (mode: ViewMode) => void;
+  onRestart?: () => void;
+}) {
+  const restart = () => (onRestart ? onRestart() : window.location.assign("/"));
+  return (
+    <div className="animate-enter flex flex-wrap items-start justify-between gap-4">
+      <div className="min-w-0 space-y-1">
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          {mode === "real" ? "Реальний прогін · Demo" : "Мок-прогін · Demo"}
+        </p>
+        <p className="max-w-3xl truncate text-sm text-muted-foreground">{idea}</p>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-2">
+        <div className="inline-flex rounded-md border border-border/60 bg-background/35 p-1 backdrop-blur">
+          {(["real", "mock"] as const).map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => onModeChange(item)}
+              className={cn(
+                "h-8 rounded px-3 text-xs font-medium transition-colors",
+                mode === item
+                  ? "bg-foreground text-background shadow-sm"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
+              )}
+            >
+              {item === "real" ? "Реальний" : "Mock"}
+            </button>
+          ))}
+        </div>
+        <Button
+          aria-label="Нова ідея"
+          className="h-9 w-9 shrink-0 text-muted-foreground [&_svg]:size-5"
+          onClick={restart}
+          size="icon"
+          title="Нова ідея"
+          variant="ghost"
+        >
+          <RestartIcon />
+        </Button>
+        <span className="hidden text-sm text-muted-foreground sm:inline">Нова ідея</span>
+      </div>
+    </div>
+  );
+}
+
+function progressFor(phase: Phase, validation: Validation) {
+  const hasExpansion = "expansion" in phase && Boolean(phase.expansion);
+  return [
+    { label: "Ідея", state: "done" as ProgressState },
+    {
+      label: "Ключі",
+      state: (hasExpansion ? "done" : "active") as ProgressState,
+    },
+    {
+      label: "Scout",
+      state: (phase.kind === "done"
+        ? "done"
+        : hasExpansion
+          ? "active"
+          : "waiting") as ProgressState,
+    },
+    {
+      label: "Конкуренти",
+      state: (phase.kind === "done" ? "done" : "waiting") as ProgressState,
+    },
+    {
+      label: "Валідація",
+      state: (validation.kind === "done"
+        ? "done"
+        : validation.kind === "running" || phase.kind === "done"
+          ? "active"
+          : "waiting") as ProgressState,
+    },
+  ];
+}
+
+function ProgressSlideBar({ steps }: { steps: { label: string; state: ProgressState }[] }) {
+  const doneCount = steps.filter((step) => step.state === "done").length;
+  const activeIndex = steps.findIndex((step) => step.state === "active");
+  const progressIndex = activeIndex === -1 ? doneCount - 1 : activeIndex;
+  const pct = Math.max(0, Math.min(100, (progressIndex / (steps.length - 1)) * 100));
+
+  return (
+    <Card className="animate-enter border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+      <CardContent className="py-4">
+        <div className="relative flex flex-col gap-3">
+          <div className="relative h-1.5 overflow-hidden rounded-full bg-muted/45">
+            <div
+              className="h-full rounded-full bg-foreground transition-[width] duration-700 ease-out"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <div
+            className="grid gap-2"
+            style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
+          >
+            {steps.map((step, index) => (
+              <div
+                key={step.label}
+                className="animate-enter flex min-w-0 flex-col gap-1"
+                style={{ animationDelay: `${index * 70}ms` }}
+              >
+                <span
+                  className={cn(
+                    "h-2 w-2 rounded-full transition-colors",
+                    step.state === "done"
+                      ? "bg-foreground"
+                      : step.state === "active"
+                        ? "bg-foreground/80 shadow-[0_0_0_4px_rgba(255,255,255,0.08)]"
+                        : "bg-muted-foreground/30",
+                  )}
+                />
+                <span
+                  className={cn(
+                    "truncate text-[10px] font-medium uppercase tracking-[0.14em]",
+                    step.state === "waiting" ? "text-muted-foreground/55" : "text-muted-foreground",
+                  )}
+                >
+                  {step.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function GameWhileGenerating({ phase, validation }: { phase: Phase; validation: Validation }) {
+  const label =
+    phase.kind === "expanding"
+      ? "Виділяємо пошуковий намір"
+      : phase.kind === "scanning"
+        ? "Scout збирає конкурентів"
+        : validation.kind === "running"
+          ? "Multi-LLM панель оцінює ідею"
+          : "Готуємо звіт";
+
+  return (
+    <Card className="animate-enter overflow-hidden border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+      <CardContent className="grid gap-6 py-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div className="flex flex-col gap-3">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Поки генерується аналіз
+          </p>
+          <h2 className="text-xl font-semibold tracking-tight">{label}</h2>
+          <p className="max-w-xl text-sm text-muted-foreground">
+            Реальний пайплайн працює у фоні: пошукові ключі, Scout, конкуренти та валідація
+            з'являються по мірі готовності.
+          </p>
+        </div>
+        <div className="justify-self-center">
+          <Game2048 />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SearchIntentSection({
+  idea,
+  phase,
+  expansion,
+}: {
+  idea: string;
+  phase: Phase;
+  expansion?: SearchExpansion;
+}) {
+  return (
+    <section className="scroll-mt-10">
+      <Card className="animate-enter border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <CardHeader className="gap-1.5">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Крок · 1 · search intent
+          </p>
+          <CardTitle className="text-xl">Пошуковий намір</CardTitle>
+          <p className="text-sm text-muted-foreground">{idea}</p>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-5">
+          {phase.kind === "expanding" && (
+            <ScoutLoading
+              title="Розбираємо ідею…"
+              hint="Виділяємо ключові слова та категорії для пошуку конкурентів."
+            />
+          )}
+
+          {expansion && (
+            <div className="animate-enter grid gap-5">
+              <div className="flex flex-col gap-2">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  Категорії · {expansion.categories.length}
+                </p>
+                <Chips items={expansion.categories} tone="category" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  Ключові слова · {expansion.keywords.length}
+                </p>
+                <Chips items={expansion.keywords} tone="keyword" />
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </section>
   );
 }
 
@@ -98,6 +343,7 @@ function Chips({ items, tone }: { items: string[]; tone: "keyword" | "category" 
 export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => void }) {
   const [phase, setPhase] = useState<Phase>({ kind: "expanding" });
   const [validation, setValidation] = useState<Validation>({ kind: "idle" });
+  const [viewMode, setViewMode] = useState<ViewMode>("real");
   const cancelled = useRef(false);
   const mockRunRef = useRef<Run | null>(null);
 
@@ -216,64 +462,60 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
     const run = mockRunRef.current;
     return (
       <div className="flex flex-1 flex-col gap-6">
-        <header className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              Звіт
-            </p>
-            <p className="text-sm text-muted-foreground">{run.input.idea}</p>
-          </div>
-          <button
-            type="button"
-            aria-label="Новий прогін"
-            title="Новий прогін"
-            onClick={() => (onRestart ? onRestart() : window.location.assign("/"))}
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            ↻
-          </button>
-        </header>
+        <RunTopBar
+          idea={run.input.idea}
+          mode="mock"
+          onModeChange={setViewMode}
+          onRestart={onRestart}
+        />
+        <p className="animate-enter text-sm text-muted-foreground">
+          Реальний прогін зупинився: {phase.message}. Показую мок-аналіз, щоб демо не ламалось.
+        </p>
         <ReportBody run={run} />
       </div>
     );
   }
 
   const expansion = "expansion" in phase ? phase.expansion : undefined;
+  const progressSteps = progressFor(phase, validation);
+  const isGenerating =
+    phase.kind === "expanding" || phase.kind === "scanning" || validation.kind === "running";
+
+  if (viewMode === "mock") {
+    if (!mockRunRef.current) mockRunRef.current = randomMockRun();
+    const run = mockRunRef.current;
+    return (
+      <div className="flex flex-col gap-6">
+        <RunTopBar
+          idea={run.input.idea}
+          mode={viewMode}
+          onModeChange={setViewMode}
+          onRestart={onRestart}
+        />
+        <ReportBody run={run} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
-      <Card className="animate-enter border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-        <CardHeader>
-          <CardTitle className="text-base">Ідея</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <p className="text-sm text-foreground/85">{idea}</p>
+      <RunTopBar idea={idea} mode={viewMode} onModeChange={setViewMode} onRestart={onRestart} />
+      {isGenerating && <GameWhileGenerating phase={phase} validation={validation} />}
+      <ProgressSlideBar steps={progressSteps} />
 
-          {phase.kind === "expanding" && (
-            <ScoutLoading
-              title="Розбираємо ідею…"
-              hint="Виділяємо ключові слова та категорії для пошуку конкурентів."
-            />
-          )}
+      {validation.kind === "done" && (
+        <div className="animate-enter">
+          <ValidationSection validation={validation.result} />
+        </div>
+      )}
 
-          {expansion && (
-            <div className="animate-enter flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Категорії · {expansion.categories.length}
-                </p>
-                <Chips items={expansion.categories} tone="category" />
-              </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Ключові слова · {expansion.keywords.length}
-                </p>
-                <Chips items={expansion.keywords} tone="keyword" />
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {validation.kind === "error" && (
+        <p className="animate-enter text-sm text-destructive" role="alert">
+          Валідація не вдалася: {validation.message}
+        </p>
+      )}
+
+      <SearchIntentSection idea={idea} phase={phase} expansion={expansion} />
 
       {phase.kind === "scanning" && (
         <ScoutLoading
@@ -294,26 +536,6 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
           title="Валідуємо ідею…"
           hint="Multi-LLM панель оцінює ідею: Скептик · Адвокат · Аналітик."
         />
-      )}
-
-      {validation.kind === "error" && (
-        <p className="text-sm text-destructive" role="alert">
-          Валідація не вдалася: {validation.message}
-        </p>
-      )}
-
-      {validation.kind === "done" && (
-        <div className="animate-enter">
-          <ValidationSection validation={validation.result} />
-        </div>
-      )}
-
-      {onRestart && phase.kind === "done" && (
-        <div className="flex justify-center pt-2">
-          <Button variant="outline" onClick={onRestart}>
-            Нова ідея
-          </Button>
-        </div>
       )}
     </div>
   );
@@ -379,22 +601,49 @@ function groupBySource(competitors: Competitor[]): [string, Competitor[]][] {
 function CompetitorList({ competitors }: { competitors: Competitor[] }) {
   if (competitors.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">
-        Конкурентів не знайдено для цих запитів. Спробуйте конкретнішу ідею.
-      </p>
+      <section className="scroll-mt-10">
+        <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+          <CardHeader className="gap-1.5">
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Крок · 2 · scout
+            </p>
+            <CardTitle className="text-xl">Конкурентний ландшафт</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Конкурентів не знайдено для цих запитів. Спробуйте конкретнішу ідею.
+            </p>
+          </CardContent>
+        </Card>
+      </section>
     );
   }
   const groups = groupBySource(competitors);
   return (
-    <div className="stagger-enter flex flex-col gap-5">
-      <PlatformPie sources={competitors.map((c) => c.source)} />
-      <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-        Конкуренти · {competitors.length}
-      </p>
-      {groups.map(([source, items]) => (
-        <SourceTable key={source} source={source} items={items} />
-      ))}
-    </div>
+    <section className="scroll-mt-10">
+      <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <CardHeader className="gap-1.5">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Крок · 2 · scout
+          </p>
+          <CardTitle className="text-xl">Конкурентний ландшафт</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Реальні конкуренти з App Store, Google Play, Product Hunt та AlternativeTo.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="stagger-enter flex flex-col gap-5">
+            <PlatformPie sources={competitors.map((c) => c.source)} />
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Конкуренти · {competitors.length}
+            </p>
+            {groups.map(([source, items]) => (
+              <SourceTable key={source} source={source} items={items} />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </section>
   );
 }
 
