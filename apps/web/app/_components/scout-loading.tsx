@@ -1,60 +1,146 @@
 "use client";
 
-// Endel-style ambient "still working" surface. A deep calm panel with three
-// blurred gradient orbs drifting on slow, offset loops (18/23/29s) so the
-// motion never visibly repeats — paired with a softly breathing caption.
-// Used for every waiting state in the run (search-intent, Scout, validation).
-export function ScoutLoading({ title, hint }: { title: string; hint?: string }) {
+import { useEffect, useMemo, useState } from "react";
+
+interface ScoutLoadingProps {
+  title: string;
+  hint?: string;
+  steps?: string[];
+}
+
+const SEARCH_STEPS = [
+  "Нормалізуємо формулювання ідеї.",
+  "Витягуємо intent та user job.",
+  "Будуємо seed keywords.",
+  "Групуємо категорії для пошуку.",
+  "Перевіряємо, чи запити не надто широкі.",
+];
+
+const SCOUT_STEPS = [
+  "Готуємо query-пакет для стора.",
+  "Скануємо iTunes Search API.",
+  "Зіставляємо Android-сигнали з Google Play.",
+  "Перевіряємо Product Hunt та AlternativeTo.",
+  "Прибираємо дублікати конкурентів.",
+  "Ранжуємо результати за сумісністю.",
+];
+
+const VALIDATION_STEPS = [
+  "Передаємо конкурентів у Multi-LLM панель.",
+  "Скептик шукає слабкі місця.",
+  "Адвокат оцінює upside.",
+  "Аналітик звіряє бізнес-модель.",
+  "Збираємо консенсус-оцінку.",
+];
+
+function fallbackSteps(title: string, hint?: string): string[] {
+  const normalized = title.toLowerCase();
+  if (normalized.includes("scout")) return SCOUT_STEPS;
+  if (normalized.includes("валід")) return VALIDATION_STEPS;
+  if (hint) return [hint, ...SEARCH_STEPS.slice(1)];
+  return SEARCH_STEPS;
+}
+
+export function ScoutLoading({ title, hint, steps }: ScoutLoadingProps) {
+  const sequence = useMemo(() => {
+    const explicit = steps?.filter(Boolean);
+    return explicit && explicit.length > 0 ? explicit : fallbackSteps(title, hint);
+  }, [hint, steps, title]);
+  const [index, setIndex] = useState(0);
+  const current = sequence[index % sequence.length] ?? hint ?? title;
+  const stepPosition =
+    sequence.length <= 1 ? 0.72 : (index % sequence.length) / (sequence.length - 1);
+  const activityPct = Math.round(18 + stepPosition * 74);
+
+  useEffect(() => {
+    setIndex(0);
+  }, []);
+
+  useEffect(() => {
+    if (sequence.length <= 1) return;
+    const timer = window.setInterval(() => {
+      setIndex((value) => value + 1);
+    }, 1650);
+    return () => window.clearInterval(timer);
+  }, [sequence.length]);
+
   return (
     <div
-      className="relative overflow-hidden rounded-xl border border-border/60"
+      className="relative overflow-hidden rounded-xl border border-border/60 bg-neutral-950 text-white shadow-[0_18px_60px_rgba(0,0,0,0.22)]"
       style={{
         background:
-          "radial-gradient(120% 120% at 50% 0%, oklch(0.28 0.03 60) 0%, oklch(0.18 0.02 50) 60%, oklch(0.13 0.015 45) 100%)",
+          "radial-gradient(120% 160% at 12% 0%, rgba(255,255,255,0.14), transparent 42%), linear-gradient(135deg, #171717 0%, #0d0d0e 52%, #050506 100%)",
       }}
     >
-      {/* Drifting aurora orbs — screen-blended warm tones over the dark base. */}
+      <style>{`
+        @keyframes scout-scan {
+          0% { transform: translateX(-45%); opacity: 0; }
+          12% { opacity: 0.7; }
+          50% { opacity: 0.35; }
+          100% { transform: translateX(145%); opacity: 0; }
+        }
+        @keyframes scout-dash {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(220%); }
+        }
+        @keyframes scout-caret {
+          0%, 45% { opacity: 1; }
+          46%, 100% { opacity: 0; }
+        }
+        .scout-scan-line { animation: scout-scan 4.8s ease-in-out infinite; }
+        .scout-dash-line { animation: scout-dash 1.8s ease-in-out infinite; }
+        .scout-caret { animation: scout-caret 1s steps(2, end) infinite; }
+      `}</style>
+
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="scout-scan-line absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent blur-xl" />
         <div
-          className="ambient-orb ambient-orb-a"
+          className="absolute inset-0 opacity-[0.08]"
           style={{
-            top: "-30%",
-            left: "-10%",
-            width: "60%",
-            height: "160%",
-            background:
-              "radial-gradient(circle at center, oklch(0.78 0.16 55 / 0.55), transparent 70%)",
-          }}
-        />
-        <div
-          className="ambient-orb ambient-orb-b"
-          style={{
-            top: "-20%",
-            right: "-15%",
-            width: "55%",
-            height: "150%",
-            background:
-              "radial-gradient(circle at center, oklch(0.7 0.18 20 / 0.5), transparent 70%)",
-          }}
-        />
-        <div
-          className="ambient-orb ambient-orb-c"
-          style={{
-            bottom: "-40%",
-            left: "25%",
-            width: "55%",
-            height: "150%",
-            background:
-              "radial-gradient(circle at center, oklch(0.6 0.16 300 / 0.45), transparent 70%)",
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.16) 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
           }}
         />
       </div>
 
-      {/* Caption — breathes gently in/out over the aurora. */}
-      <div className="relative flex flex-col items-center gap-2 px-6 py-12 text-center">
-        <div className="animate-breathe flex flex-col items-center gap-2">
-          <span className="text-sm font-medium tracking-wide text-white/90">{title}</span>
-          {hint && <span className="max-w-md text-xs text-white/55">{hint}</span>}
+      <div className="relative flex flex-col gap-5 px-6 py-7 sm:px-8">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex min-w-0 flex-col gap-2">
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/45">
+              Live progress
+            </p>
+            <p className="text-base font-medium tracking-wide text-white/92 sm:text-lg">{title}</p>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-white/55">
+            <span className="h-1.5 w-1.5 rounded-full bg-white/80" />
+            Running
+          </div>
+        </div>
+
+        <div className="overflow-hidden rounded-md border border-white/10 bg-black/30">
+          <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2 text-[11px] text-white/45">
+            <span className="h-2 w-2 rounded-full bg-white/35" />
+            scout.pipeline
+          </div>
+          <div className="flex min-h-16 flex-col justify-center gap-2 px-3 py-3">
+            <p key={current} className="animate-enter text-sm text-white/82">
+              {current}
+              <span className="scout-caret ml-1 inline-block">_</span>
+            </p>
+            {hint && <p className="text-xs text-white/38">{hint}</p>}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full rounded-full bg-white/80 transition-[width] duration-700 ease-out"
+              style={{ width: `${activityPct}%` }}
+            />
+            <div className="scout-dash-line absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/55 to-transparent" />
+          </div>
+          <span className="w-12 text-right text-xs tabular-nums text-white/45">{activityPct}%</span>
         </div>
       </div>
     </div>

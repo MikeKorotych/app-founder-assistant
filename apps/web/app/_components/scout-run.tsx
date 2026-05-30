@@ -501,8 +501,8 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
   return (
     <div className="flex flex-col gap-6">
       <RunTopBar idea={idea} mode={viewMode} onModeChange={setViewMode} onRestart={onRestart} />
-      {isGenerating && <GameWhileGenerating phase={phase} validation={validation} />}
       <ProgressSlideBar steps={progressSteps} />
+      {isGenerating && <GameWhileGenerating phase={phase} validation={validation} />}
 
       {validation.kind === "done" && (
         <div className="animate-enter">
@@ -522,6 +522,15 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
         <ScoutLoading
           title="Scout шукає конкурентів…"
           hint="Сканую iTunes, Google Play, Product Hunt та AlternativeTo за цими запитами."
+          steps={[
+            "Готуємо query-пакет для стора.",
+            "Скануємо iTunes Search API.",
+            "Зіставляємо Android-сигнали з Google Play.",
+            "Перевіряємо Product Hunt та AlternativeTo.",
+            "Прибираємо дублікати конкурентів.",
+            "Ранжуємо результати за сумісністю.",
+            "Збираємо рейтинги, відгуки та посилання.",
+          ]}
         />
       )}
 
