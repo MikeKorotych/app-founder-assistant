@@ -211,7 +211,9 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
       <div className="flex flex-1 flex-col gap-6">
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Звіт</p>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Звіт
+            </p>
             <p className="text-sm text-muted-foreground">{run.input.idea}</p>
           </div>
           <button
