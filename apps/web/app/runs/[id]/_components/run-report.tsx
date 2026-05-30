@@ -41,7 +41,12 @@ function RestartIcon() {
 
 function NewRunLink() {
   return (
-    <Button asChild className="h-11 w-11 shrink-0 [&_svg]:size-5" size="icon" variant="outline">
+    <Button
+      asChild
+      className="h-9 w-9 shrink-0 text-muted-foreground [&_svg]:size-5"
+      size="icon"
+      variant="ghost"
+    >
       <Link aria-label="Новий прогін" href="/" title="Новий прогін">
         <RestartIcon />
       </Link>

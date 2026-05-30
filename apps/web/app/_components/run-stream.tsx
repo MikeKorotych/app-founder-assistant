@@ -135,12 +135,12 @@ export function RunStream({ idea, demo = false }: { idea: string; demo?: boolean
           </div>
           <Button
             aria-label="Новий прогін"
-            className="h-11 w-11 shrink-0 [&_svg]:size-5"
+            className="h-9 w-9 shrink-0 text-muted-foreground [&_svg]:size-5"
             onClick={() => window.location.assign("/")}
             size="icon"
             title="Новий прогін"
             type="button"
-            variant="outline"
+            variant="ghost"
           >
             <RestartIcon />
           </Button>
