@@ -19,6 +19,7 @@ import type {
 } from "@hahaton/contracts";
 import { type LlmProvider, MODELS } from "@hahaton/llm";
 import type { StepContext } from "./index";
+import { withOutputLanguage } from "../llm-language";
 
 /**
  * Everything the panel scores against. The full pipeline supplies all fields;
@@ -266,12 +267,12 @@ async function scoreIdea(
 
 const CUSD_DEV_QUESTIONS: Record<keyof ValidationScore, string> = {
   problemMarket:
-    "Have you spoken to ≥10 potential customers? Can you name 3 who said they would pay for this today?",
+    "Чи ти поспілкувався з ≥10 потенційними клієнтами? Назви 3, хто сказав, що заплатив би за це вже сьогодні.",
   solutionDiff:
-    "Why would a customer switch from their current solution to yours? What makes it 10× better, not just marginally better?",
+    "Чому клієнт перейде зі свого поточного рішення на твоє? Що робить його у 10× кращим, а не трохи кращим?",
   businessModel:
-    "What is your realistic CAC from your first acquisition channel? Does LTV ÷ CAC exceed 3 within 12 months?",
-  gtmTraction: "Who is your first paying customer and how will you get them in the next 30 days?",
+    "Який реалістичний CAC з твого першого каналу залучення? Чи перевищує LTV ÷ CAC значення 3 протягом 12 місяців?",
+  gtmTraction: "Хто твій перший платний клієнт і як ти залучиш його за наступні 30 днів?",
 };
 
 function synthesise(personas: ValidationPersonaResult[]): ValidationResult {
@@ -308,13 +309,14 @@ export async function validateIdea(
   llm: LlmProvider,
   input: ValidationInput,
 ): Promise<ValidationResult> {
+  const lm = withOutputLanguage(llm);
   const researchContext = buildResearchContext(input);
 
   // Run all 3 personas in parallel — they share cached research context.
   const [skepticResult, advocateResult, analystResult] = await Promise.all([
-    scoreIdea(llm, "skeptic", researchContext, input.idea),
-    scoreIdea(llm, "advocate", researchContext, input.idea),
-    scoreIdea(llm, "analyst", researchContext, input.idea),
+    scoreIdea(lm, "skeptic", researchContext, input.idea),
+    scoreIdea(lm, "advocate", researchContext, input.idea),
+    scoreIdea(lm, "analyst", researchContext, input.idea),
   ]);
 
   return synthesise([skepticResult, advocateResult, analystResult]);
