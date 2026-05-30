@@ -21,6 +21,7 @@ export {
 export { ImageZoom } from "./components/ui/image-zoom";
 export { Input } from "./components/ui/input";
 export { Label } from "./components/ui/label";
+export { RainbowButton, rainbowButtonVariants } from "./components/ui/rainbow-button";
 export { Skeleton } from "./components/ui/skeleton";
 export {
   Table,

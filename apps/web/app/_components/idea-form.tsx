@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, CardContent } from "@hahaton/ui";
+import { Card, CardContent, RainbowButton } from "@hahaton/ui";
 import { useRef, useState } from "react";
 import { startBackgroundMusic, stopBackgroundMusic } from "../_lib/background-music";
 import { RunStream } from "./run-stream";
@@ -142,7 +142,9 @@ export function IdeaForm() {
           )}
 
           <div className="flex flex-col items-center gap-2">
-            <Button type="submit">Згенерувати план</Button>
+            <RainbowButton type="submit" size="lg">
+              Згенерувати план
+            </RainbowButton>
           </div>
         </form>
       </CardContent>
