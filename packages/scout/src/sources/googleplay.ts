@@ -4,7 +4,7 @@ import type { RawCompetitor, ScoutParams } from "../types.js";
 /**
  * Google Play has no official public search API, and the `google-play-scraper`
  * npm lib doesn't run on the Workers runtime. So we go through a SERP provider
- * (SerpApi's `google_play` engine) keyed by `SEARCH_API_KEY`. If no key is set,
+ * (SerpApi's `google_play` engine) keyed by `GOOGLE_SEARCH_API_KEY`. If no key is set,
  * this source degrades to empty (the run still works on the other sources).
  *
  * SerpApi: GET https://serpapi.com/search.json?engine=google_play&store=apps&q=&api_key=

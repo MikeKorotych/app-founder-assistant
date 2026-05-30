@@ -27,7 +27,7 @@ GET /scout/:id → { status, competitors[] }  (best compatibility first)
 | Source | Auth | How | Notes |
 |---|---|---|---|
 | **iTunes Search** | none | `GET itunes.apple.com/search?media=software&entity=software` | iOS apps; rich metadata. |
-| **Google Play** | `SEARCH_API_KEY` | SerpApi `google_play` engine | `google-play-scraper` can't run on Workers → SERP API. Degrades to empty without a key. |
+| **Google Play** | `GOOGLE_SEARCH_API_KEY` | SerpApi `google_play` engine | `google-play-scraper` can't run on Workers → SERP API. Degrades to empty without a key. |
 | **Product Hunt** | `PRODUCTHUNT_TOKEN` | API v2 GraphQL (popular posts, keyword-filtered client-side — v2 has no text search) | Degrades to empty without a token. |
 | **AlternativeTo** | none | `HTMLRewriter` scrape of the search page | No public API; best-effort, brittle, degrades to empty on markup change. |
 
@@ -64,7 +64,7 @@ packages/scout/src/
 apps/api/src/
   scout/workflow.ts        CompetitorDiscoveryWorkflow (WorkflowEntrypoint)
   index.ts                 POST /scout, GET /scout/:id, exports the workflow class
-  env.ts                   DISCOVERY_WORKFLOW + SEARCH_API_KEY + PRODUCTHUNT_TOKEN bindings
+  env.ts                   DISCOVERY_WORKFLOW + GOOGLE_SEARCH_API_KEY + PRODUCTHUNT_TOKEN bindings
   wrangler.jsonc           workflows[] binding (top-level + prod + dev)
 packages/db/src/schema/index.ts   competitors table
 ```
@@ -76,7 +76,7 @@ packages/db/src/schema/index.ts   competitors table
 - Persistence: **D1 via Drizzle**.
 
 ## Credentials
-- `SEARCH_API_KEY` — SerpApi (`serpapi.com` → Dashboard → API Key); `google_play` engine.
+- `GOOGLE_SEARCH_API_KEY` — SerpApi (`serpapi.com` → Dashboard → API Key); `google_play` engine.
 - `PRODUCTHUNT_TOKEN` — Product Hunt v2 developer token (`producthunt.com/v2/oauth/applications`
   → Add app → Create Token).
 - Set both via `wrangler secret put`; locally in `apps/api/.dev.vars`.

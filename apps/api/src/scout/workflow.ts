@@ -34,7 +34,7 @@ export class CompetitorDiscoveryWorkflow extends WorkflowEntrypoint<Bindings, Sc
     const [itunes, googleplay, producthunt, alternativeto] = await Promise.all([
       step.do("fetch:itunes", SOURCE_RETRY, () => fetchItunes(params, country)),
       step.do("fetch:googleplay", SOURCE_RETRY, () =>
-        fetchGooglePlay(params, this.env.SEARCH_API_KEY, country),
+        fetchGooglePlay(params, this.env.GOOGLE_SEARCH_API_KEY, country),
       ),
       step.do("fetch:producthunt", SOURCE_RETRY, () =>
         fetchProductHunt(params, this.env.PRODUCTHUNT_TOKEN),

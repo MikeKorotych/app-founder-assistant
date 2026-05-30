@@ -9,7 +9,7 @@ export interface Bindings {
   /** Scout competitor-discovery workflow binding (wrangler.jsonc → workflows). */
   DISCOVERY_WORKFLOW: Workflow;
   /** Scout source secrets. */
-  SEARCH_API_KEY?: string;
+  GOOGLE_SEARCH_API_KEY?: string;
   PRODUCTHUNT_TOKEN?: string;
   /** Plain vars. */
   APP_ENV?: string;
