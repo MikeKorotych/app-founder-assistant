@@ -314,6 +314,36 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
   );
 }
 
+// Human labels for the four Scout sources (the row's `source` is the SourceId).
+const SOURCE_LABELS: Record<string, string> = {
+  itunes: "iTunes / App Store",
+  googleplay: "Google Play",
+  producthunt: "Product Hunt",
+  alternativeto: "AlternativeTo",
+};
+// Display order: known sources in this order, then any unknown ones alphabetically.
+const SOURCE_ORDER = ["itunes", "googleplay", "producthunt", "alternativeto"];
+
+function sourceLabel(source: string): string {
+  return SOURCE_LABELS[source] ?? source.charAt(0).toUpperCase() + source.slice(1);
+}
+
+// Bucket competitors by the source they were discovered from, preserving the
+// incoming compatibility-desc order within each bucket.
+function groupBySource(competitors: Competitor[]): [string, Competitor[]][] {
+  const groups = new Map<string, Competitor[]>();
+  for (const c of competitors) {
+    const list = groups.get(c.source);
+    if (list) list.push(c);
+    else groups.set(c.source, [c]);
+  }
+  const rank = (s: string) => {
+    const i = SOURCE_ORDER.indexOf(s);
+    return i === -1 ? SOURCE_ORDER.length : i;
+  };
+  return [...groups.entries()].sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b));
+}
+
 function CompetitorList({ competitors }: { competitors: Competitor[] }) {
   if (competitors.length === 0) {
     return (
@@ -322,54 +352,86 @@ function CompetitorList({ competitors }: { competitors: Competitor[] }) {
       </p>
     );
   }
+  const groups = groupBySource(competitors);
   return (
-    <div className="stagger-enter flex flex-col gap-3">
+    <div className="stagger-enter flex flex-col gap-5">
       <PlatformPie sources={competitors.map((c) => c.source)} />
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
         Конкуренти · {competitors.length}
       </p>
-      {competitors.map((c) => (
-        <Card
-          key={c.id}
-          className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60"
-        >
-          <CardContent className="flex flex-col gap-2 pt-5">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <div className="flex items-baseline gap-2">
-                {c.url ? (
-                  <a
-                    href={c.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium underline-offset-2 hover:underline"
-                  >
-                    {c.name}
-                  </a>
-                ) : (
-                  <span className="font-medium">{c.name}</span>
-                )}
-                <span className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {c.source}
-                </span>
-              </div>
-              {typeof c.compatibilityScore === "number" && (
-                <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 text-sm font-medium">
-                  {c.compatibilityScore}/100
-                </span>
-              )}
-            </div>
-            {c.rationale && <p className="text-sm text-muted-foreground">{c.rationale}</p>}
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-              {c.developer && <span>{c.developer}</span>}
-              <span>{c.rating > 0 ? `★ ${c.rating.toFixed(1)}` : "★ N/A"}</span>
-              <span>
-                {c.reviewCount > 0 ? `${c.reviewCount.toLocaleString()} відгуків` : "Відгуки: N/A"}
-              </span>
-              {c.price && <span>{c.price}</span>}
-            </div>
-          </CardContent>
-        </Card>
+      {groups.map(([source, items]) => (
+        <SourceTable key={source} source={source} items={items} />
       ))}
+    </div>
+  );
+}
+
+// One table per data source. The scroll area is capped to ~10 rows tall; beyond
+// that the body scrolls vertically while the header stays pinned.
+function SourceTable({ source, items }: { source: string; items: Competitor[] }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-sm font-medium">{sourceLabel(source)}</p>
+        <span className="text-xs text-muted-foreground">{items.length}</span>
+      </div>
+      <div className="overflow-hidden rounded-md border border-border/60">
+        <div className="max-h-[34rem] overflow-y-auto">
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 z-10 bg-muted/95 text-[10px] uppercase tracking-[0.14em] text-muted-foreground backdrop-blur">
+              <tr>
+                <th className="px-3 py-2 text-left font-medium">Конкурент</th>
+                <th className="w-24 px-3 py-2 text-center font-medium">Сумісність</th>
+                <th className="px-3 py-2 text-left font-medium">Чому конкурент</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((c) => (
+                <tr key={c.id} className="border-t border-border/60 align-top">
+                  <td className="px-3 py-2.5">
+                    <div className="flex flex-col gap-0.5">
+                      {c.url ? (
+                        <a
+                          href={c.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium underline-offset-2 hover:underline"
+                        >
+                          {c.name}
+                        </a>
+                      ) : (
+                        <span className="font-medium">{c.name}</span>
+                      )}
+                      <span className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+                        {c.developer && <span>{c.developer}</span>}
+                        <span>{c.rating > 0 ? `★ ${c.rating.toFixed(1)}` : "★ N/A"}</span>
+                        <span>
+                          {c.reviewCount > 0
+                            ? `${c.reviewCount.toLocaleString()} відгуків`
+                            : "Відгуки: N/A"}
+                        </span>
+                        {c.price && <span>{c.price}</span>}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5 text-center">
+                    {typeof c.compatibilityScore === "number" ? (
+                      <span className="inline-block rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-xs font-medium tabular-nums">
+                        {c.compatibilityScore}/100
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+                    {c.rationale ?? "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
