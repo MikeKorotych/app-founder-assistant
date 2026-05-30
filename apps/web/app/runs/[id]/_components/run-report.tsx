@@ -100,7 +100,11 @@ export function RunReport({ id }: { id: string }) {
   const { run } = state;
   return (
     <main className="flex flex-1 flex-col gap-6">
-      <header className="animate-enter flex flex-wrap items-start justify-between gap-3">
+      <div className="animate-enter flex items-center gap-2">
+        <NewRunLink />
+        <span className="text-sm text-muted-foreground">Нова ідея</span>
+      </div>
+      <header className="animate-enter flex flex-wrap items-start gap-3">
         <div className="space-y-1">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Прогін
@@ -111,7 +115,6 @@ export function RunReport({ id }: { id: string }) {
             <span className="text-foreground/85">{run.input.idea}</span>
           </p>
         </div>
-        <NewRunLink />
       </header>
 
       <ReportBody run={run} />
