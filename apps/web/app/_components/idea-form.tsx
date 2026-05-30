@@ -82,7 +82,7 @@ export function IdeaForm() {
                 setIdea(e.target.value);
                 fitTextareaHeight(e.target);
               }}
-              placeholder="Напр. AI-радар, що знаходить нішеві mobile app ідеї з App Store сигналів і перетворює найкращі в бізнес-план"
+              placeholder="Напр. AI-радар нішевих App Store ідей"
               rows={1}
               className="min-h-12 w-full resize-none overflow-hidden rounded-md border border-input bg-background px-3 py-3 pr-12 text-sm leading-6 shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               required
