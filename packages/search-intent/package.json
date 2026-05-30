@@ -1,0 +1,25 @@
+{
+  "name": "@hahaton/search-intent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Expands a raw UI search query into comprehensive keywords + categories via the LLM gateway, for fanning out searches across services.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rimraf .turbo coverage *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@hahaton/contracts": "workspace:*",
+    "@hahaton/llm": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "rimraf": "^6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

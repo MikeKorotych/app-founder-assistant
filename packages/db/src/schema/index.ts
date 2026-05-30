@@ -45,3 +45,22 @@ export const competitors = sqliteTable("competitors", {
 
 export type CompetitorRow = typeof competitors.$inferSelect;
 export type CompetitorInsert = typeof competitors.$inferInsert;
+
+/**
+ * One row per search-intent expansion: the raw user query plus the LLM-derived
+ * `keywords` and `categories` (each JSON-serialized as a string[]). Downstream
+ * services (e.g. scout) read these to fan out searches across sources.
+ */
+export const searchExpansions = sqliteTable("search_expansions", {
+  id: text("id").primaryKey(),
+  query: text("query").notNull(),
+  locale: text("locale"),
+  /** JSON-serialized string[]. */
+  keywords: text("keywords").notNull(),
+  /** JSON-serialized string[]. */
+  categories: text("categories").notNull(),
+  createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
+});
+
+export type SearchExpansionRow = typeof searchExpansions.$inferSelect;
+export type SearchExpansionInsert = typeof searchExpansions.$inferInsert;

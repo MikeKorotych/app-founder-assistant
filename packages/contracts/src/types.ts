@@ -271,3 +271,41 @@ export type AgentEvent =
       retryable?: boolean;
       at: string;
     };
+
+// ---------------------------------------------------------------------------
+// Search-intent expansion (raw UI query → keywords + categories for fan-out)
+// ---------------------------------------------------------------------------
+
+/** Raw search query coming from the UI. */
+export interface SearchIntentInput {
+  /** The user's free-text search query. */
+  query: string;
+  /** Optional BCP-47 locale hint, e.g. "uk", "en-US". */
+  locale?: string;
+}
+
+/**
+ * Expanded search intent — the comprehensive set of terms and categories the
+ * LLM derives from a raw query, used to fan out searches across services.
+ */
+export interface SearchIntent {
+  /** Deduplicated search terms: core terms, synonyms, long-tail, related, entities. */
+  keywords: string[];
+  /** Taxonomy/category labels the query relates to. */
+  categories: string[];
+}
+
+/**
+ * A persisted search-intent expansion: the raw query plus its derived
+ * `SearchIntent`, with an id + timestamp. Stored so the UI can show what was
+ * queried and downstream services (scout) can fan out from the same id.
+ */
+export interface SearchExpansion extends SearchIntent {
+  id: string;
+  /** The raw query the user submitted from the UI. */
+  query: string;
+  /** Optional BCP-47 locale the expansion was run for. */
+  locale?: string;
+  /** ISO timestamp of when the expansion was created. */
+  createdAt: string;
+}

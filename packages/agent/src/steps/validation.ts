@@ -38,15 +38,23 @@ function buildResearchContext(ctx: StepContext): string {
 
   if (run.market) {
     lines.push(`\nMARKET SIZING (${run.market.method}):`);
-    lines.push(`  TAM: ${run.market.tam.value} ${run.market.tam.unit ?? ""} — ${run.market.tam.rationale}`);
-    lines.push(`  SAM: ${run.market.sam.value} ${run.market.sam.unit ?? ""} — ${run.market.sam.rationale}`);
-    lines.push(`  SOM: ${run.market.som.value} ${run.market.som.unit ?? ""} — ${run.market.som.rationale}`);
+    lines.push(
+      `  TAM: ${run.market.tam.value} ${run.market.tam.unit ?? ""} — ${run.market.tam.rationale}`,
+    );
+    lines.push(
+      `  SAM: ${run.market.sam.value} ${run.market.sam.unit ?? ""} — ${run.market.sam.rationale}`,
+    );
+    lines.push(
+      `  SOM: ${run.market.som.value} ${run.market.som.unit ?? ""} — ${run.market.som.rationale}`,
+    );
   }
 
   if (run.competitors?.competitors.length) {
     lines.push(`\nCOMPETITORS (${run.competitors.competitors.length}):`);
     for (const c of run.competitors.competitors.slice(0, 6)) {
-      lines.push(`  • ${c.name}: ${c.positioning}${c.pricing ? ` | price: ${c.pricing.value}` : ""}`);
+      lines.push(
+        `  • ${c.name}: ${c.positioning}${c.pricing ? ` | price: ${c.pricing.value}` : ""}`,
+      );
     }
   }
 
@@ -227,7 +235,8 @@ async function scoreIdea(
     gtmTraction: clamp(parsed.scores.gtmTraction),
   };
 
-  const total = scores.problemMarket + scores.solutionDiff + scores.businessModel + scores.gtmTraction;
+  const total =
+    scores.problemMarket + scores.solutionDiff + scores.businessModel + scores.gtmTraction;
 
   return { persona, scores, total, rationale: parsed.rationale };
 }
@@ -243,8 +252,7 @@ const CUSD_DEV_QUESTIONS: Record<keyof ValidationScore, string> = {
     "Why would a customer switch from their current solution to yours? What makes it 10× better, not just marginally better?",
   businessModel:
     "What is your realistic CAC from your first acquisition channel? Does LTV ÷ CAC exceed 3 within 12 months?",
-  gtmTraction:
-    "Who is your first paying customer and how will you get them in the next 30 days?",
+  gtmTraction: "Who is your first paying customer and how will you get them in the next 30 days?",
 };
 
 function synthesise(personas: ValidationPersonaResult[]): ValidationResult {
@@ -255,11 +263,9 @@ function synthesise(personas: ValidationPersonaResult[]): ValidationResult {
       cat,
       Math.round(personas.reduce((sum, p) => sum + p.scores[cat], 0) / personas.length),
     ]),
-  ) as ValidationScore;
+  ) as unknown as ValidationScore;
 
-  const totalScore = Math.round(
-    personas.reduce((sum, p) => sum + p.total, 0) / personas.length,
-  );
+  const totalScore = Math.round(personas.reduce((sum, p) => sum + p.total, 0) / personas.length);
 
   const disagreements = cats
     .map((cat) => {

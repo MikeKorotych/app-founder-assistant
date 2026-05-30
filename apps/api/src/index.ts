@@ -1,9 +1,10 @@
 import { runAgent, runPipeline } from "@hahaton/agent";
-import type { AgentEvent, Assumptions, RunInput } from "@hahaton/contracts";
+import type { AgentEvent, Assumptions, RunInput, SearchExpansion } from "@hahaton/contracts";
 import { createDb } from "@hahaton/db";
 import { createLlmProvider } from "@hahaton/llm";
 import { listCompetitors, type ScoutParams } from "@hahaton/scout";
-import { loadRun, saveRun } from "@hahaton/store";
+import { expandSearchIntent } from "@hahaton/search-intent";
+import { loadRun, loadSearchExpansion, saveRun, saveSearchExpansion } from "@hahaton/store";
 import { computeUnitEconomics } from "@hahaton/unit-economics";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -136,6 +137,43 @@ app.get("/scout/:id", async (c) => {
   if (!instance) return c.json({ error: "Workflow instance not found." }, 404);
   const competitors = await listCompetitors(createDb(c.env.DB), id);
   return c.json({ id, status: await instance.status(), competitors });
+});
+
+// Expand a raw UI search query into comprehensive, noise-free keywords +
+// categories, persist it, and return the saved record (with id) so the UI can
+// show what was queried and downstream services (scout) can fan out from it.
+app.post("/search-intent", async (c) => {
+  const { query, locale } = await c.req.json().catch(() => ({}));
+  if (typeof query !== "string" || query.length === 0) {
+    return c.json({ error: "Body must include a non-empty 'query' string." }, 400);
+  }
+  try {
+    requireLlmEnv(c.env);
+    const intent = await expandSearchIntent(
+      { query, locale: typeof locale === "string" ? locale : undefined },
+      createLlmProvider(c.env),
+    );
+    const expansion: SearchExpansion = {
+      id: crypto.randomUUID(),
+      query,
+      locale: typeof locale === "string" ? locale : undefined,
+      keywords: intent.keywords,
+      categories: intent.categories,
+      createdAt: new Date().toISOString(),
+    };
+    await saveSearchExpansion(createDb(c.env.DB), expansion);
+    return c.json(expansion);
+  } catch (err) {
+    console.error("search-intent error:", err);
+    return c.json({ error: "Search intent expansion failed." }, 500);
+  }
+});
+
+// Replay a persisted search expansion by id (consumed by the UI and scout).
+app.get("/search-intent/:id", async (c) => {
+  const expansion = await loadSearchExpansion(createDb(c.env.DB), c.req.param("id"));
+  if (!expansion) return c.json({ error: "Search expansion not found." }, 404);
+  return c.json(expansion);
 });
 
 // Recompute unit economics from assumptions — pure, no LLM round-trip.

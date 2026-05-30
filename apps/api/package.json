@@ -18,6 +18,7 @@
     "@hahaton/db": "workspace:*",
     "@hahaton/llm": "workspace:*",
     "@hahaton/scout": "workspace:*",
+    "@hahaton/search-intent": "workspace:*",
     "@hahaton/store": "workspace:*",
     "@hahaton/unit-economics": "workspace:*",
     "drizzle-orm": "catalog:",
