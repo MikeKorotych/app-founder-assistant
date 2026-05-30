@@ -12,6 +12,10 @@ There are three kinds of source:
 
 ## Works out of the box (no credentials)
 
+- **iTunes Search API** — public official REST API. No OpenAPI document is
+  published, so it is integrated directly rather than generated from a spec.
+- **Unofficial Play Store API** — public data via libraries such as
+  `google-play-scraper`. No browser or Playwright required; no OpenAPI codegen.
 - **App Store Connect** — `url`, public community mirror of Apple's spec.
 - **Google Play** — `url`, APIs.guru's OpenAPI conversion of the androidpublisher Discovery doc.
 
@@ -29,11 +33,19 @@ There are three kinds of source:
 | `g2.openapi.json`           | G2 (RapidAPI) | export from the RapidAPI listing's OpenAPI tab        |
 | `capterra.openapi.yaml`     | Capterra      | hand-write from their API docs                        |
 | `kickstarter.openapi.yaml`  | Kickstarter   | hand-write from their API docs                        |
+| `appfigures.openapi.yaml`   | Appfigures    | hand-write / export from their API docs               |
 | `apptopia.openapi.yaml`     | Apptopia      | hand-write from their API docs                        |
 | `dataai.openapi.yaml`       | data.ai       | hand-write from their API docs                        |
 | `apptweak.openapi.yaml`     | AppTweak      | hand-write from their API docs                        |
+| `crunchbase.openapi.yaml`   | Crunchbase    | hand-write / export from their API docs               |
+| `trustpilot.openapi.yaml`   | Trustpilot    | hand-write / export from their API docs               |
+| `similarweb.openapi.yaml`   | Similarweb    | hand-write / export from their API docs               |
+| `appbrain.openapi.yaml`     | AppBrain      | hand-write / export from their API docs               |
 
 ## Skipped on purpose
 
 - **Product Hunt** — the API is GraphQL, so there's no OpenAPI to generate from.
   Use a GraphQL codegen against their schema instead.
+- **iTunes Search API** and **Unofficial Play Store API** — both are usable
+  without credentials, but neither has an OpenAPI document suitable for this
+  generator.

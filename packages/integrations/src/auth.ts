@@ -6,6 +6,11 @@
  * credential object for a given source.
  */
 
+/** Public endpoint or library — no credentials required. */
+export interface NoAuth {
+  kind: "noAuth";
+}
+
 /** OAuth 2.0 (authorization-code) — Reddit, Product Hunt, Kickstarter. */
 export interface OAuth2Auth {
   kind: "oauth2";
@@ -23,7 +28,7 @@ export interface OAuth2Auth {
   expiresAt?: number;
 }
 
-/** Plain API key — G2 (RapidAPI), Capterra, Apptopia, data.ai, AppTweak. */
+/** Plain API key — paid/partner APIs such as G2, Capterra, Appfigures, data.ai, AppTweak. */
 export interface ApiKeyAuth {
   kind: "apiKey";
   apiKey: string;
@@ -71,6 +76,7 @@ export interface SupabaseAnonAuth {
 }
 
 export type Auth =
+  | NoAuth
   | OAuth2Auth
   | ApiKeyAuth
   | JwtAuth
