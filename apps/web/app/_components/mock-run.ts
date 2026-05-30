@@ -48,7 +48,7 @@ export const MOCK_RUN: Run = {
       { name: "Butternut Box", positioning: "Британський лідер, свіжа DTC-підписка; розширюється в ЄС", pricing: f("€2–5 / день", undefined, "Публічна сторінка цін; залежить від ваги собаки.", "c2") as Fact<string>, funding: f("$350M+ Series E", undefined, "Crunchbase.", "c2") as Fact<string>, url: "https://butternutbox.com", citationId: "c2" },
       { name: "Lily's Kitchen", positioning: "Преміум натуральний, ритейл + онлайн (Nestlé)", pricing: f("€3–4 / день", undefined, "Преміум-тариф у ритейлі.", "c3") as Fact<string>, url: "https://lilyskitchen.co.uk", citationId: "c3" },
       { name: "Pupil Foods (PL)", positioning: "Локальний польський преміум-корм, обмежена свіжа лінійка", url: "https://pupil.com.pl", citationId: "c4" },
-      { name: "Локальні бренди сухого корму", positioning: "Масові гравці; орієнтація на ціну, не на свіжість", estimated: true },
+      { name: "Локальні бренди сухого корму", positioning: "Масові гравці; орієнтація на ціну, не на свіжість" },
     ],
   },
   canvas: {
