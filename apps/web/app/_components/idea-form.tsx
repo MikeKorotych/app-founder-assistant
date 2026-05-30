@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { startBackgroundMusic, stopBackgroundMusic } from "../_lib/background-music";
 import { RunStream } from "./run-stream";
 import { ScoutRun } from "./scout-run";
+import { useTypedPlaceholder } from "./use-typed-placeholder";
 
 /** Sample ideas for the "Suggest an idea" button — specific & demo-friendly. */
 const SAMPLE_IDEAS = [
@@ -47,6 +48,7 @@ export function IdeaForm() {
   const [started, setStarted] = useState<string | null>(null);
   const [demo, setDemo] = useState(false);
   const [restarting, setRestarting] = useState(false);
+  const typedPlaceholder = useTypedPlaceholder(idea.trim().length === 0);
 
   function fitTextareaHeight(node = textareaRef.current) {
     if (!node) return;
@@ -137,7 +139,7 @@ export function IdeaForm() {
                       e.currentTarget.form?.requestSubmit();
                     }
                   }}
-                  placeholder="Напр. AI-тренер англійської через голосові"
+                  placeholder={typedPlaceholder || "Напр. AI-тренер англійської через голосові"}
                   rows={1}
                   className="min-h-12 w-full resize-none overflow-hidden rounded-md border border-input bg-background px-3 py-3 pr-12 text-sm leading-6 shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   required

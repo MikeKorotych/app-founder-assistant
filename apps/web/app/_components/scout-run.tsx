@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { apiUrl } from "../_lib/api";
 import { ValidationSection } from "../runs/[id]/_components/validation-section";
 import { Game2048 } from "./game-2048";
+import { IdeaGraph } from "./idea-graph";
 import { MarketDataMock } from "./market-data-mock";
 import { randomMockRun } from "./mock-run";
 import { PlatformPie } from "./platform-pie";
@@ -75,27 +76,6 @@ function toAgentCompetitor(c: Competitor): AgentCompetitor {
     url: c.url ?? undefined,
     ...(c.price ? { pricing: { value: c.price, rationale: "Store listing price" } } : {}),
   };
-}
-
-function Chips({ items, tone }: { items: string[]; tone: "keyword" | "category" }) {
-  if (items.length === 0) return <p className="text-sm text-muted-foreground">—</p>;
-  const cls =
-    tone === "category"
-      ? "border-primary/40 bg-primary/10 text-foreground"
-      : "border-border/60 bg-muted/60 text-muted-foreground";
-  return (
-    <div className="flex flex-wrap gap-2">
-      {items.map((item, index) => (
-        <span
-          key={item}
-          className={`animate-enter rounded-full border px-3 py-1 text-sm ${cls}`}
-          style={{ animationDelay: `${90 + index * 44}ms` }}
-        >
-          {item}
-        </span>
-      ))}
-    </div>
-  );
 }
 
 function RestartIcon() {
@@ -314,19 +294,16 @@ function SearchIntentSection({
           )}
 
           {expansion && (
-            <div className="animate-enter grid gap-5">
-              <div className="flex flex-col gap-2">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Категорії · {expansion.categories.length}
-                </p>
-                <Chips items={expansion.categories} tone="category" />
+            <div className="animate-enter flex flex-col gap-3">
+              <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                <span>Категорії · {expansion.categories.length}</span>
+                <span>Ключові слова · {expansion.keywords.length}</span>
               </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Ключові слова · {expansion.keywords.length}
-                </p>
-                <Chips items={expansion.keywords} tone="keyword" />
-              </div>
+              <IdeaGraph
+                idea={idea}
+                categories={expansion.categories}
+                keywords={expansion.keywords}
+              />
             </div>
           )}
         </CardContent>
