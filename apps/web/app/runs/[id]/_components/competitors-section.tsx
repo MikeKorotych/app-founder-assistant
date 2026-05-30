@@ -21,9 +21,14 @@ export function CompetitorsSection({
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {competitors.map((c, i) => {
-            const citation = c.citationId ? citations.find((cn) => cn.id === c.citationId) : undefined;
+            const citation = c.citationId
+              ? citations.find((cn) => cn.id === c.citationId)
+              : undefined;
             return (
-              <div key={i} className="flex flex-col gap-2 rounded-md border border-border/60 bg-background/40 p-4">
+              <div
+                key={i}
+                className="flex flex-col gap-2 rounded-md border border-border/60 bg-background/40 p-4"
+              >
                 <div className="flex items-baseline justify-between gap-2">
                   <h3 className="text-base font-semibold leading-tight">{c.name}</h3>
                   {c.url && (
@@ -44,7 +49,9 @@ export function CompetitorsSection({
                       <dt className="text-muted-foreground">Pricing</dt>
                       <dd className="font-medium">
                         {String(c.pricing.value)}
-                        {c.pricing.estimated && <span className="ml-1 text-muted-foreground">(est.)</span>}
+                        {c.pricing.estimated && (
+                          <span className="ml-1 text-muted-foreground">(est.)</span>
+                        )}
                       </dd>
                     </>
                   )}
@@ -53,7 +60,9 @@ export function CompetitorsSection({
                       <dt className="text-muted-foreground">Funding</dt>
                       <dd className="font-medium">
                         {String(c.funding.value)}
-                        {c.funding.estimated && <span className="ml-1 text-muted-foreground">(est.)</span>}
+                        {c.funding.estimated && (
+                          <span className="ml-1 text-muted-foreground">(est.)</span>
+                        )}
                       </dd>
                     </>
                   )}

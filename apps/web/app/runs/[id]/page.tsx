@@ -1,15 +1,15 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import type { Run } from "@hahaton/contracts";
 import { Button } from "@hahaton/ui";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { BriefSection } from "./_components/brief-section";
-import { MarketSection } from "./_components/market-section";
-import { CompetitorsSection } from "./_components/competitors-section";
 import { CanvasSection } from "./_components/canvas-section";
+import { CompetitorsSection } from "./_components/competitors-section";
 import { GtmSection } from "./_components/gtm-section";
-import { UnitEconomicsSection } from "./_components/unit-economics-section";
+import { MarketSection } from "./_components/market-section";
 import { RisksSection } from "./_components/risks-section";
 import { SynthesisSection } from "./_components/synthesis-section";
+import { UnitEconomicsSection } from "./_components/unit-economics-section";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3000";
 
@@ -35,10 +35,13 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
     <main className="flex flex-1 flex-col gap-6">
       <header className="flex flex-wrap items-baseline justify-between gap-3">
         <div className="space-y-1">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Run</p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Run
+          </p>
           <h1 className="font-mono text-lg">{run.id}</h1>
           <p className="text-sm text-muted-foreground">
-            {STATUS_LABEL[run.status]} · idea: <span className="text-foreground/85">{run.input.idea}</span>
+            {STATUS_LABEL[run.status]} · idea:{" "}
+            <span className="text-foreground/85">{run.input.idea}</span>
           </p>
         </div>
         <Link href="/">

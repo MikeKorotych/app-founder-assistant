@@ -4,7 +4,9 @@ import { EmptyState, SectionShell } from "./section-shell";
 function PlanColumn({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="flex flex-col gap-2 rounded-md border border-border/60 bg-background/40 p-3.5">
-      <h4 className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{title}</h4>
+      <h4 className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+        {title}
+      </h4>
       {items.length === 0 ? (
         <p className="text-xs italic text-muted-foreground/70">—</p>
       ) : (

@@ -9,7 +9,9 @@ const LEVEL_STYLE: Record<Risk["likelihood"], string> = {
 
 function LevelPill({ level }: { level: Risk["likelihood"] }) {
   return (
-    <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${LEVEL_STYLE[level]}`}>
+    <span
+      className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${LEVEL_STYLE[level]}`}
+    >
       {level}
     </span>
   );
@@ -41,8 +43,12 @@ export function RisksSection({ register }: { register: RiskRegister | undefined 
               {risks.map((r, i) => (
                 <tr key={i} className="border-t border-border/60 align-top">
                   <td className="px-3 py-3 font-medium">{r.title}</td>
-                  <td className="px-3 py-3"><LevelPill level={r.likelihood} /></td>
-                  <td className="px-3 py-3"><LevelPill level={r.impact} /></td>
+                  <td className="px-3 py-3">
+                    <LevelPill level={r.likelihood} />
+                  </td>
+                  <td className="px-3 py-3">
+                    <LevelPill level={r.impact} />
+                  </td>
                   <td className="px-3 py-3 text-foreground/85">{r.mitigation}</td>
                 </tr>
               ))}

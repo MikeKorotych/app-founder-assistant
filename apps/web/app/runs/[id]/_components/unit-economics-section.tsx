@@ -1,6 +1,6 @@
 import type { Assumptions, Citation } from "@hahaton/contracts";
-import { EmptyState, SectionShell } from "./section-shell";
 import { InteractiveUnitEconomics } from "./interactive-unit-economics";
+import { EmptyState, SectionShell } from "./section-shell";
 
 function isAssumptionsEmpty(a: Assumptions): boolean {
   return (

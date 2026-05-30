@@ -14,7 +14,9 @@ function Field({ label, value }: { label: string; value: string | undefined }) {
   if (!value || value.trim() === "") return null;
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">{label}</span>
+      <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+        {label}
+      </span>
       <span className="text-sm leading-relaxed">{value}</span>
     </div>
   );
@@ -22,7 +24,11 @@ function Field({ label, value }: { label: string; value: string | undefined }) {
 
 export function BriefSection({ brief }: { brief: StructuredBrief | undefined }) {
   return (
-    <SectionShell step="1 · brief" title="Structured brief" description="The idea normalized into the questions the rest of the pipeline must answer.">
+    <SectionShell
+      step="1 · brief"
+      title="Structured brief"
+      description="The idea normalized into the questions the rest of the pipeline must answer."
+    >
       {!brief || !hasContent(brief) ? (
         <EmptyState message="The agent has not produced a structured brief yet." />
       ) : (

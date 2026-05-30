@@ -25,7 +25,13 @@ export function FactValue<T>({ fact, citations, size = "sm" }: Props<T>) {
 
   return (
     <div className="flex flex-col gap-1.5">
-      <div className={size === "lg" ? "text-2xl font-semibold tracking-tight sm:text-3xl" : "text-base font-medium"}>
+      <div
+        className={
+          size === "lg"
+            ? "text-2xl font-semibold tracking-tight sm:text-3xl"
+            : "text-base font-medium"
+        }
+      >
         {display}
         {fact.estimated && (
           <span className="ml-2 rounded-full border border-border/60 bg-muted/50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground align-middle">
@@ -33,7 +39,9 @@ export function FactValue<T>({ fact, citations, size = "sm" }: Props<T>) {
           </span>
         )}
       </div>
-      {fact.rationale && <p className="text-xs leading-relaxed text-muted-foreground">{fact.rationale}</p>}
+      {fact.rationale && (
+        <p className="text-xs leading-relaxed text-muted-foreground">{fact.rationale}</p>
+      )}
       {citation && (
         <a
           href={citation.url}

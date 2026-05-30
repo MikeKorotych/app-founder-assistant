@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import type { Assumptions, Citation } from "@hahaton/contracts";
-import { computeUnitEconomics } from "@hahaton/unit-economics";
 import { Button } from "@hahaton/ui";
+import { computeUnitEconomics } from "@hahaton/unit-economics";
+import { useMemo, useState } from "react";
 
 interface Field {
   key: keyof Assumptions;
@@ -18,13 +18,13 @@ interface Field {
 // product. Steps are coarse enough that dragging feels snappy, fine enough that
 // LTV:CAC and payback don't jump in big jagged steps.
 const FIELDS: Field[] = [
-  { key: "arpu",             label: "ARPU",           min: 0, max: 500,    step: 1,    unit: "USD/mo" },
-  { key: "grossMarginPct",   label: "Gross margin",   min: 0, max: 100,    step: 1,    unit: "%"      },
-  { key: "cac",              label: "CAC",            min: 0, max: 1000,   step: 5,    unit: "USD"    },
-  { key: "monthlyChurnPct",  label: "Monthly churn",  min: 0, max: 30,     step: 0.5,  unit: "%"      },
-  { key: "conversionPct",    label: "Conversion",     min: 0, max: 100,    step: 0.5,  unit: "%"      },
-  { key: "fixedMonthlyCost", label: "Fixed cost / mo", min: 0, max: 50000, step: 100,  unit: "USD"    },
-  { key: "funnelVolume",     label: "Funnel / mo",    min: 0, max: 100000, step: 100,  unit: "users"  },
+  { key: "arpu", label: "ARPU", min: 0, max: 500, step: 1, unit: "USD/mo" },
+  { key: "grossMarginPct", label: "Gross margin", min: 0, max: 100, step: 1, unit: "%" },
+  { key: "cac", label: "CAC", min: 0, max: 1000, step: 5, unit: "USD" },
+  { key: "monthlyChurnPct", label: "Monthly churn", min: 0, max: 30, step: 0.5, unit: "%" },
+  { key: "conversionPct", label: "Conversion", min: 0, max: 100, step: 0.5, unit: "%" },
+  { key: "fixedMonthlyCost", label: "Fixed cost / mo", min: 0, max: 50000, step: 100, unit: "USD" },
+  { key: "funnelVolume", label: "Funnel / mo", min: 0, max: 100000, step: 100, unit: "users" },
 ];
 
 const compactFmt = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
@@ -55,13 +55,13 @@ function extractValues(a: Assumptions): ValuesByKey {
 
 function assumptionsFromValues(original: Assumptions, values: ValuesByKey): Assumptions {
   return {
-    arpu:             { ...original.arpu,             value: values.arpu             },
-    grossMarginPct:   { ...original.grossMarginPct,   value: values.grossMarginPct   },
-    cac:              { ...original.cac,              value: values.cac              },
-    monthlyChurnPct:  { ...original.monthlyChurnPct,  value: values.monthlyChurnPct  },
-    conversionPct:    { ...original.conversionPct,    value: values.conversionPct    },
+    arpu: { ...original.arpu, value: values.arpu },
+    grossMarginPct: { ...original.grossMarginPct, value: values.grossMarginPct },
+    cac: { ...original.cac, value: values.cac },
+    monthlyChurnPct: { ...original.monthlyChurnPct, value: values.monthlyChurnPct },
+    conversionPct: { ...original.conversionPct, value: values.conversionPct },
     fixedMonthlyCost: { ...original.fixedMonthlyCost, value: values.fixedMonthlyCost },
-    funnelVolume:     { ...original.funnelVolume,     value: values.funnelVolume     },
+    funnelVolume: { ...original.funnelVolume, value: values.funnelVolume },
   };
 }
 
@@ -105,15 +105,22 @@ export function InteractiveUnitEconomics({
         {FIELDS.map((f) => {
           const value = values[f.key];
           const fact = assumptions[f.key];
-          const citation = fact.citationId ? citations.find((c) => c.id === fact.citationId) : undefined;
+          const citation = fact.citationId
+            ? citations.find((c) => c.id === fact.citationId)
+            : undefined;
           const changed = value !== original[f.key];
           return (
             <div key={f.key} className="flex flex-col gap-2">
               <div className="flex items-baseline justify-between gap-2">
-                <label htmlFor={`ue-${f.key}`} className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                <label
+                  htmlFor={`ue-${f.key}`}
+                  className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground"
+                >
                   {f.label}
                 </label>
-                <span className={`text-sm font-semibold tabular-nums ${changed ? "text-foreground" : "text-foreground/85"}`}>
+                <span
+                  className={`text-sm font-semibold tabular-nums ${changed ? "text-foreground" : "text-foreground/85"}`}
+                >
                   {fmtAssumption(value, f.unit)}
                 </span>
               </div>
@@ -127,7 +134,11 @@ export function InteractiveUnitEconomics({
                 onChange={(e) => setField(f.key, e.target.value)}
                 className="h-1 w-full cursor-pointer appearance-none rounded-full bg-muted accent-foreground"
               />
-              {fact.rationale && <p className="text-[11px] leading-relaxed text-muted-foreground">{fact.rationale}</p>}
+              {fact.rationale && (
+                <p className="text-[11px] leading-relaxed text-muted-foreground">
+                  {fact.rationale}
+                </p>
+              )}
               {citation && (
                 <a
                   href={citation.url}
@@ -149,9 +160,22 @@ export function InteractiveUnitEconomics({
         </h4>
         <div className="grid gap-3 sm:grid-cols-3">
           <Metric label="LTV" value={fmtNumber(derived.ltv)} />
-          <Metric label="LTV : CAC" value={Number.isFinite(derived.ltvCacRatio) ? derived.ltvCacRatio.toFixed(1) : "∞"} />
-          <Metric label="Payback" value={Number.isFinite(derived.paybackMonths) ? `${derived.paybackMonths.toFixed(0)} mo` : "∞"} />
-          <Metric label="Contribution / customer" value={fmtNumber(derived.contributionPerCustomer)} />
+          <Metric
+            label="LTV : CAC"
+            value={Number.isFinite(derived.ltvCacRatio) ? derived.ltvCacRatio.toFixed(1) : "∞"}
+          />
+          <Metric
+            label="Payback"
+            value={
+              Number.isFinite(derived.paybackMonths)
+                ? `${derived.paybackMonths.toFixed(0)} mo`
+                : "∞"
+            }
+          />
+          <Metric
+            label="Contribution / customer"
+            value={fmtNumber(derived.contributionPerCustomer)}
+          />
           <Metric label="Break-even customers" value={fmtNumber(derived.breakEvenCustomers)} />
           <Metric label="Monthly burn" value={fmtNumber(derived.monthlyBurn)} />
         </div>
@@ -171,7 +195,9 @@ export function InteractiveUnitEconomics({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-border/60 bg-background/40 p-3.5">
-      <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
+      <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+        {label}
+      </p>
       <p className="mt-1 text-xl font-semibold tabular-nums tracking-tight">{value}</p>
     </div>
   );

@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@hahaton/ui";
+import type { ReactNode } from "react";
 
 interface Props {
   step: string;
