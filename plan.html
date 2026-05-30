@@ -476,6 +476,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"16:00", "author":"Ruslan", "workstream":"C", "summary":"✅ C6: Scout → Validate now auto-chains in the real flow. scout-run.tsx, once Scout finishes, POSTs /validate (idea + discovered competitors mapped to the agent Competitor shape) and renders the existing Multi-LLM ValidationSection (3 personas ×4 cats → /100 + CustDev gaps) right under the competitor list. New reusable validateIdea(llm, input) in @hahaton/agent (refactored out of validationStep over a ValidationInput; pipeline Step 9 unchanged) + POST /validate in apps/api (stateless). Frontend orchestration, no D1 schema change. Verified: typecheck 12/12, tests pass, biome clean on touched files, api wrangler dry-run bundles, web next build green.", "commit":"—" },
   { "date":"2026-05-30", "time":"17:05", "author":"Mykhailo", "workstream":"C", "summary":"Hide the unit-economics warning banner in the interactive report block: computeUnitEconomics still returns warnings, but they were rendered live on every slider drag (LTV:CAC<3 / payback>12) and in English. Removed the UI rendering only (engine untouched).", "commit":"—" },
   { "date":"2026-05-30", "time":"16:55", "author":"Mykhailo", "workstream":"C", "summary":"2048 polish: smaller fixed board (52px cells), mouse/touch swipe (pointer), and original-style animations — tile-based with stable ids so tiles slide via transform transition, with scale-pop on spawn and on merge (merged-away tile slides in then is cleaned up). Compiles clean.", "commit":"—" },
   { "date":"2026-05-30", "time":"15:51", "author":"Ruslan", "workstream":"C", "summary":"🔨 started C6: auto-chain Scout → Validate in the real flow. After search-intent + Scout finish, scout-run.tsx will POST a new /validate (idea + discovered competitors) and render the existing Multi-LLM ValidationSection. Adds a reusable validateIdea() in @hahaton/agent (refactored out of validationStep) + POST /validate in apps/api. Frontend orchestration, no D1 schema change.", "commit":"—" },
@@ -570,7 +571,7 @@
   { "id":"C3", "group":"C", "title_uk":"Живий research-timeline (SSE)", "title_en":"Live research timeline (SSE)", "owner":"—", "status":"todo" },
   { "id":"C4", "group":"C", "title_uk":"Секції звіту (ринок/конкуренти/canvas/GTM/ризики/синтез)", "title_en":"Report sections (market/competitors/canvas/GTM/risks/synthesis)", "owner":"Mykhailo", "status":"done" },
   { "id":"C5", "group":"C", "title_uk":"Інтерактивна юніт-економіка (слайдери → перерахунок)", "title_en":"Interactive unit economics (sliders → recompute)", "owner":"Mykhailo", "status":"done" },
-  { "id":"C6", "group":"C", "title_uk":"Scorecard валідації (4×25 + gaps + панель)", "title_en":"Validation scorecard (4×25 + gaps + panel)", "owner":"Ruslan", "status":"in-progress" },
+  { "id":"C6", "group":"C", "title_uk":"Scorecard валідації (4×25 + gaps + панель)", "title_en":"Validation scorecard (4×25 + gaps + panel)", "owner":"Ruslan", "status":"review" },
   { "id":"C7", "group":"C", "title_uk":"Цитати (inline + sources appendix)", "title_en":"Citations (inline + sources appendix)", "owner":"—", "status":"todo" },
   { "id":"C8", "group":"C", "title_uk":"Полірування — монохром/Linear", "title_en":"Polish — monochrome/Linear style", "owner":"—", "status":"todo" },
 

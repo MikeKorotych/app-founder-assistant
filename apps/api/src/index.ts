@@ -1,5 +1,11 @@
-import { runAgent, runPipeline } from "@hahaton/agent";
-import type { AgentEvent, Assumptions, RunInput, SearchExpansion } from "@hahaton/contracts";
+import { runAgent, runPipeline, validateIdea } from "@hahaton/agent";
+import type {
+  AgentEvent,
+  Assumptions,
+  Competitor,
+  RunInput,
+  SearchExpansion,
+} from "@hahaton/contracts";
 import { createDb } from "@hahaton/db";
 import { createLlmProvider } from "@hahaton/llm";
 import { listCompetitors, type ScoutParams } from "@hahaton/scout";
@@ -137,6 +143,35 @@ app.get("/scout/:id", async (c) => {
   if (!instance) return c.json({ error: "Workflow instance not found." }, 404);
   const competitors = await listCompetitors(createDb(c.env.DB), id);
   return c.json({ id, status: await instance.status(), competitors });
+});
+
+// Validate — run the Multi-LLM panel (Skeptic / Advocate / Analyst → /100 +
+// CustDev gaps) over an idea + already-discovered competitors. This is the
+// Scout → Validate chain's final step: stateless, returns a ValidationResult the
+// UI renders directly. The full /pipeline runs the same panel as its Step 9.
+app.post("/validate", async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as {
+    idea?: string;
+    competitors?: Competitor[];
+  };
+  if (typeof body.idea !== "string" || body.idea.length === 0) {
+    return c.json({ error: "Body must include a non-empty 'idea' string." }, 400);
+  }
+  try {
+    requireLlmEnv(c.env);
+    const competitors =
+      Array.isArray(body.competitors) && body.competitors.length > 0
+        ? { competitors: body.competitors }
+        : undefined;
+    const validation = await validateIdea(createLlmProvider(c.env), {
+      idea: body.idea,
+      competitors,
+    });
+    return c.json(validation);
+  } catch (err) {
+    console.error("validate error:", err);
+    return c.json({ error: "Validation failed." }, 500);
+  }
 });
 
 // Expand a raw UI search query into comprehensive, noise-free keywords +

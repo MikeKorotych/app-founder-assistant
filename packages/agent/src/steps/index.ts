@@ -130,6 +130,10 @@ export const synthesisStep = step("synthesis", "Assembling the pitch", async (ct
 
 import { validationStep as _validationStep } from "./validation";
 
+export type { ValidationInput } from "./validation";
+/** Reusable Multi-LLM panel — score any idea (+ optional research) /100 + CustDev risks. */
+export { validateIdea } from "./validation";
+
 /** Step 9 — Sonnet ×3 in parallel. Multi-LLM validation panel → score /100 + CustDev risks. */
 export const validationStep = step(
   "validation",

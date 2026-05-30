@@ -11,67 +11,83 @@
  */
 
 import type {
+  Run,
   ValidationPersona,
   ValidationPersonaResult,
   ValidationResult,
   ValidationScore,
 } from "@hahaton/contracts";
-import { MODELS } from "@hahaton/llm";
+import { type LlmProvider, MODELS } from "@hahaton/llm";
 import type { StepContext } from "./index";
+
+/**
+ * Everything the panel scores against. The full pipeline supplies all fields;
+ * lighter callers (e.g. the Scout → Validate chain) may supply just `idea` +
+ * `competitors`. Personas score sparse categories neutrally and flag the gap,
+ * so partial input still yields a usable scorecard.
+ */
+export interface ValidationInput {
+  idea: string;
+  brief?: Run["brief"];
+  market?: Run["market"];
+  competitors?: Run["competitors"];
+  canvas?: Run["canvas"];
+  gtm?: Run["gtm"];
+  assumptions?: Run["assumptions"];
+}
 
 // ---------------------------------------------------------------------------
 // Context builder — serialises the grounded research into a single block
 // that all three personas receive via prompt caching.
 // ---------------------------------------------------------------------------
 
-function buildResearchContext(ctx: StepContext): string {
-  const { run } = ctx;
+function buildResearchContext(input: ValidationInput): string {
   const lines: string[] = ["=== GROUNDED RESEARCH CONTEXT ===\n"];
 
-  if (run.brief) {
-    lines.push(`PROBLEM: ${run.brief.problem}`);
-    lines.push(`CUSTOMER: ${run.brief.customer}`);
-    lines.push(`VALUE PROP: ${run.brief.valueProp}`);
-    lines.push(`GEOGRAPHY: ${run.brief.geography}`);
-    if (run.brief.budget) lines.push(`BUDGET: ${run.brief.budget}`);
+  if (input.brief) {
+    lines.push(`PROBLEM: ${input.brief.problem}`);
+    lines.push(`CUSTOMER: ${input.brief.customer}`);
+    lines.push(`VALUE PROP: ${input.brief.valueProp}`);
+    lines.push(`GEOGRAPHY: ${input.brief.geography}`);
+    if (input.brief.budget) lines.push(`BUDGET: ${input.brief.budget}`);
   }
 
-  if (run.market) {
-    lines.push(`\nMARKET SIZING (${run.market.method}):`);
+  if (input.market) {
+    lines.push(`\nMARKET SIZING (${input.market.method}):`);
     lines.push(
-      `  TAM: ${run.market.tam.value} ${run.market.tam.unit ?? ""} — ${run.market.tam.rationale}`,
+      `  TAM: ${input.market.tam.value} ${input.market.tam.unit ?? ""} — ${input.market.tam.rationale}`,
     );
     lines.push(
-      `  SAM: ${run.market.sam.value} ${run.market.sam.unit ?? ""} — ${run.market.sam.rationale}`,
+      `  SAM: ${input.market.sam.value} ${input.market.sam.unit ?? ""} — ${input.market.sam.rationale}`,
     );
     lines.push(
-      `  SOM: ${run.market.som.value} ${run.market.som.unit ?? ""} — ${run.market.som.rationale}`,
+      `  SOM: ${input.market.som.value} ${input.market.som.unit ?? ""} — ${input.market.som.rationale}`,
     );
   }
 
-  if (run.competitors?.competitors.length) {
-    lines.push(`\nCOMPETITORS (${run.competitors.competitors.length}):`);
-    for (const c of run.competitors.competitors.slice(0, 6)) {
+  if (input.competitors?.competitors.length) {
+    lines.push(`\nCOMPETITORS (${input.competitors.competitors.length}):`);
+    for (const c of input.competitors.competitors.slice(0, 6)) {
       lines.push(
         `  • ${c.name}: ${c.positioning}${c.pricing ? ` | price: ${c.pricing.value}` : ""}`,
       );
     }
   }
 
-  if (run.canvas) {
+  if (input.canvas) {
     lines.push(`\nBUSINESS MODEL CANVAS:`);
-    lines.push(`  Revenue streams: ${run.canvas.revenueStreams.join(", ")}`);
-    lines.push(`  Customer segments: ${run.canvas.customerSegments.join(", ")}`);
-    lines.push(`  Channels: ${run.canvas.channels.join(", ")}`);
+    lines.push(`  Revenue streams: ${input.canvas.revenueStreams.join(", ")}`);
+    lines.push(`  Customer segments: ${input.canvas.customerSegments.join(", ")}`);
+    lines.push(`  Channels: ${input.canvas.channels.join(", ")}`);
   }
 
-  if (run.gtm) {
-    lines.push(`\nGTM — FIRST 30 DAYS: ${run.gtm.plan30.join("; ")}`);
-    lines.push(`GTM CHANNELS: ${run.gtm.channels.join(", ")}`);
+  if (input.gtm) {
+    lines.push(`\nGTM — FIRST 30 DAYS: ${input.gtm.plan30.join("; ")}`);
+    lines.push(`GTM CHANNELS: ${input.gtm.channels.join(", ")}`);
   }
 
-  if (run.assumptions) {
-    const a = run.assumptions;
+  if (input.assumptions) {
+    const a = input.assumptions;
     lines.push(`\nUNIT ECONOMICS ASSUMPTIONS:`);
     lines.push(`  ARPU: ${a.arpu.value} ${a.arpu.unit} — ${a.arpu.rationale}`);
     lines.push(`  Gross margin: ${a.grossMarginPct.value}% — ${a.grossMarginPct.rationale}`);
@@ -179,11 +195,12 @@ Respond ONLY with valid JSON in this exact shape:
 // ---------------------------------------------------------------------------
 
 async function scoreIdea(
-  ctx: StepContext,
+  llm: LlmProvider,
   persona: ValidationPersona,
   researchContext: string,
+  idea: string,
 ): Promise<ValidationPersonaResult> {
-  const response = await ctx.llm.chat({
+  const response = await llm.chat({
     model: MODELS.sonnet,
     maxTokens: 600,
     temperature: 0.3, // low temp for consistent scoring
@@ -208,7 +225,7 @@ async function scoreIdea(
           },
           {
             type: "text",
-            text: `\nIdea: "${ctx.run.input.idea}"\n\nScore this idea now.`,
+            text: `\nIdea: "${idea}"\n\nScore this idea now.`,
           },
         ],
       },
@@ -282,18 +299,39 @@ function synthesise(personas: ValidationPersonaResult[]): ValidationResult {
 }
 
 // ---------------------------------------------------------------------------
-// Exported step
+// Reusable entry point — runs the 3-persona panel over any ValidationInput.
+// Used by the pipeline step below and by standalone callers (POST /validate,
+// the Scout → Validate chain) that have only an idea + discovered competitors.
+// ---------------------------------------------------------------------------
+
+export async function validateIdea(
+  llm: LlmProvider,
+  input: ValidationInput,
+): Promise<ValidationResult> {
+  const researchContext = buildResearchContext(input);
+
+  // Run all 3 personas in parallel — they share cached research context.
+  const [skepticResult, advocateResult, analystResult] = await Promise.all([
+    scoreIdea(llm, "skeptic", researchContext, input.idea),
+    scoreIdea(llm, "advocate", researchContext, input.idea),
+    scoreIdea(llm, "analyst", researchContext, input.idea),
+  ]);
+
+  return synthesise([skepticResult, advocateResult, analystResult]);
+}
+
+// ---------------------------------------------------------------------------
+// Exported step — the pipeline's Step 9, feeding the full grounded run.
 // ---------------------------------------------------------------------------
 
 export async function validationStep(ctx: StepContext): Promise<void> {
-  const researchContext = buildResearchContext(ctx);
-
-  // Run all 3 personas in parallel — they share cached research context
-  const [skepticResult, advocateResult, analystResult] = await Promise.all([
-    scoreIdea(ctx, "skeptic", researchContext),
-    scoreIdea(ctx, "advocate", researchContext),
-    scoreIdea(ctx, "analyst", researchContext),
-  ]);
-
-  ctx.run.validation = synthesise([skepticResult, advocateResult, analystResult]);
+  ctx.run.validation = await validateIdea(ctx.llm, {
+    idea: ctx.run.input.idea,
+    brief: ctx.run.brief,
+    market: ctx.run.market,
+    competitors: ctx.run.competitors,
+    canvas: ctx.run.canvas,
+    gtm: ctx.run.gtm,
+    assumptions: ctx.run.assumptions,
+  });
 }
