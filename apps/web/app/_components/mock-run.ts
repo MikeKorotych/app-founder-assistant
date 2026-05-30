@@ -164,7 +164,7 @@ export const MOCK_RUNS: Run[] = [
       competitors: [
         { name: "Migraine Buddy", positioning: "Лідер трекінгу мігрені; ручний ввід, мало AI", pricing: f("freemium", undefined, "Безкоштовно + преміум."), url: "https://migrainebuddy.com" },
         { name: "Bearable", positioning: "Загальний трекер симптомів/настрою", pricing: f("$30/рік", undefined, "Публічний тариф."), url: "https://bearable.app" },
-        { name: "Паперовий щоденник", positioning: "Статус-кво: блокнот", estimated: true },
+        { name: "Паперовий щоденник", positioning: "Статус-кво: блокнот" },
       ],
     },
     canvas: {
@@ -240,7 +240,7 @@ export const MOCK_RUNS: Run[] = [
       competitors: [
         { name: "QuickBooks Self-Employed", positioning: "Облік + податки, важкий і не про cash-flow календар", pricing: f("$15/міс", undefined, "Публічний тариф."), url: "https://quickbooks.intuit.com" },
         { name: "Wave", positioning: "Безкоштовний облік/інвойсинг", pricing: f("free + платежі", undefined, "Модель на платежах."), url: "https://waveapps.com" },
-        { name: "Excel/нотатки", positioning: "Статус-кво", estimated: true },
+        { name: "Excel/нотатки", positioning: "Статус-кво" },
       ],
     },
     canvas: {
@@ -316,7 +316,7 @@ export const MOCK_RUNS: Run[] = [
       competitors: [
         { name: "LeetCode", positioning: "Алго-задачі, без персонального плану й мок-інтерв'ю з AI", pricing: f("$35/міс", undefined, "Premium."), url: "https://leetcode.com" },
         { name: "Pramp / Exponent", positioning: "Мок-інтерв'ю (peer/курси)", pricing: f("$79/міс", undefined, "Exponent підписка."), url: "https://tryexponent.com" },
-        { name: "YouTube/безкоштовне", positioning: "Статус-кво", estimated: true },
+        { name: "YouTube/безкоштовне", positioning: "Статус-кво" },
       ],
     },
     canvas: {
@@ -392,7 +392,7 @@ export const MOCK_RUNS: Run[] = [
       competitors: [
         { name: "Splitwise", positioning: "Розподіл витрат, але не бюджет/цілі пари", pricing: f("freemium", undefined, "Pro-підписка."), url: "https://splitwise.com" },
         { name: "Honeydue", positioning: "Фінанси для пар; UX і утримання слабкі", pricing: f("free", undefined, "Безкоштовний."), url: "https://honeydue.com" },
-        { name: "Таблиця/нотатки", positioning: "Статус-кво", estimated: true },
+        { name: "Таблиця/нотатки", positioning: "Статус-кво" },
       ],
     },
     canvas: {
