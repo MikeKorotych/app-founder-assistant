@@ -13,6 +13,7 @@ import { ValidationSection } from "../runs/[id]/_components/validation-section";
 import { randomMockRun } from "./mock-run";
 import { PlatformPie } from "./platform-pie";
 import { ReportBody } from "./report-body";
+import { ScoutLoading } from "./scout-loading";
 
 // A persisted competitor row as returned by GET /scout/:id (Drizzle row shape).
 interface Competitor {
@@ -244,9 +245,10 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
           <p className="text-sm text-foreground/85">{idea}</p>
 
           {phase.kind === "expanding" && (
-            <p className="text-sm text-muted-foreground">
-              Розбираємо ідею на ключові слова та категорії…
-            </p>
+            <ScoutLoading
+              title="Розбираємо ідею…"
+              hint="Виділяємо ключові слова та категорії для пошуку конкурентів."
+            />
           )}
 
           {expansion && (
@@ -269,10 +271,10 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
       </Card>
 
       {phase.kind === "scanning" && (
-        <p className="text-sm text-muted-foreground">
-          Scout шукає й ранжує конкурентів за цими запитами (iTunes, Google Play, Product Hunt,
-          AlternativeTo)…
-        </p>
+        <ScoutLoading
+          title="Scout шукає конкурентів…"
+          hint="Сканую iTunes, Google Play, Product Hunt та AlternativeTo за цими запитами."
+        />
       )}
 
       {phase.kind === "done" && (
@@ -283,9 +285,10 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
 
       {/* Validate step — chained automatically after Scout. */}
       {validation.kind === "running" && (
-        <p className="text-sm text-muted-foreground">
-          Валідуємо ідею Multi-LLM панеллю (Скептик · Адвокат · Аналітик)…
-        </p>
+        <ScoutLoading
+          title="Валідуємо ідею…"
+          hint="Multi-LLM панель оцінює ідею: Скептик · Адвокат · Аналітик."
+        />
       )}
 
       {validation.kind === "error" && (

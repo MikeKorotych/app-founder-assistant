@@ -319,6 +319,80 @@
   animation: pill-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
+/* ─── Endel-style ambient loading · slow drifting aurora ───────────── */
+/* Three blurred gradient orbs drift on lazy, offset paths so the block
+   never visibly loops — a calm "still thinking" surface while we wait. */
+@keyframes aurora-a {
+  0% {
+    transform: translate(-12%, -8%) scale(1);
+  }
+  50% {
+    transform: translate(14%, 10%) scale(1.18);
+  }
+  100% {
+    transform: translate(-12%, -8%) scale(1);
+  }
+}
+
+@keyframes aurora-b {
+  0% {
+    transform: translate(16%, 6%) scale(1.1);
+  }
+  50% {
+    transform: translate(-10%, -12%) scale(0.92);
+  }
+  100% {
+    transform: translate(16%, 6%) scale(1.1);
+  }
+}
+
+@keyframes aurora-c {
+  0% {
+    transform: translate(4%, 14%) scale(0.95);
+  }
+  50% {
+    transform: translate(-8%, -6%) scale(1.22);
+  }
+  100% {
+    transform: translate(4%, 14%) scale(0.95);
+  }
+}
+
+/* Whole-block breathing — barely-there opacity swell, ~7s in/out. */
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.62;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(34px);
+  will-change: transform;
+  mix-blend-mode: screen;
+}
+
+.ambient-orb-a {
+  animation: aurora-a 18s ease-in-out infinite;
+}
+
+.ambient-orb-b {
+  animation: aurora-b 23s ease-in-out infinite;
+}
+
+.ambient-orb-c {
+  animation: aurora-c 29s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 7s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
