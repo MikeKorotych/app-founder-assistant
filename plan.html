@@ -145,8 +145,26 @@
   .files .d{color:var(--muted)}
   footer{margin-top:72px; padding-top:22px; border-top:1px solid var(--border-soft); color:var(--faint); font-size:12.5px}
   .toc{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:18px; font-size:13px}
-  .toc a{color:var(--muted); border:0}
+  .toc a{color:var(--muted); border:0; cursor:pointer}
   .toc a:hover{color:var(--text)}
+
+  /* ---- responsive ---- */
+  @media(max-width:860px){
+    .grid.c4{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:620px){
+    .wrap{padding:52px 16px 90px}
+    h1{font-size:26px}
+    .lede{font-size:15px}
+    section{margin-top:42px}
+    .grid.c4,.grid.c2{grid-template-columns:1fr}
+    .board{grid-template-columns:1fr}
+    .toc{gap:8px 12px; font-size:12.5px}
+    th,td{padding:8px 9px; font-size:13px}
+    td:first-child{white-space:normal}
+    .files div{flex-direction:column; gap:2px; align-items:flex-start}
+    .files .p{white-space:normal; word-break:break-word}
+  }
 </style>
 </head>
 <body>
@@ -317,6 +335,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"plan.html: JS smooth-scroll TOC (works in iframe/preview) + responsive layout for small screens.", "commit":"—" },
   { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"Bilingual plan.html (UA/EN) with a language switch; agents read the English version.", "commit":"—" },
   { "date":"2026-05-30", "author":"scaffold", "workstream":"—", "summary":"CLAUDE.md: mandatory loop — pull + read plan before work, update status + push after.", "commit":"a467749" },
   { "date":"2026-05-30", "author":"scaffold", "workstream":"A/B", "summary":"Type contract, orchestrator, 8 step stubs, unit-economics engine (verified). Typecheck clean.", "commit":"fa5ef47" }
@@ -508,6 +527,13 @@
 
   document.querySelectorAll(".seg button").forEach(b =>
     b.addEventListener("click", () => applyLang(b.dataset.lang)));
+
+  // Smooth-scroll TOC — works even where hash navigation is blocked (iframe/preview).
+  document.querySelectorAll('.toc a[href^="#"]').forEach(a =>
+    a.addEventListener("click", ev => {
+      const el = document.getElementById(a.getAttribute("href").slice(1));
+      if (el) { ev.preventDefault(); el.scrollIntoView({ behavior:"smooth", block:"start" }); }
+    }));
 
   // initial language: ?lang= > localStorage > default uk
   const urlLang = new URLSearchParams(location.search).get("lang");
