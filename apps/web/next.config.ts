@@ -1,13 +1,11 @@
 import type { NextConfig } from "next";
 
-const API_URL = process.env.API_URL ?? "http://localhost:8787";
-
+// /api/* is proxied to the API Worker by app/api/[...path]/route.ts — external
+// rewrites aren't proxied by OpenNext on Cloudflare Workers, so we don't use
+// next.config rewrites here.
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ["@hahaton/ui", "@hahaton/contracts"],
-  async rewrites() {
-    return [{ source: "/api/:path*", destination: `${API_URL}/:path*` }];
-  },
 };
 
 export default nextConfig;
