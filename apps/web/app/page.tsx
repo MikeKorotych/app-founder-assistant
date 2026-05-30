@@ -16,7 +16,7 @@ export default function HomePage() {
         </p>
       </header>
 
-      <div className="animate-enter animate-enter-delay-3">
+      <div className="animate-enter animate-enter-delay-3 mx-auto w-full max-w-3xl">
         <IdeaForm />
       </div>
     </main>
