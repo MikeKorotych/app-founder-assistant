@@ -6,15 +6,16 @@
  * extraction/utility.
  *   opus   → market sizing, unit economics, synthesis
  *   sonnet → brief, competitors, canvas, gtm, risks, search-intent expansion
- *   haiku  → utility: input validation, titles
+ *   haiku  → utility: input validation, titles, competitor ranking
  *
- * NOTE: `sonnet` is wired to Claude Sonnet 4.5. Replace `opus`/`haiku` with the
- * real `model_name`s once those entries are added to the LiteLLM config.
+ * Values are real `model_name`s from the gateway's `/v1/models` list. Bare
+ * `opus`/`haiku` aliases are NOT configured there (they 400) — use the versioned
+ * Claude names.
  */
 export const MODELS = {
-  opus: "opus",
+  opus: "claude-opus-4-7",
   sonnet: "claude-sonnet-4-5",
-  haiku: "haiku",
+  haiku: "claude-haiku-4-5",
 } as const;
 
 export type ModelAlias = (typeof MODELS)[keyof typeof MODELS];

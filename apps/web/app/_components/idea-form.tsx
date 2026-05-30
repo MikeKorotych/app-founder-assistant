@@ -3,6 +3,7 @@
 import { Button, Card, CardContent } from "@hahaton/ui";
 import { useRef, useState } from "react";
 import { RunStream } from "./run-stream";
+import { ScoutRun } from "./scout-run";
 
 /** Sample ideas for the "Suggest an idea" button — specific & demo-friendly. */
 const SAMPLE_IDEAS = [
@@ -87,10 +88,16 @@ export function IdeaForm() {
     }, 160);
   }
 
+  // Real flow: idea → search-intent → Scout (competitor discovery) → Validate.
+  // ?demo=1 keeps the scripted RunStream as a presentation safety net.
   if (started) {
     return (
       <div className={restarting ? "animate-exit" : "animate-enter"}>
-        <RunStream idea={started} demo={demo} onRestart={restartRun} />
+        {demo ? (
+          <RunStream idea={started} demo={demo} onRestart={restartRun} />
+        ) : (
+          <ScoutRun idea={started} onRestart={restartRun} />
+        )}
       </div>
     );
   }
