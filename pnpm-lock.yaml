@@ -59,6 +59,9 @@ importers:
       '@hahaton/llm':
         specifier: workspace:*
         version: link:../../packages/llm
+      '@hahaton/scout':
+        specifier: workspace:*
+        version: link:../../packages/scout
       '@hahaton/store':
         specifier: workspace:*
         version: link:../../packages/store
@@ -232,6 +235,34 @@ importers:
       '@types/node':
         specifier: ^20.11.0
         version: 20.19.41
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/node@20.19.41)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.16.9)(tsx@4.22.3)(yaml@2.9.0)
+
+  packages/scout:
+    dependencies:
+      '@hahaton/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@hahaton/db':
+        specifier: workspace:*
+        version: link:../db
+      '@hahaton/llm':
+        specifier: workspace:*
+        version: link:../llm
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.45.2(@cloudflare/workers-types@4.20260530.1)
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 'catalog:'
+        version: 4.20260530.1
       rimraf:
         specifier: ^6.0.1
         version: 6.1.3

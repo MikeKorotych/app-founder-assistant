@@ -1,5 +1,6 @@
 {
   "name": "hahaton-api",
+  "account_id": "dbb2d590e1bf73c311d96144bc7b7476",
   "main": "src/index.ts",
   "compatibility_date": "2026-04-05",
   "compatibility_flags": ["nodejs_compat"],
@@ -23,6 +24,14 @@
     }
   ],
 
+  "workflows": [
+    {
+      "name": "competitor-discovery",
+      "binding": "DISCOVERY_WORKFLOW",
+      "class_name": "CompetitorDiscoveryWorkflow"
+    }
+  ],
+
   "env": {
     "prod": {
       "vars": {
@@ -37,6 +46,13 @@
           "database_id": "2bf49a4c-5ded-4ad6-ad79-e10513933e7a",
           "migrations_dir": "../../packages/db/migrations"
         }
+      ],
+      "workflows": [
+        {
+          "name": "competitor-discovery",
+          "binding": "DISCOVERY_WORKFLOW",
+          "class_name": "CompetitorDiscoveryWorkflow"
+        }
       ]
     },
     "dev": {
@@ -50,6 +66,13 @@
           "database_name": "hahaton-dev",
           "database_id": "REPLACE_WITH_D1_DEV_DATABASE_ID",
           "migrations_dir": "../../packages/db/migrations"
+        }
+      ],
+      "workflows": [
+        {
+          "name": "competitor-discovery",
+          "binding": "DISCOVERY_WORKFLOW",
+          "class_name": "CompetitorDiscoveryWorkflow"
         }
       ]
     }

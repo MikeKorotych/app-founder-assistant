@@ -2,12 +2,15 @@ import { runAgent, runPipeline } from "@hahaton/agent";
 import type { AgentEvent, Assumptions, RunInput } from "@hahaton/contracts";
 import { createDb } from "@hahaton/db";
 import { createLlmProvider } from "@hahaton/llm";
+import { listCompetitors, type ScoutParams } from "@hahaton/scout";
 import { loadRun, saveRun } from "@hahaton/store";
 import { computeUnitEconomics } from "@hahaton/unit-economics";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { streamSSE } from "hono/streaming";
 import { type BaseEnv, requireLlmEnv } from "./env";
+
+export { CompetitorDiscoveryWorkflow } from "./scout/workflow";
 
 const app = new Hono<BaseEnv>();
 
@@ -105,6 +108,34 @@ app.get("/runs/:id", async (c) => {
   const run = await loadRun(createDb(c.env.DB), c.req.param("id"));
   if (!run) return c.json({ error: "Run not found." }, 404);
   return c.json(run);
+});
+
+// Scout — spawn the competitor-discovery workflow. Accepts pre-extracted
+// keywords/categories (+ an optional idea that sharpens compatibility ranking).
+// Returns the instance id immediately; poll GET /scout/:id for status + results.
+app.post("/scout", async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as Partial<ScoutParams>;
+  if (!Array.isArray(body.keywords) || body.keywords.length === 0) {
+    return c.json({ error: "Body must include a non-empty 'keywords' string array." }, 400);
+  }
+  const params: ScoutParams = {
+    keywords: body.keywords,
+    categories: body.categories ?? [],
+    idea: body.idea,
+    country: body.country,
+    limitPerSource: body.limitPerSource,
+  };
+  const instance = await c.env.DISCOVERY_WORKFLOW.create({ params });
+  return c.json({ id: instance.id, status: await instance.status() }, 202);
+});
+
+// Scout status + ranked competitors persisted so far.
+app.get("/scout/:id", async (c) => {
+  const id = c.req.param("id");
+  const instance = await c.env.DISCOVERY_WORKFLOW.get(id).catch(() => null);
+  if (!instance) return c.json({ error: "Workflow instance not found." }, 404);
+  const competitors = await listCompetitors(createDb(c.env.DB), id);
+  return c.json({ id, status: await instance.status(), competitors });
 });
 
 // Recompute unit economics from assumptions — pure, no LLM round-trip.

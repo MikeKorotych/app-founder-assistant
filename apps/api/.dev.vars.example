@@ -10,6 +10,15 @@ LLM_GATEWAY_BASE_URL=http://localhost:4000
 LLM_GATEWAY_API_KEY=sk-replace-me
 LLM_TIMEOUT_MS=120000
 
+# Scout — competitor discovery sources (Worker secrets). Both optional: if unset,
+# that source degrades to empty and Scout still runs on the others.
+#   GOOGLE_SEARCH_API_KEY — SerpApi key (google_play engine) for Android results.
+#                       Get it at serpapi.com → Dashboard → "Your API Key".
+#   PRODUCTHUNT_TOKEN — Product Hunt API v2 developer token (Bearer).
+#                       producthunt.com/v2/oauth/applications → Add app → Create Token.
+GOOGLE_SEARCH_API_KEY=
+PRODUCTHUNT_TOKEN=
+
 # Appfigures — app market intelligence (Bearer = PAT). See docs/sources/appfigures.md.
 # NOTE: current account is owned-apps-only (no connected apps); competitor/market
 # data needs Partner API Access. Real values go in .dev.vars (gitignored).

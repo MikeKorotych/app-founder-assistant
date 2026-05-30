@@ -17,6 +17,7 @@
     "@hahaton/contracts": "workspace:*",
     "@hahaton/db": "workspace:*",
     "@hahaton/llm": "workspace:*",
+    "@hahaton/scout": "workspace:*",
     "@hahaton/store": "workspace:*",
     "@hahaton/unit-economics": "workspace:*",
     "drizzle-orm": "catalog:",

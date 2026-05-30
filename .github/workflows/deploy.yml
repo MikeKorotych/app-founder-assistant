@@ -93,7 +93,10 @@ jobs:
 
       - name: Set Worker secrets
         run: |
+          echo "${{ secrets.LLM_GATEWAY_BASE_URL }}" | pnpm --filter @hahaton/api exec wrangler secret put LLM_GATEWAY_BASE_URL --env=""
           echo "${{ secrets.LLM_GATEWAY_API_KEY }}" | pnpm --filter @hahaton/api exec wrangler secret put LLM_GATEWAY_API_KEY --env=""
+          echo "${{ secrets.GOOGLE_SEARCH_API_KEY }}" | pnpm --filter @hahaton/api exec wrangler secret put GOOGLE_SEARCH_API_KEY --env=""
+          echo "${{ secrets.PRODUCTHUNT_TOKEN }}" | pnpm --filter @hahaton/api exec wrangler secret put PRODUCTHUNT_TOKEN --env=""
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
