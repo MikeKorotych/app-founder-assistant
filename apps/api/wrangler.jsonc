@@ -1,5 +1,6 @@
 {
   "name": "hahaton-api",
+  "account_id": "dbb2d590e1bf73c311d96144bc7b7476",
   "main": "src/index.ts",
   "compatibility_date": "2026-04-05",
   "compatibility_flags": ["nodejs_compat"],
