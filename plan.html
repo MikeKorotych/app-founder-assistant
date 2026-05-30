@@ -370,6 +370,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"13:50", "author":"Mykhailo", "workstream":"C", "summary":"C5 done. UnitEconomicsSection is now interactive: 7 range sliders (one per Assumptions field) drive computeUnitEconomics locally — LTV / LTV:CAC / payback / contribution / break-even / monthly burn recompute on every drag, no API round-trip. Modified flag + 'Reset to agent values' button restore the original LLM assumptions. Citations + rationale stay attached to each slider. Build clean (/runs/[id] = 6.4 KB).", "commit":"—" },
   { "date":"2026-05-30", "time":"13:35", "author":"Mykhailo", "workstream":"C", "summary":"C2 + C4 done. /runs/[id] now renders 8 typed report sections off the @hahaton/contracts Run shape: brief, market (TAM/SAM/SOM + estimated pills + citation links), competitors, 9-block canvas, GTM (channels + 30/60/90 + hypotheses), unit economics (assumptions + derived via @hahaton/unit-economics + warnings), risks table (likelihood/impact pills), pitch synthesis (executive summary + narrative + deck outline). Common SectionShell/FactValue/EmptyState. Also marked @hahaton/ui's ImageZoom as a Client Component so Next 15 RSC builds clean. Build + typecheck green.", "commit":"—" },
   { "date":"2026-05-30", "time":"12:51", "author":"Codex", "workstream":"A", "summary":"A14 auth slice: added paid mobile-intelligence sources (AppMagic, Sensor Tower, Mobile Action), env-var API key mapping, auth readiness helpers, and header/query injection for Scout source requests. Typecheck green.", "commit":"—" },
   { "date":"2026-05-30", "time":"12:47", "author":"Codex", "workstream":"A", "summary":"🔨 started A14: extend Scout source registry/auth metadata for paid mobile-intelligence APIs and document which API keys are required before source fetching.", "commit":"—" },
@@ -432,7 +433,7 @@
   { "id":"C2", "group":"C", "title_uk":"Форма вводу (ідея + регіон + бюджет)", "title_en":"Input form (idea + region + budget)", "owner":"Mykhailo", "status":"done" },
   { "id":"C3", "group":"C", "title_uk":"Живий research-timeline (SSE)", "title_en":"Live research timeline (SSE)", "owner":"—", "status":"todo" },
   { "id":"C4", "group":"C", "title_uk":"Секції звіту (ринок/конкуренти/canvas/GTM/ризики/синтез)", "title_en":"Report sections (market/competitors/canvas/GTM/risks/synthesis)", "owner":"Mykhailo", "status":"done" },
-  { "id":"C5", "group":"C", "title_uk":"Інтерактивна юніт-економіка (слайдери → перерахунок)", "title_en":"Interactive unit economics (sliders → recompute)", "owner":"Mykhailo", "status":"in-progress" },
+  { "id":"C5", "group":"C", "title_uk":"Інтерактивна юніт-економіка (слайдери → перерахунок)", "title_en":"Interactive unit economics (sliders → recompute)", "owner":"Mykhailo", "status":"done" },
   { "id":"C6", "group":"C", "title_uk":"Scorecard валідації (4×25 + gaps + панель)", "title_en":"Validation scorecard (4×25 + gaps + panel)", "owner":"—", "status":"todo" },
   { "id":"C7", "group":"C", "title_uk":"Цитати (inline + sources appendix)", "title_en":"Citations (inline + sources appendix)", "owner":"—", "status":"todo" },
   { "id":"C8", "group":"C", "title_uk":"Полірування — монохром/Linear", "title_en":"Polish — monochrome/Linear style", "owner":"—", "status":"todo" },
