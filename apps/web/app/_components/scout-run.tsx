@@ -269,7 +269,7 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
 
       {phase.kind === "scanning" && (
         <p className="text-sm text-muted-foreground">
-          Scout шукає конкурентів за цими запитами (iTunes, Google Play, Product Hunt,
+          Scout шукає й ранжує конкурентів за цими запитами (iTunes, Google Play, Product Hunt,
           AlternativeTo)…
         </p>
       )}
@@ -348,8 +348,10 @@ function CompetitorList({ competitors }: { competitors: Competitor[] }) {
             {c.rationale && <p className="text-sm text-muted-foreground">{c.rationale}</p>}
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
               {c.developer && <span>{c.developer}</span>}
-              {c.rating > 0 && <span>★ {c.rating.toFixed(1)}</span>}
-              {c.reviewCount > 0 && <span>{c.reviewCount.toLocaleString()} відгуків</span>}
+              <span>{c.rating > 0 ? `★ ${c.rating.toFixed(1)}` : "★ N/A"}</span>
+              <span>
+                {c.reviewCount > 0 ? `${c.reviewCount.toLocaleString()} відгуків` : "Відгуки: N/A"}
+              </span>
               {c.price && <span>{c.price}</span>}
             </div>
           </CardContent>

@@ -1,5 +1,6 @@
 import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloudflare:workers";
 import { createDb } from "@hahaton/db";
+import { createLlmProvider } from "@hahaton/llm";
 import {
   dedupeById,
   fetchAlternativeTo,
@@ -8,6 +9,7 @@ import {
   fetchProductHunt,
   persistCompetitors,
   type RawCompetitor,
+  rankCompetitors,
   type ScoutParams,
   type ScoutSummary,
 } from "@hahaton/scout";
@@ -84,17 +86,22 @@ export class CompetitorDiscoveryWorkflow extends WorkflowEntrypoint<Bindings, Sc
     const warnings = results.map((r) => r.warning).filter((w): w is string => w !== undefined);
     const candidates: RawCompetitor[] = dedupeById(results.flatMap((r) => r.items));
 
-    // No ranking step — persist every discovered competitor (D1 upsert) so the
-    // UI shows the full set from all sources.
+    // Rank by compatibility with the idea (LLM), then persist (D1 upsert).
+    const scored = await step.do(
+      "rank",
+      { retries: { limit: 2, delay: "5 seconds", backoff: "exponential" }, timeout: "2 minutes" },
+      () => rankCompetitors(createLlmProvider(this.env), params, candidates),
+    );
+
     await step.do("ingest", () =>
-      persistCompetitors(createDb(this.env.DB), event.instanceId, candidates),
+      persistCompetitors(createDb(this.env.DB), event.instanceId, scored),
     );
 
     return {
       runId: event.instanceId,
       discovered: candidates.length,
-      ranked: candidates.length,
-      topCompetitorId: candidates[0]?.id,
+      ranked: scored.length,
+      topCompetitorId: scored[0]?.id,
       warnings,
     };
   }

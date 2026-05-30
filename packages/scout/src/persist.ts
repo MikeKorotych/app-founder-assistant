@@ -1,22 +1,21 @@
 import { competitors, type Db } from "@hahaton/db";
 import { desc, eq } from "drizzle-orm";
-import type { RawCompetitor } from "./types.js";
+import type { ScoredCompetitor } from "./types.js";
 
 const nowIso = () => new Date().toISOString();
 
 /**
- * Upsert discovered competitors for a workflow run. `id` is the conflict target,
- * so a re-run with overlapping apps updates rather than duplicates. D1 caps bound
- * variables, so we chunk the batch. Ranking was removed — every discovered app is
- * persisted as-is (compatibilityScore/rationale left null) and shown on the UI.
+ * Upsert ranked competitors for a workflow run. `id` is the conflict target, so
+ * a re-run with overlapping apps updates rather than duplicates. D1 caps bound
+ * variables, so we chunk the batch.
  */
 export async function persistCompetitors(
   db: Db,
   runId: string,
-  discovered: RawCompetitor[],
+  scored: ScoredCompetitor[],
 ): Promise<void> {
-  if (discovered.length === 0) return;
-  const rows = discovered.map((c) => ({
+  if (scored.length === 0) return;
+  const rows = scored.map((c) => ({
     id: c.id,
     runId,
     name: c.name,
@@ -29,8 +28,8 @@ export async function persistCompetitors(
     price: c.price ?? null,
     rating: c.rating,
     reviewCount: c.reviewCount,
-    compatibilityScore: null,
-    rationale: null,
+    compatibilityScore: c.compatibilityScore,
+    rationale: c.rationale,
     updatedAt: nowIso(),
   }));
 
@@ -65,11 +64,11 @@ export async function persistCompetitors(
   }
 }
 
-/** Read back a run's competitors, most-reviewed (most popular) first. */
+/** Read back a run's competitors, best compatibility first. */
 export async function listCompetitors(db: Db, runId: string) {
   return db
     .select()
     .from(competitors)
     .where(eq(competitors.runId, runId))
-    .orderBy(desc(competitors.reviewCount), desc(competitors.rating));
+    .orderBy(desc(competitors.compatibilityScore));
 }

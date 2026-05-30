@@ -9,6 +9,7 @@ import type { Db } from "@hahaton/db";
 import type { LlmProvider } from "@hahaton/llm";
 import { dedupeById } from "./normalize.js";
 import { persistCompetitors } from "./persist.js";
+import { rankCompetitors } from "./rank.js";
 import { fetchAlternativeTo } from "./sources/alternativeto.js";
 import { fetchGooglePlay } from "./sources/googleplay.js";
 import { fetchItunes } from "./sources/itunes.js";
@@ -62,13 +63,13 @@ export async function runScout(
       : [],
   );
   const candidates = dedupeById(settled.flatMap((r) => (r.status === "fulfilled" ? r.value : [])));
-  // Ranking removed — persist + return every discovered competitor.
-  await persistCompetitors(deps.db, runId, candidates);
+  const scored = await rankCompetitors(deps.llm, params, candidates);
+  await persistCompetitors(deps.db, runId, scored);
   return {
     runId,
     discovered: candidates.length,
-    ranked: candidates.length,
-    topCompetitorId: candidates[0]?.id,
+    ranked: scored.length,
+    topCompetitorId: scored[0]?.id,
     warnings,
   };
 }
