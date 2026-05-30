@@ -63,7 +63,9 @@ export async function fetchGooglePlay(
   country: string,
 ): Promise<RawCompetitor[]> {
   if (!apiKey) return [];
-  const perKeyword = await Promise.all(
+  // Settle per keyword so one failing term doesn't discard the rest (mirrors
+  // iTunes). Throw only when every term failed → the step retries/degrades.
+  const settled = await Promise.allSettled(
     params.keywords.map(async (term) => {
       const url = `${ENDPOINT}?engine=google_play&store=apps&gl=${country}&q=${encodeURIComponent(term)}&api_key=${apiKey}`;
       const res = await fetch(url, { headers: { Accept: "application/json" } });
@@ -74,5 +76,14 @@ export async function fetchGooglePlay(
         .filter((c): c is RawCompetitor => c !== null);
     }),
   );
-  return dedupeById(perKeyword.flat());
+  const ok = settled.filter(
+    (r): r is PromiseFulfilledResult<RawCompetitor[]> => r.status === "fulfilled",
+  );
+  if (ok.length === 0 && settled.length > 0) {
+    const first = settled[0] as PromiseRejectedResult;
+    throw first.reason instanceof Error
+      ? first.reason
+      : new Error(`Google Play: all keyword queries failed (${String(first.reason)})`);
+  }
+  return dedupeById(ok.flatMap((r) => r.value));
 }

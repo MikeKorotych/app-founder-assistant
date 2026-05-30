@@ -269,7 +269,7 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
 
       {phase.kind === "scanning" && (
         <p className="text-sm text-muted-foreground">
-          Scout шукає й ранжує конкурентів за цими запитами (iTunes, Google Play, Product Hunt,
+          Scout шукає конкурентів за цими запитами (iTunes, Google Play, Product Hunt,
           AlternativeTo)…
         </p>
       )}
