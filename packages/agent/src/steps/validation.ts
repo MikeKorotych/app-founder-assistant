@@ -18,8 +18,8 @@ import type {
   ValidationScore,
 } from "@hahaton/contracts";
 import { type LlmProvider, MODELS } from "@hahaton/llm";
-import type { StepContext } from "./index";
 import { withOutputLanguage } from "../llm-language";
+import type { StepContext } from "./index";
 
 /**
  * Everything the panel scores against. The full pipeline supplies all fields;
@@ -203,7 +203,11 @@ async function scoreIdea(
 ): Promise<ValidationPersonaResult> {
   const response = await llm.chat({
     model: MODELS.sonnet,
-    maxTokens: 600,
+    // Four Ukrainian rationales routinely run 465–530 tokens and spike past 600;
+    // capping at 600 truncated the JSON mid-`rationale`, and the greedy extractor
+    // below then backtracked to the `scores` brace → "Expected ',' or '}'" parse
+    // crash surfaced as a 500. Give comfortable headroom so the panel never clips.
+    maxTokens: 1500,
     temperature: 0.3, // low temp for consistent scoring
     messages: [
       {
@@ -235,16 +239,27 @@ async function scoreIdea(
 
   const raw = response.content ?? "";
 
-  // Extract JSON from the response (model sometimes wraps it in markdown)
+  // Extract JSON from the response (model sometimes wraps it in markdown).
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
     throw new Error(`[validation:${persona}] No JSON in response: ${raw.slice(0, 200)}`);
   }
 
-  const parsed = JSON.parse(jsonMatch[0]) as {
+  let parsed: {
     scores: ValidationScore;
     rationale: Record<keyof ValidationScore, string>;
   };
+  try {
+    parsed = JSON.parse(jsonMatch[0]);
+  } catch (err) {
+    // A truncated response (maxTokens hit) leaves unbalanced braces; the greedy
+    // match above backtracks to an inner `}`, so JSON.parse throws cryptically.
+    // Surface the raw so the real cause (clipped body) is obvious, not a bare
+    // SyntaxError.
+    throw new Error(
+      `[validation:${persona}] Malformed JSON (likely truncated): ${(err as Error).message} — raw: ${raw.slice(0, 300)}`,
+    );
+  }
 
   // Clamp all scores to [0, 25]
   const clamp = (v: unknown) => Math.min(25, Math.max(0, Number(v) || 0));
