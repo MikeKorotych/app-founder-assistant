@@ -115,7 +115,14 @@ describe("fetchProductHunt", () => {
     return bodies;
   }
 
-  type PhStubNode = { id: string; name: string; tagline?: string; votesCount?: number };
+  type PhStubNode = {
+    id: string;
+    name: string;
+    tagline?: string;
+    votesCount?: number;
+    featuredAt?: string;
+    createdAt?: string;
+  };
 
   it("returns empty without a token (no request made)", async () => {
     const bodies = stubFetch([]);
@@ -136,6 +143,22 @@ describe("fetchProductHunt", () => {
     expect(bodies.map((b) => b.slug)).toEqual(["productivity", "health-and-fitness"]);
     expect(out.map((c) => c.id)).toEqual(["ph-1", "ph-2"]);
     expect(out[0]).toMatchObject({ source: "producthunt", reviewCount: 99, platforms: ["web"] });
+  });
+
+  it("maps launchedAt from featuredAt, falling back to createdAt", async () => {
+    stubFetch([
+      [
+        { id: "1", name: "Featured", votesCount: 9, featuredAt: "2026-05-01T00:00:00Z" },
+        { id: "2", name: "Created-only", votesCount: 8, createdAt: "2026-04-01T00:00:00Z" },
+        { id: "3", name: "Neither", votesCount: 7 },
+      ],
+    ]);
+    const out = await fetchProductHunt({ keywords: ["x"], categories: ["productivity"] }, "tok");
+    expect(out.map((c) => c.launchedAt)).toEqual([
+      "2026-05-01T00:00:00Z",
+      "2026-04-01T00:00:00Z",
+      undefined,
+    ]);
   });
 
   it("falls back to slugified keywords when no categories are given", async () => {

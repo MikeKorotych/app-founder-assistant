@@ -42,6 +42,8 @@ export interface RawCompetitor {
   price?: string;
   /** App icon URL — the smallest artwork the source offers (60px iTunes / Play thumbnail). */
   iconUrl?: string;
+  /** When the listing launched (ISO 8601). Product Hunt only — its featured/created date. */
+  launchedAt?: string;
   rating: number;
   reviewCount: number;
 }

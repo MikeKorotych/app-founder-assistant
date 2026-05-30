@@ -27,6 +27,7 @@ interface Competitor {
   platforms: string | null;
   price: string | null;
   iconUrl: string | null;
+  launchedAt: string | null;
   rating: number;
   reviewCount: number;
   compatibilityScore: number | null;
@@ -332,6 +333,33 @@ function sourceLabel(source: string): string {
   return SOURCE_LABELS[source] ?? source.charAt(0).toUpperCase() + source.slice(1);
 }
 
+// Ukrainian plural form picker: [one, few, many] (1 день / 2 дні / 5 днів).
+function plural(n: number, forms: [string, string, string]): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return forms[0];
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return forms[1];
+  return forms[2];
+}
+
+// "Launched N days ago" in Ukrainian from a launch ISO date (PH featured/created).
+// Collapses to days → months → years; null for missing/invalid/future dates.
+function launchedLabel(iso: string | null): string | null {
+  if (!iso) return null;
+  const then = Date.parse(iso);
+  if (Number.isNaN(then)) return null;
+  const days = Math.floor((Date.now() - then) / 86_400_000);
+  if (days < 0) return null;
+  if (days === 0) return "Запущено сьогодні";
+  if (days < 30) return `Запущено ${days} ${plural(days, ["день", "дні", "днів"])} тому`;
+  if (days < 365) {
+    const months = Math.floor(days / 30);
+    return `Запущено ${months} ${plural(months, ["місяць", "місяці", "місяців"])} тому`;
+  }
+  const years = Math.floor(days / 365);
+  return `Запущено ${years} ${plural(years, ["рік", "роки", "років"])} тому`;
+}
+
 // Bucket competitors by the source they were discovered from, preserving the
 // incoming compatibility-desc order within each bucket.
 function groupBySource(competitors: Competitor[]): [string, Competitor[]][] {
@@ -425,6 +453,9 @@ function SourceTable({ source, items }: { source: string; items: Competitor[] })
                               : "Відгуки: N/A"}
                           </span>
                           {c.price && <span>{c.price}</span>}
+                          {launchedLabel(c.launchedAt) && (
+                            <span>{launchedLabel(c.launchedAt)}</span>
+                          )}
                         </span>
                       </div>
                     </div>

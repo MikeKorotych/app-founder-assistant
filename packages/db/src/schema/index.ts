@@ -36,6 +36,7 @@ export const competitors = sqliteTable("competitors", {
   platforms: text("platforms"),
   price: text("price"),
   iconUrl: text("icon_url"),
+  launchedAt: text("launched_at"),
   rating: real("rating").notNull().default(0),
   reviewCount: integer("review_count").notNull().default(0),
   compatibilityScore: real("compatibility_score"),

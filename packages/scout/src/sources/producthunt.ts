@@ -20,7 +20,7 @@ const ENDPOINT = "https://api.producthunt.com/v2/api/graphql";
 
 const QUERY = `query Topic($slug: String!, $first: Int!) {
   posts(topic: $slug, order: VOTES, first: $first) {
-    edges { node { id name tagline description votesCount url topics(first: 1) { edges { node { name } } } } }
+    edges { node { id name tagline description votesCount url featuredAt createdAt topics(first: 1) { edges { node { name } } } } }
   }
 }`;
 
@@ -34,6 +34,10 @@ interface PhNode {
   description?: string;
   votesCount?: number;
   url?: string;
+  /** When the post hit the PH homepage — PH's "Launched" date. ISO 8601. */
+  featuredAt?: string;
+  /** When the post was created — fallback for posts never featured. ISO 8601. */
+  createdAt?: string;
   topics?: { edges?: { node?: { name?: string } }[] };
 }
 
@@ -50,6 +54,8 @@ function toCompetitor(n: PhNode): RawCompetitor | null {
     rating: 0,
     // PH has no star rating; upvotes are the popularity proxy.
     reviewCount: n.votesCount ?? 0,
+    // "Launched" on PH = the featured date; fall back to creation date.
+    launchedAt: n.featuredAt ?? n.createdAt,
   };
 }
 

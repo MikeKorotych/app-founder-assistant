@@ -1,0 +1,1 @@
+ALTER TABLE `competitors` ADD `launched_at` text;
