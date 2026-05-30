@@ -370,6 +370,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"12:30", "author":"Anton", "workstream":"A", "summary":"Add packages/scout/PLAN.md — spec for the Scout sub-agent (fan-out → fan-in → fan-out): plan sources from the frozen @hahaton/integrations registry, build concrete HTTP requests, query sources in parallel (Firecrawl fallback), aggregate, then LLM per-source reports. Researched live no-auth APIs (HN Algolia, iTunes, Reddit) + Firecrawl. Added roadmap A13–A17.", "commit":"—" },
   { "date":"2026-05-30", "time":"12:25", "author":"Anton", "workstream":"—", "summary":"CLAUDE.md: require a claim-commit pushed at session start (before any code) — update plan.html JSON islands or an empty commit (git commit --allow-empty) announcing the sub-task, so the team sees who works on what BEFORE the task is done.", "commit":"—" },
   { "date":"2026-05-30", "time":"12:20", "author":"Ruslan", "workstream":"D", "summary":"🔨 started D3: migrate stack to Cloudflare on the phasekit pattern — Hono Worker (apps/api), D1+Drizzle (packages/db), OpenNext surface (apps/web), Biome, and CI deploy.yml.", "commit":"—" },
   { "date":"2026-05-30", "time":"12:15", "author":"Mykhailo", "workstream":"C", "summary":"🔨 started C1: UI stack = Next.js + shadcn; porting the design system from funnel-analyzer into apps/web (stripping funnel/prisma/auth/crawler).", "commit":"—" },
@@ -407,6 +408,12 @@
   { "id":"A10", "group":"A", "title_uk":"Grounding: enforce citationId + серверна валідація", "title_en":"Grounding: enforce citationId + server validation", "owner":"—", "status":"todo" },
   { "id":"A11", "group":"A", "title_uk":"Multi-LLM панель + скоринг 4×25 + gaps", "title_en":"Multi-LLM panel + 4×25 scoring + gaps", "owner":"—", "status":"todo" },
   { "id":"A12", "group":"A", "title_uk":"Роутинг моделей + prompt caching", "title_en":"Model routing + prompt caching", "owner":"—", "status":"todo" },
+
+  { "id":"A13", "group":"A", "title_uk":"Scout: каркас пакета + контракти (packages/scout)", "title_en":"Scout: package scaffold + contracts (packages/scout)", "owner":"—", "status":"todo" },
+  { "id":"A14", "group":"A", "title_uk":"Scout: планувальник джерел + шаблони HTTP-запитів", "title_en":"Scout: source planner + HTTP request templates", "owner":"—", "status":"todo" },
+  { "id":"A15", "group":"A", "title_uk":"Scout: паралельний fetch джерел + Firecrawl-фолбек", "title_en":"Scout: parallel source fetch + Firecrawl fallback", "owner":"—", "status":"todo" },
+  { "id":"A16", "group":"A", "title_uk":"Scout: агрегація + звіт по кожному джерелу (LLM)", "title_en":"Scout: aggregate + per-source report (LLM)", "owner":"—", "status":"todo" },
+  { "id":"A17", "group":"A", "title_uk":"Scout: /scout ендпоінт + інтеграція в крок конкурентів/ринку", "title_en":"Scout: /scout endpoint + wire into competitors/market step", "owner":"—", "status":"todo" },
 
   { "id":"B1", "group":"B", "title_uk":"SSE /agent/stream (apps/api)", "title_en":"SSE /agent/stream (apps/api)", "owner":"—", "status":"todo" },
   { "id":"B2", "group":"B", "title_uk":"Схема подій + heartbeats", "title_en":"Event schema + heartbeats", "owner":"—", "status":"todo" },

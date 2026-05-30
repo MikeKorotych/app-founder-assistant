@@ -331,18 +331,18 @@ inline footnotes with zero extra UI work.
 
 ---
 
-## 9. Build order (roadmap sub-tasks S1–S5)
+## 9. Build order (roadmap sub-tasks A13–A17)
 
-- **S1 — Scaffold + contracts.** Package, `tsconfig`, `package.json`, `src/types.ts`,
+- **A13 — Scaffold + contracts.** Package, `tsconfig`, `package.json`, `src/types.ts`,
   `src/index.ts`. `pnpm typecheck` green. Wire deps (`contracts`, `integrations`).
-- **S2 — Phase 1 planner + templates.** `plan-sources.ts` + `request-templates.ts` for the
+- **A14 — Phase 1 planner + templates.** `plan-sources.ts` + `request-templates.ts` for the
   4 no-auth sources. Unit-test: idea → expected `SourceRequest[]` (deterministic URLs).
-- **S3 — Phase 2 fetch + Firecrawl fallback.** `fetch-source.ts`, `firecrawl.ts`, auth
+- **A15 — Phase 2 fetch + Firecrawl fallback.** `fetch-source.ts`, `firecrawl.ts`, auth
   injection from the registry, per-source timeout, `allSettled` degrade. Live smoke test
   against HN + iTunes + Reddit (no creds).
-- **S4 — Phase 3 + 4.** `aggregate.ts` (dedupe citations) + `report-source.ts` (LLM →
+- **A16 — Phase 3 + 4.** `aggregate.ts` (dedupe citations) + `report-source.ts` (LLM →
   `SourceReport`, honesty rule: every metric grounded or `estimated:true`). Emit events.
-- **S5 — Wire-in.** `POST /scout` + SSE in `apps/api`; feed `competitorsStep`/`marketStep`;
+- **A17 — Wire-in.** `POST /scout` + SSE in `apps/api`; feed `competitorsStep`/`marketStep`;
   one golden `ScoutReport` persisted for offline replay.
 
 ---
