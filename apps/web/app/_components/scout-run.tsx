@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { apiUrl } from "../_lib/api";
 import { ValidationSection } from "../runs/[id]/_components/validation-section";
 import { randomMockRun } from "./mock-run";
+import { PlatformPie } from "./platform-pie";
 import { ReportBody } from "./report-body";
 
 // A persisted competitor row as returned by GET /scout/:id (Drizzle row shape).
@@ -320,6 +321,7 @@ function CompetitorList({ competitors }: { competitors: Competitor[] }) {
   }
   return (
     <div className="stagger-enter flex flex-col gap-3">
+      <PlatformPie sources={competitors.map((c) => c.source)} />
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
         Конкуренти · {competitors.length}
       </p>
