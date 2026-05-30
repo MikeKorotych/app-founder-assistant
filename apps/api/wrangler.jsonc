@@ -1,0 +1,59 @@
+{
+  "name": "hahaton-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-05",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // The Idea → Business Plan pipeline awaits many LLM calls. Time spent waiting
+  // on those subrequests does not count as CPU, but raise the CPU ceiling so the
+  // orchestration itself never trips the default 30s limit. Requires the Workers
+  // Standard (paid) plan; drop to 30000 on the free plan.
+  "limits": { "cpu_ms": 300000 },
+
+  "vars": {
+    "APP_ENV": "production",
+    "SURFACE_BASE_URL": "https://hahaton-web.pages.dev"
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hahaton-prod",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "../../packages/db/migrations"
+    }
+  ],
+
+  "env": {
+    "prod": {
+      "vars": {
+        "APP_ENV": "production",
+        "SURFACE_BASE_URL": "https://hahaton-web.pages.dev",
+        "LLM_GATEWAY_BASE_URL": "REPLACE_WITH_LITELLM_PROXY_URL"
+      },
+      "limits": { "cpu_ms": 300000 },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "hahaton-prod",
+          "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+          "migrations_dir": "../../packages/db/migrations"
+        }
+      ]
+    },
+    "dev": {
+      "vars": {
+        "APP_ENV": "development",
+        "SURFACE_BASE_URL": "http://localhost:3000"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "hahaton-dev",
+          "database_id": "REPLACE_WITH_D1_DEV_DATABASE_ID",
+          "migrations_dir": "../../packages/db/migrations"
+        }
+      ]
+    }
+  }
+}

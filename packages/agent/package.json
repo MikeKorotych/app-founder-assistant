@@ -4,28 +4,21 @@
   "private": true,
   "type": "module",
   "description": "The Idea → Business Plan agent pipeline: orchestrator + steps.",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
+    ".": "./src/index.ts"
   },
-  "files": ["dist"],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch --preserveWatchOutput",
     "typecheck": "tsc --noEmit",
-    "clean": "rimraf dist .turbo *.tsbuildinfo"
+    "clean": "rimraf .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0",
-    "@hahaton/contracts": "workspace:*"
+    "@hahaton/contracts": "workspace:*",
+    "@hahaton/llm": "workspace:*",
+    "@hahaton/outbound": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0",
+    "@cloudflare/workers-types": "catalog:",
     "rimraf": "^6.0.1",
-    "typescript": "^5.7.0"
+    "typescript": "catalog:"
   }
 }

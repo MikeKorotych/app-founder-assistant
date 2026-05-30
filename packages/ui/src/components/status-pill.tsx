@@ -1,6 +1,6 @@
-import { cn } from '../lib/utils';
+import { cn } from "../lib/utils";
 
-type Tone = 'idle' | 'working' | 'success' | 'error';
+type Tone = "idle" | "working" | "success" | "error";
 
 interface StatusPillProps {
   tone: Tone;
@@ -9,27 +9,27 @@ interface StatusPillProps {
 
 const toneStyles: Record<Tone, { dot: string; ring: string; text: string; pulse: boolean }> = {
   idle: {
-    dot: 'bg-muted-foreground',
-    ring: 'bg-muted-foreground',
-    text: 'text-muted-foreground',
+    dot: "bg-muted-foreground",
+    ring: "bg-muted-foreground",
+    text: "text-muted-foreground",
     pulse: false,
   },
   working: {
-    dot: 'bg-success shadow-[0_0_12px_var(--success)]',
-    ring: 'bg-success',
-    text: 'text-foreground',
+    dot: "bg-success shadow-[0_0_12px_var(--success)]",
+    ring: "bg-success",
+    text: "text-foreground",
     pulse: true,
   },
   success: {
-    dot: 'bg-success',
-    ring: 'bg-success',
-    text: 'text-foreground',
+    dot: "bg-success",
+    ring: "bg-success",
+    text: "text-foreground",
     pulse: false,
   },
   error: {
-    dot: 'bg-destructive',
-    ring: 'bg-destructive',
-    text: 'text-destructive',
+    dot: "bg-destructive",
+    ring: "bg-destructive",
+    text: "text-destructive",
     pulse: false,
   },
 };
@@ -42,14 +42,14 @@ export function StatusPill({ tone, label }: StatusPillProps) {
         {styles.pulse && (
           <span
             className={cn(
-              'absolute inset-0 inline-block rounded-full animate-pill-ping',
+              "absolute inset-0 inline-block rounded-full animate-pill-ping",
               styles.ring,
             )}
           />
         )}
-        <span className={cn('relative inline-block size-2 rounded-full', styles.dot)} />
+        <span className={cn("relative inline-block size-2 rounded-full", styles.dot)} />
       </span>
-      <span className={cn('font-medium tracking-tight', styles.text)}>{label}</span>
+      <span className={cn("font-medium tracking-tight", styles.text)}>{label}</span>
     </div>
   );
 }

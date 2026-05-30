@@ -5,6 +5,7 @@
  * types live behind a separate entry point (`@hahaton/integrations/generated`)
  * because they're produced by `pnpm generate:contracts` and git-ignored.
  */
-export * from "./sources.js";
+
 export * from "./auth.js";
 export * from "./credentials.js";
+export * from "./sources.js";

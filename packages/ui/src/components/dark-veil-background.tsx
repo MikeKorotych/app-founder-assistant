@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { Mesh, Program, Renderer, Triangle, Vec2 } from 'ogl';
-import { cn } from '../lib/utils';
+import { Mesh, Program, Renderer, Triangle, Vec2 } from "ogl";
+import * as React from "react";
+import { cn } from "../lib/utils";
 
 const vertex = `
 attribute vec2 position;
@@ -145,7 +145,7 @@ function DarkVeilBackground({
 
     let frame = 0;
     const start = performance.now();
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function loop() {
       uniforms.uTime.value = reduceMotion ? 0 : ((performance.now() - start) / 1000) * speed;
@@ -158,13 +158,13 @@ function DarkVeilBackground({
       if (!reduceMotion) frame = requestAnimationFrame(loop);
     }
 
-    window.addEventListener('resize', resize);
+    window.addEventListener("resize", resize);
     resize();
     loop();
 
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener('resize', resize);
+      window.removeEventListener("resize", resize);
     };
   }, [
     hueShift,
@@ -177,7 +177,7 @@ function DarkVeilBackground({
   ]);
 
   return (
-    <div className={cn('relative h-full w-full', className)} {...props}>
+    <div className={cn("relative h-full w-full", className)} {...props}>
       <canvas ref={canvasRef} className="block h-full w-full" />
     </div>
   );

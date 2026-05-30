@@ -1,0 +1,25 @@
+{
+  "name": "@hahaton/llm",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "LiteLLM gateway provider on the openai SDK. A separate layer from outbound — shares only its error taxonomy.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rimraf .turbo coverage *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@hahaton/outbound": "workspace:*",
+    "openai": "^4.77.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "rimraf": "^6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

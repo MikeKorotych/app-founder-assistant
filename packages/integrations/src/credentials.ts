@@ -1,5 +1,5 @@
 import type { ApiKeyAuth, Auth, NoAuth } from "./auth.js";
-import { SOURCES, type ApiSource } from "./sources.js";
+import { type ApiSource, SOURCES } from "./sources.js";
 
 export type SecretBag = Record<string, string | undefined>;
 
@@ -77,7 +77,10 @@ export function allAuthStatuses(secrets: SecretBag = process.env): AuthStatus[] 
   return SOURCES.map((source) => authStatus(source, secrets));
 }
 
-export function resolveAuthForSource(sourceId: string, secrets: SecretBag = process.env): Auth | null {
+export function resolveAuthForSource(
+  sourceId: string,
+  secrets: SecretBag = process.env,
+): Auth | null {
   const source = findSource(sourceId);
   if (!source) return null;
 
@@ -103,7 +106,10 @@ export function resolveAuthForSource(sourceId: string, secrets: SecretBag = proc
   return auth;
 }
 
-export function applyAuthToRequest(request: HttpRequestDescriptor, auth: Auth | null): HttpRequestDescriptor {
+export function applyAuthToRequest(
+  request: HttpRequestDescriptor,
+  auth: Auth | null,
+): HttpRequestDescriptor {
   if (!auth || auth.kind === "noAuth") return request;
 
   if (auth.kind !== "apiKey") {

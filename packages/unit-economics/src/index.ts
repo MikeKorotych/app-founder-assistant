@@ -31,14 +31,16 @@ export function computeUnitEconomics(a: Assumptions): UnitEconomics {
   const ltv = churn > 0 ? contributionPerCustomer / churn : Infinity;
   const ltvCacRatio = cac > 0 ? ltv / cac : Infinity;
   const paybackMonths = contributionPerCustomer > 0 ? cac / contributionPerCustomer : Infinity;
-  const breakEvenCustomers = contributionPerCustomer > 0 ? fixed / contributionPerCustomer : Infinity;
+  const breakEvenCustomers =
+    contributionPerCustomer > 0 ? fixed / contributionPerCustomer : Infinity;
 
   const newCustomers = funnel * conversion;
   const monthlyBurn = fixed + newCustomers * cac;
 
   // Sanity flags — these surface in the UI as "the agent self-checks" signals.
   if (churn <= 0) warnings.push("Churn is 0% — LTV is unbounded; set a realistic churn.");
-  if (contributionPerCustomer <= 0) warnings.push("Contribution per customer ≤ 0 — revenue does not cover variable cost.");
+  if (contributionPerCustomer <= 0)
+    warnings.push("Contribution per customer ≤ 0 — revenue does not cover variable cost.");
   if (Number.isFinite(ltvCacRatio) && ltvCacRatio < 3) {
     warnings.push(`LTV:CAC is ${ltvCacRatio.toFixed(1)} — below the 3.0 viability benchmark.`);
   }

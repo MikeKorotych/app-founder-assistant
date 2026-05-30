@@ -1,28 +1,27 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import type { Run } from "@hahaton/contracts";
+import { type Db, runs } from "@hahaton/db";
+import { eq } from "drizzle-orm";
 
 /**
- * Dead-simple JSON-on-disk persistence for runs. Enough for the hackathon:
- * lets a completed run reload + replay instantly on stage (the demo safety net).
- * Swap for SQLite/Postgres later if needed.
- *
- * Resolves relative to the calling process's cwd, so each app keeps its own
- * `data/runs` directory.
+ * D1-backed persistence for runs — the demo replay safety net. A completed run
+ * is upserted as a single row (full JSON in `data`) so it reloads + replays
+ * instantly on stage. Pass the Drizzle handle from the Worker: `createDb(c.env.DB)`.
  */
-const RUNS_DIR = join(process.cwd(), "data", "runs");
+const nowIso = () => new Date().toISOString();
 
-const runPath = (id: string) => join(RUNS_DIR, `${id}.json`);
-
-export async function saveRun(run: Run): Promise<void> {
-  await mkdir(RUNS_DIR, { recursive: true });
-  await writeFile(runPath(run.id), JSON.stringify(run, null, 2), "utf8");
+export async function saveRun(db: Db, run: Run): Promise<void> {
+  const data = JSON.stringify(run);
+  await db
+    .insert(runs)
+    .values({ id: run.id, status: run.status, data, updatedAt: nowIso() })
+    .onConflictDoUpdate({
+      target: runs.id,
+      set: { status: run.status, data, updatedAt: nowIso() },
+    });
 }
 
-export async function loadRun(id: string): Promise<Run | null> {
-  try {
-    return JSON.parse(await readFile(runPath(id), "utf8")) as Run;
-  } catch {
-    return null;
-  }
+export async function loadRun(db: Db, id: string): Promise<Run | null> {
+  const [row] = await db.select().from(runs).where(eq(runs.id, id)).limit(1);
+  if (!row) return null;
+  return JSON.parse(row.data) as Run;
 }

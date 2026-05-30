@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
 import { AppBackground, ThemeProvider } from "@hahaton/ui";
+import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "AI CEO — Founder Strategist",
-  description: "One sentence → grounded business plan: market, competitors, canvas, GTM, unit economics, risks.",
+  description:
+    "One sentence → grounded business plan: market, competitors, canvas, GTM, unit economics, risks.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

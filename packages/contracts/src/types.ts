@@ -212,4 +212,13 @@ export type AgentEvent =
   | { type: "source_found"; step: StepId; citation: Citation; at: string }
   | { type: "step_completed"; step: StepId; at: string }
   | { type: "run_completed"; runId: string; at: string }
-  | { type: "error"; step?: StepId; message: string; at: string };
+  | {
+      type: "error";
+      step?: StepId;
+      message: string;
+      /** OutboundErrorKind value (e.g. "auth", "rate-limit", "transport"), when known. */
+      kind?: string;
+      /** Whether the failed call is worth retrying, when known. */
+      retryable?: boolean;
+      at: string;
+    };

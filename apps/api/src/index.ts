@@ -1,70 +1,119 @@
-import express from "express";
 import { runAgent, runPipeline } from "@hahaton/agent";
+import type { AgentEvent, Assumptions, RunInput } from "@hahaton/contracts";
+import { createDb } from "@hahaton/db";
+import { createLlmProvider } from "@hahaton/llm";
 import { loadRun, saveRun } from "@hahaton/store";
 import { computeUnitEconomics } from "@hahaton/unit-economics";
-import type { Assumptions, RunInput } from "@hahaton/contracts";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { streamSSE } from "hono/streaming";
+import { type BaseEnv, requireLlmEnv } from "./env";
 
-const app = express();
-app.use(express.json());
+const app = new Hono<BaseEnv>();
 
-const PORT = Number(process.env.PORT) || 3000;
+app.use("*", cors());
 
-// Platform healthcheck hits this.
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
-});
+// Liveness probe — no env required.
+app.get("/health", (c) => c.json({ status: "ok" }));
 
 // Minimal single-turn agent — the original entry point.
-app.post("/agent", async (req, res) => {
-  const { prompt } = req.body ?? {};
+app.post("/agent", async (c) => {
+  const { prompt } = await c.req.json().catch(() => ({}));
   if (typeof prompt !== "string" || prompt.length === 0) {
-    return res.status(400).json({ error: "Body must include a non-empty 'prompt' string." });
+    return c.json({ error: "Body must include a non-empty 'prompt' string." }, 400);
   }
-
   try {
-    const reply = await runAgent(prompt);
-    res.json({ reply });
+    requireLlmEnv(c.env);
+    const reply = await runAgent(prompt, createLlmProvider(c.env));
+    return c.json({ reply });
   } catch (err) {
     console.error("agent error:", err);
-    res.status(500).json({ error: "Agent failed." });
+    return c.json({ error: "Agent failed." }, 500);
   }
 });
 
 // Full Idea → Business Plan pipeline. Runs the orchestrated DAG and persists
 // the completed run so it can be replayed via GET /runs/:id.
-app.post("/pipeline", async (req, res) => {
-  const { idea, region, budget } = req.body ?? {};
+app.post("/pipeline", async (c) => {
+  const { idea, region, budget } = await c.req.json().catch(() => ({}));
   if (typeof idea !== "string" || idea.length === 0) {
-    return res.status(400).json({ error: "Body must include a non-empty 'idea' string." });
+    return c.json({ error: "Body must include a non-empty 'idea' string." }, 400);
   }
-
   const input: RunInput = { idea, region, budget };
   try {
-    const run = await runPipeline(input);
-    await saveRun(run);
-    res.json(run);
+    requireLlmEnv(c.env);
+    const run = await runPipeline(input, { llm: createLlmProvider(c.env) });
+    await saveRun(createDb(c.env.DB), run);
+    return c.json(run);
   } catch (err) {
     console.error("pipeline error:", err);
-    res.status(500).json({ error: "Pipeline failed." });
+    return c.json({ error: "Pipeline failed." }, 500);
   }
+});
+
+// Streaming variant — emits each AgentEvent over SSE as the pipeline runs, then
+// a final `run` event with the persisted result. Consume with EventSource.
+app.get("/agent/stream", (c) => {
+  const idea = c.req.query("idea") ?? "";
+  if (idea.length === 0) {
+    return c.json({ error: "Query must include a non-empty 'idea'." }, 400);
+  }
+  const input: RunInput = {
+    idea,
+    region: c.req.query("region"),
+    budget: c.req.query("budget"),
+  };
+
+  return streamSSE(c, async (stream) => {
+    try {
+      requireLlmEnv(c.env);
+    } catch (err) {
+      await stream.writeSSE({
+        event: "error",
+        data: JSON.stringify({ message: err instanceof Error ? err.message : String(err) }),
+      });
+      return;
+    }
+
+    const queue: AgentEvent[] = [];
+    let done = false;
+    const pipeline = runPipeline(input, {
+      llm: createLlmProvider(c.env),
+      onEvent: (e) => queue.push(e),
+    }).finally(() => {
+      done = true;
+    });
+
+    // Drain emitted events to the client as they arrive.
+    while (!done || queue.length > 0) {
+      const event = queue.shift();
+      if (event) {
+        await stream.writeSSE({ event: event.type, data: JSON.stringify(event) });
+      } else {
+        await stream.sleep(50);
+      }
+    }
+
+    const run = await pipeline;
+    await saveRun(createDb(c.env.DB), run);
+    await stream.writeSSE({ event: "run", data: JSON.stringify(run) });
+  });
 });
 
 // Replay a persisted run (the demo safety net).
-app.get("/runs/:id", async (req, res) => {
-  const run = await loadRun(req.params.id);
-  if (!run) return res.status(404).json({ error: "Run not found." });
-  res.json(run);
+app.get("/runs/:id", async (c) => {
+  const run = await loadRun(createDb(c.env.DB), c.req.param("id"));
+  if (!run) return c.json({ error: "Run not found." }, 404);
+  return c.json(run);
 });
 
 // Recompute unit economics from assumptions — pure, no LLM round-trip.
-app.post("/unit-economics", (req, res) => {
-  const assumptions = req.body as Assumptions | undefined;
+app.post("/unit-economics", async (c) => {
+  const assumptions = (await c.req.json().catch(() => null)) as Assumptions | null;
   if (!assumptions?.arpu) {
-    return res.status(400).json({ error: "Body must be a full Assumptions object." });
+    return c.json({ error: "Body must be a full Assumptions object." }, 400);
   }
-  res.json(computeUnitEconomics(assumptions));
+  return c.json(computeUnitEconomics(assumptions));
 });
 
-app.listen(PORT, () => {
-  console.log(`Listening on :${PORT}`);
-});
+export default app;

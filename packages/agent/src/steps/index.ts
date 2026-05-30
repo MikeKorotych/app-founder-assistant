@@ -1,14 +1,15 @@
-import type Anthropic from "@anthropic-ai/sdk";
 import type { AgentEvent, Fact, Run, StepId } from "@hahaton/contracts";
+import type { LlmProvider } from "@hahaton/llm";
+import { errorMeta } from "../error-meta";
 
 /**
  * Shared context every step receives. A step reads prior outputs from `run`,
- * does its work (LLM call + optional web_search), emits progress events, and
- * writes its typed output back onto `run`.
+ * does its work (LLM call via `llm` + optional web_search), emits progress
+ * events, and writes its typed output back onto `run`.
  */
 export interface StepContext {
   run: Run;
-  client: Anthropic;
+  llm: LlmProvider;
   emit: (e: AgentEvent) => void;
 }
 
@@ -35,12 +36,7 @@ function step(id: StepId, label: string, body: StepFn): StepFn {
       await body(ctx);
       ctx.emit({ type: "step_completed", step: id, at: nowIso() });
     } catch (err) {
-      ctx.emit({
-        type: "error",
-        step: id,
-        message: err instanceof Error ? err.message : String(err),
-        at: nowIso(),
-      });
+      ctx.emit({ type: "error", step: id, ...errorMeta(err), at: nowIso() });
       throw err;
     }
   };

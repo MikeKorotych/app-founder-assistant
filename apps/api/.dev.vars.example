@@ -1,0 +1,11 @@
+# Copy to .dev.vars (gitignored) for local `wrangler dev`.
+# These are Worker secrets — never commit the real values.
+#
+# In CI/production: LLM_GATEWAY_BASE_URL is a plain var in wrangler.jsonc and
+# LLM_GATEWAY_API_KEY is injected via `wrangler secret put` (see
+# .github/workflows/deploy.yml).
+
+# LiteLLM gateway — the agent routes all LLM calls through it.
+LLM_GATEWAY_BASE_URL=http://localhost:4000
+LLM_GATEWAY_API_KEY=sk-replace-me
+LLM_TIMEOUT_MS=120000

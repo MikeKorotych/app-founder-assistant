@@ -5,6 +5,8 @@
  * - `runAgent` is the minimal single-turn helper.
  * - The individual steps and `StepContext` are re-exported for testing / reuse.
  */
-export { runPipeline, MODELS } from "./orchestrator.js";
-export { runAgent } from "./simple.js";
-export * from "./steps/index.js";
+
+export type { RunPipelineOptions } from "./orchestrator";
+export { MODELS, runPipeline } from "./orchestrator";
+export { runAgent } from "./simple";
+export * from "./steps/index";

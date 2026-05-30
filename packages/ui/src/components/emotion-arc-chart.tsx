@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 import {
   Area,
   AreaChart,
@@ -7,8 +7,8 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from 'recharts';
-import { cn } from '../lib/utils';
+} from "recharts";
+import { cn } from "../lib/utils";
 
 export interface EmotionArcData {
   emotions: string[];
@@ -17,10 +17,10 @@ export interface EmotionArcData {
 
 // Distinct hues that read well on the dark theme; violet leads to match the
 // app's primary accent.
-const SERIES_COLORS = ['#8b5cf6', '#38bdf8', '#fb923c'];
+const SERIES_COLORS = ["#8b5cf6", "#38bdf8", "#fb923c"];
 
 function colorFor(i: number): string {
-  return SERIES_COLORS[i % SERIES_COLORS.length] ?? '#8b5cf6';
+  return SERIES_COLORS[i % SERIES_COLORS.length] ?? "#8b5cf6";
 }
 
 /**
@@ -56,15 +56,15 @@ export function EmotionArcChart({ emotions, points }: EmotionArcData) {
               }}
               aria-pressed={!off}
               className={cn(
-                'inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs capitalize transition-colors hover:bg-muted/50',
-                off ? 'text-muted-foreground/50' : 'text-muted-foreground',
+                "inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs capitalize transition-colors hover:bg-muted/50",
+                off ? "text-muted-foreground/50" : "text-muted-foreground",
               )}
             >
               <span
-                className={cn('size-2 rounded-full transition-opacity', off && 'opacity-30')}
+                className={cn("size-2 rounded-full transition-opacity", off && "opacity-30")}
                 style={{ background: colorFor(i) }}
               />
-              <span className={cn(off && 'line-through')}>{e}</span>
+              <span className={cn(off && "line-through")}>{e}</span>
             </button>
           );
         })}
@@ -91,7 +91,7 @@ export function EmotionArcChart({ emotions, points }: EmotionArcData) {
             />
             <YAxis domain={[0, 100]} hide />
             <Tooltip
-              cursor={{ stroke: 'currentColor', strokeOpacity: 0.2 }}
+              cursor={{ stroke: "currentColor", strokeOpacity: 0.2 }}
               content={<ArcTooltip />}
             />
             {emotions.map((e, i) =>

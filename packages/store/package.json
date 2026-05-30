@@ -3,28 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "JSON-on-disk persistence for runs — the demo replay safety net.",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "description": "D1-backed run persistence — the demo replay safety net.",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
+    ".": "./src/index.ts"
   },
-  "files": ["dist"],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch --preserveWatchOutput",
     "typecheck": "tsc --noEmit",
-    "clean": "rimraf dist .turbo *.tsbuildinfo"
+    "clean": "rimraf .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@hahaton/contracts": "workspace:*"
+    "@hahaton/contracts": "workspace:*",
+    "@hahaton/db": "workspace:*",
+    "drizzle-orm": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0",
     "rimraf": "^6.0.1",
-    "typescript": "^5.7.0"
+    "typescript": "catalog:"
   }
 }

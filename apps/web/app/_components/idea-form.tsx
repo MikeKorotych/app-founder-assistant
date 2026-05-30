@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import type { Run, RunInput } from "@hahaton/contracts";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@hahaton/ui";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const REGIONS = [
   { value: "UA", label: "Ukraine" },
@@ -12,7 +12,11 @@ const REGIONS = [
   { value: "Global", label: "Global" },
 ];
 
-type Status = { kind: "idle" } | { kind: "submitting" } | { kind: "error"; message: string } | { kind: "success"; runId: string };
+type Status =
+  | { kind: "idle" }
+  | { kind: "submitting" }
+  | { kind: "error"; message: string }
+  | { kind: "success"; runId: string };
 
 export function IdeaForm() {
   const router = useRouter();

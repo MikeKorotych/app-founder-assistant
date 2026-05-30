@@ -76,7 +76,8 @@ export const SOURCES: ApiSource[] = [
     requiresAuth: false,
     canUseWithoutAuth: true,
     howToGetAuth: "No credentials required",
-    apiAccess: "Open-source scraper libraries such as google-play-scraper return JSON without a browser.",
+    apiAccess:
+      "Open-source scraper libraries such as google-play-scraper return JSON without a browser.",
     researchValue: "Public Google Play metadata, ratings, reviews, prices and app listing signals.",
     needsBotOrUi: false,
     startupTime: "0 min",
@@ -107,7 +108,8 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "api.producthunt.com → OAuth",
     apiAccess: "Official GraphQL API; no OpenAPI contract.",
-    researchValue: "Launch positioning, maker copy, early adopter feedback and comparable startup launches.",
+    researchValue:
+      "Launch positioning, maker copy, early adopter feedback and comparable startup launches.",
     needsBotOrUi: false,
     startupTime: "15 min",
     // Product Hunt v2 is GraphQL — no OpenAPI contract to generate from.
@@ -121,7 +123,8 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "rapidapi.com → G2 API",
     apiAccess: "Third-party/RapidAPI access; no Playwright needed after subscribing.",
-    researchValue: "B2B software reviews, competitor positioning, pricing hints and category alternatives.",
+    researchValue:
+      "B2B software reviews, competitor positioning, pricing hints and category alternatives.",
     needsBotOrUi: false,
     startupTime: "15 min",
     apiKey: { envVar: "G2_API_KEY", placement: "header", name: "x-rapidapi-key" },
@@ -140,7 +143,12 @@ export const SOURCES: ApiSource[] = [
     researchValue: "Software category listings, reviews and competitor discovery for B2B apps.",
     needsBotOrUi: false,
     startupTime: "15 min",
-    apiKey: { envVar: "CAPTERRA_API_KEY", placement: "header", name: "Authorization", prefix: "Bearer " },
+    apiKey: {
+      envVar: "CAPTERRA_API_KEY",
+      placement: "header",
+      name: "Authorization",
+      prefix: "Bearer ",
+    },
     spec: { kind: "local", path: "capterra.openapi.yaml" },
   },
   {
@@ -164,7 +172,8 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "App Store Connect → Integrations",
     apiAccess: "Official REST API for owned App Store Connect account data.",
-    researchValue: "Owned iOS app analytics, sales, subscription, TestFlight and review operations data.",
+    researchValue:
+      "Owned iOS app analytics, sales, subscription, TestFlight and review operations data.",
     needsBotOrUi: false,
     startupTime: "20 min",
     // Apple publishes the spec as a zip; this community mirror tracks the
@@ -182,7 +191,8 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "Google Cloud Console",
     apiAccess: "Official Android Publisher API for owned Google Play apps.",
-    researchValue: "Owned Android app publishing, subscriptions, reviews and store operations data.",
+    researchValue:
+      "Owned Android app publishing, subscriptions, reviews and store operations data.",
     needsBotOrUi: false,
     startupTime: "20 min",
     // androidpublisher ships as a Google Discovery doc; APIs.guru hosts a
@@ -203,7 +213,12 @@ export const SOURCES: ApiSource[] = [
     researchValue: "ASO, rankings, downloads, revenue estimates and competitor app intelligence.",
     needsBotOrUi: false,
     startupTime: "15 min",
-    apiKey: { envVar: "APPFIGURES_API_KEY", placement: "header", name: "Authorization", prefix: "Bearer " },
+    apiKey: {
+      envVar: "APPFIGURES_API_KEY",
+      placement: "header",
+      name: "Authorization",
+      prefix: "Bearer ",
+    },
     spec: { kind: "local", path: "appfigures.openapi.yaml" },
   },
   {
@@ -214,10 +229,16 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "appmagic.rocks -> Profile -> API Access (Premium)",
     apiAccess: "Official API with 50+ endpoints; no Playwright needed.",
-    researchValue: "Mobile market and competitor intelligence: downloads, revenue, rankings, creatives and category trends.",
+    researchValue:
+      "Mobile market and competitor intelligence: downloads, revenue, rankings, creatives and category trends.",
     needsBotOrUi: false,
     startupTime: "15 min",
-    apiKey: { envVar: "APPMAGIC_API_KEY", placement: "header", name: "Authorization", prefix: "Bearer " },
+    apiKey: {
+      envVar: "APPMAGIC_API_KEY",
+      placement: "header",
+      name: "Authorization",
+      prefix: "Bearer ",
+    },
     spec: { kind: "local", path: "appmagic.openapi.yaml" },
   },
   {
@@ -228,7 +249,8 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "sensortower.com -> Request Demo / Connect API",
     apiAccess: "Official Connect API / data feed; enterprise access required.",
-    researchValue: "Enterprise mobile, web, audience and advertising intelligence for competitor and market analysis.",
+    researchValue:
+      "Enterprise mobile, web, audience and advertising intelligence for competitor and market analysis.",
     needsBotOrUi: false,
     startupTime: "30+ min",
     apiKey: { envVar: "SENSOR_TOWER_API_KEY", placement: "query", name: "auth_token" },
@@ -242,10 +264,16 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "apptopia.com → Account → API",
     apiAccess: "Official API/docs, but no public OpenAPI document.",
-    researchValue: "Mobile market intelligence, downloads, revenue estimates and competitor performance.",
+    researchValue:
+      "Mobile market intelligence, downloads, revenue estimates and competitor performance.",
     needsBotOrUi: false,
     startupTime: "15 min",
-    apiKey: { envVar: "APPTOPIA_API_KEY", placement: "header", name: "Authorization", prefix: "Bearer " },
+    apiKey: {
+      envVar: "APPTOPIA_API_KEY",
+      placement: "header",
+      name: "Authorization",
+      prefix: "Bearer ",
+    },
     // Docs at dev.apptopia.com are a Slate (Markdown) site — no OpenAPI doc
     // published. Hand-write a spec from the docs and vendor it here.
     spec: { kind: "local", path: "apptopia.openapi.yaml" },
@@ -258,10 +286,16 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "data.ai → Account → API",
     apiAccess: "Enterprise API; no Playwright needed, but access is usually high-cost.",
-    researchValue: "Mobile analytics, market/category intelligence, downloads, revenue and competitor trends.",
+    researchValue:
+      "Mobile analytics, market/category intelligence, downloads, revenue and competitor trends.",
     needsBotOrUi: false,
     startupTime: "30+ min",
-    apiKey: { envVar: "DATAAI_API_KEY", placement: "header", name: "Authorization", prefix: "Bearer " },
+    apiKey: {
+      envVar: "DATAAI_API_KEY",
+      placement: "header",
+      name: "Authorization",
+      prefix: "Bearer ",
+    },
     spec: { kind: "local", path: "dataai.openapi.yaml" },
   },
   {
@@ -271,11 +305,18 @@ export const SOURCES: ApiSource[] = [
     requiresAuth: true,
     canUseWithoutAuth: false,
     howToGetAuth: "apptweak.com -> API Documentation / Dashboard API tab -> Generate token",
-    apiAccess: "Official API with downloadable OpenAPI via ReadMe/Postman, but raw fetch is unreliable.",
-    researchValue: "ASO keywords, rankings, creatives, reviews and app store optimization opportunities.",
+    apiAccess:
+      "Official API with downloadable OpenAPI via ReadMe/Postman, but raw fetch is unreliable.",
+    researchValue:
+      "ASO keywords, rankings, creatives, reviews and app store optimization opportunities.",
     needsBotOrUi: false,
     startupTime: "15 min",
-    apiKey: { envVar: "APPTWEAK_API_KEY", placement: "header", name: "Authorization", prefix: "Bearer " },
+    apiKey: {
+      envVar: "APPTWEAK_API_KEY",
+      placement: "header",
+      name: "Authorization",
+      prefix: "Bearer ",
+    },
     // AppTweak DOES publish OpenAPI on its ReadMe portal (developers.apptweak.com,
     // see /llms.txt), but the raw-spec download is bot-gated (Cloudflare 403 /
     // stale ids 302→404) — not reliably fetchable. Export via ReadMe/Postman
@@ -290,7 +331,8 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "crunchbase.com → API / Pro or Enterprise plan",
     apiAccess: "Official REST API; paid plan required.",
-    researchValue: "Startup/company data: app maker, funding raised, founders, investors and growth stage.",
+    researchValue:
+      "Startup/company data: app maker, funding raised, founders, investors and growth stage.",
     needsBotOrUi: false,
     startupTime: "15 min",
     apiKey: { envVar: "CRUNCHBASE_API_KEY", placement: "header", name: "X-cb-user-key" },
@@ -304,7 +346,8 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "business.trustpilot.com → Developers / API",
     apiAccess: "Official API; no Playwright needed.",
-    researchValue: "Off-store user reviews, complaints about subscriptions, support quality and bugs.",
+    researchValue:
+      "Off-store user reviews, complaints about subscriptions, support quality and bugs.",
     needsBotOrUi: false,
     startupTime: "15 min",
     apiKey: { envVar: "TRUSTPILOT_API_KEY", placement: "header", name: "apikey" },
@@ -318,7 +361,8 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "similarweb.com → API",
     apiAccess: "Official REST API; no Playwright needed.",
-    researchValue: "Traffic sources and acquisition channels for competitor websites and app landing pages.",
+    researchValue:
+      "Traffic sources and acquisition channels for competitor websites and app landing pages.",
     needsBotOrUi: false,
     startupTime: "15 min",
     apiKey: { envVar: "SIMILARWEB_API_KEY", placement: "query", name: "api_key" },
@@ -335,7 +379,12 @@ export const SOURCES: ApiSource[] = [
     researchValue: "Android market stats, SDK popularity, demographics and category trends.",
     needsBotOrUi: false,
     startupTime: "15 min",
-    apiKey: { envVar: "APPBRAIN_API_KEY", placement: "header", name: "Authorization", prefix: "Bearer " },
+    apiKey: {
+      envVar: "APPBRAIN_API_KEY",
+      placement: "header",
+      name: "Authorization",
+      prefix: "Bearer ",
+    },
     spec: { kind: "local", path: "appbrain.openapi.yaml" },
   },
   {
@@ -346,7 +395,8 @@ export const SOURCES: ApiSource[] = [
     canUseWithoutAuth: false,
     howToGetAuth: "mobileaction.co -> Settings -> API Key / contact support for enterprise API",
     apiAccess: "Official REST API; key is passed as token=YOUR_API_KEY.",
-    researchValue: "App Store and Google Play ASO data: keyword rankings/history, top keywords, metadata, visibility and creatives.",
+    researchValue:
+      "App Store and Google Play ASO data: keyword rankings/history, top keywords, metadata, visibility and creatives.",
     needsBotOrUi: false,
     startupTime: "15 min",
     apiKey: {
@@ -378,6 +428,43 @@ export const SOURCES: ApiSource[] = [
         apikey: "BIGIDEASDB_KEY",
         Authorization: "Bearer:BIGIDEASDB_KEY",
       },
+    },
+  },
+  {
+    id: "bluesky",
+    label: "Bluesky",
+    auth: "noAuth",
+    requiresAuth: false,
+    canUseWithoutAuth: true,
+    howToGetAuth:
+      "Free; searchPosts needs a free app password (bsky.app → Settings → App Passwords)",
+    apiAccess: "Open AT Protocol API (public.api.bsky.app); most reads need no key.",
+    researchValue:
+      "Public social posts — pain points, sentiment and competitor chatter (free Twitter/X alternative).",
+    needsBotOrUi: false,
+    startupTime: "0–5 min",
+    // AT Protocol exposes Lexicon schemas, not OpenAPI. Types are hand-written
+    // in handwritten/bluesky.ts (searchPosts / getAuthorFeed).
+    spec: {
+      kind: "unavailable",
+      note: "AT Protocol (Lexicon), not OpenAPI — see handwritten/bluesky.ts.",
+    },
+  },
+  {
+    id: "hackernews",
+    label: "Hacker News",
+    auth: "noAuth",
+    requiresAuth: false,
+    canUseWithoutAuth: true,
+    howToGetAuth: "No credentials required",
+    apiAccess: "Free zero-auth APIs: official Firebase + Algolia full-text search.",
+    researchValue: "Startup/tech pain points, launches and sentiment (Show HN, Ask HN, comments).",
+    needsBotOrUi: false,
+    startupTime: "0 min",
+    // No OpenAPI; types hand-written in handwritten/hackernews.ts.
+    spec: {
+      kind: "unavailable",
+      note: "Firebase + Algolia JSON APIs, no OpenAPI — see handwritten/hackernews.ts.",
     },
   },
 ];

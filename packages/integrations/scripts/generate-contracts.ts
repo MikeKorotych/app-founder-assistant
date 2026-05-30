@@ -13,11 +13,11 @@
  *   local       read from ./specs/<file>
  *   unavailable skipped with the documented reason
  */
-import { mkdir, readFile, writeFile, access } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import openapiTS, { astToString } from "openapi-typescript";
-import { SOURCES, type ApiSource, type SpecSource } from "../src/sources.js";
+import { type ApiSource, SOURCES, type SpecSource } from "../src/sources.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "..");
@@ -143,8 +143,7 @@ async function writeBarrel(generatedIds: string[]): Promise<void> {
   const lines = generatedIds
     .sort()
     .map((id) => `export type * as ${toCamel(id)} from "./${id}.js";`);
-  const contents =
-    `// AUTO-GENERATED barrel — do not edit by hand.\n` + lines.join("\n") + "\n";
+  const contents = `// AUTO-GENERATED barrel — do not edit by hand.\n` + lines.join("\n") + "\n";
   await writeFile(join(OUT_DIR, "index.ts"), contents, "utf8");
 }
 

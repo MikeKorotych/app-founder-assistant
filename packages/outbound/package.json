@@ -1,0 +1,21 @@
+{
+  "name": "@hahaton/outbound",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Outbound resilience core — error taxonomy, retry, circuit breaker, and a base HTTP client. Foundation for every external REST integration.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rimraf .turbo coverage *.tsbuildinfo"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "rimraf": "^6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

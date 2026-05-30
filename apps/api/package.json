@@ -3,27 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "HTTP service exposing the agent pipeline. Deployed to Cloudflare.",
+  "description": "Hono Worker exposing the agent pipeline. Deployed to Cloudflare Workers.",
   "scripts": {
-    "dev": "tsx watch --env-file-if-exists=.env src/index.ts",
-    "build": "tsc",
-    "start": "node --env-file-if-exists=.env dist/index.js",
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
-    "clean": "rimraf dist .turbo *.tsbuildinfo"
+    "tail": "wrangler tail",
+    "clean": "rimraf dist .turbo .wrangler *.tsbuildinfo"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0",
     "@hahaton/agent": "workspace:*",
     "@hahaton/contracts": "workspace:*",
+    "@hahaton/db": "workspace:*",
+    "@hahaton/llm": "workspace:*",
     "@hahaton/store": "workspace:*",
     "@hahaton/unit-economics": "workspace:*",
-    "express": "^4.21.2"
+    "drizzle-orm": "catalog:",
+    "hono": "catalog:"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.11.0",
+    "@cloudflare/workers-types": "catalog:",
     "rimraf": "^6.0.1",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.0"
+    "typescript": "catalog:",
+    "wrangler": "catalog:"
   }
 }

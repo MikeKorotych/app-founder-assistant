@@ -1,44 +1,48 @@
-import Anthropic from "@anthropic-ai/sdk";
-import { randomUUID } from "node:crypto";
 import type { AgentEvent, Run, RunInput } from "@hahaton/contracts";
+import type { LlmProvider } from "@hahaton/llm";
+import { errorMeta } from "./error-meta";
 import {
   briefStep,
-  marketStep,
-  competitorsStep,
   canvasStep,
+  competitorsStep,
   gtmStep,
-  unitEconomicsStep,
+  marketStep,
   risksStep,
-  synthesisStep,
   type StepContext,
-} from "./steps/index.js";
+  synthesisStep,
+  unitEconomicsStep,
+} from "./steps/index";
 
-/** Model routing — splurge on visible reasoning, save on extraction/utility. */
-export const MODELS = {
-  opus: "claude-opus-4-8", // market sizing, unit economics, synthesis
-  sonnet: "claude-sonnet-4-6", // brief, competitors, canvas, gtm, risks
-  haiku: "claude-haiku-4-5-20251001", // utility: input validation, titles
-} as const;
+/** Model routing — LiteLLM `model_list` aliases. Re-exported for callers. */
+export { MODELS } from "@hahaton/llm";
 
 const nowIso = () => new Date().toISOString();
+
+/** Options for {@link runPipeline}. */
+export interface RunPipelineOptions {
+  /**
+   * LLM gateway provider. Build it once from the Worker env with
+   * `createLlmProvider(c.env)` (from `@hahaton/llm`) and pass it in.
+   */
+  llm: LlmProvider;
+  /** Called for every streaming event (wire it to SSE). */
+  onEvent?: (e: AgentEvent) => void;
+}
 
 /**
  * Runs the full Idea → Business Plan pipeline as an orchestrated DAG.
  *
- * `onEvent` is called for every streaming event (wire it to SSE). Every event
- * is also appended to `run.events` so a completed run replays instantly.
+ * `opts.onEvent` is called for every streaming event (wire it to SSE). Every
+ * event is also appended to `run.events` so a completed run replays instantly.
  *
  * NOTE: currently sequential. Once steps 1-3 land, parallelize the independent
  * branch (canvas ‖ competitors, risks ‖ gtm) to cut wall-clock — see TODO below.
  */
-export async function runPipeline(
-  input: RunInput,
-  onEvent: (e: AgentEvent) => void = () => {},
-): Promise<Run> {
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+export async function runPipeline(input: RunInput, opts: RunPipelineOptions): Promise<Run> {
+  const { llm, onEvent = () => {} } = opts;
 
   const run: Run = {
-    id: randomUUID(),
+    id: crypto.randomUUID(),
     input,
     createdAt: nowIso(),
     status: "running",
@@ -51,7 +55,7 @@ export async function runPipeline(
     onEvent(e);
   };
 
-  const ctx: StepContext = { run, client, emit };
+  const ctx: StepContext = { run, llm, emit };
 
   emit({ type: "run_started", runId: run.id, input, at: nowIso() });
 
@@ -72,11 +76,7 @@ export async function runPipeline(
     emit({ type: "run_completed", runId: run.id, at: nowIso() });
   } catch (err) {
     run.status = "failed";
-    emit({
-      type: "error",
-      message: err instanceof Error ? err.message : String(err),
-      at: nowIso(),
-    });
+    emit({ type: "error", ...errorMeta(err), at: nowIso() });
   }
 
   return run;

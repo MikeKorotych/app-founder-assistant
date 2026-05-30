@@ -11,8 +11,8 @@ export default function HomePage() {
           From a one-sentence idea to a grounded business plan.
         </h1>
         <p className="max-w-2xl text-muted-foreground">
-          Market sizing, real competitors, a Business Model Canvas, GTM, live unit economics,
-          a risk register and a pitch — with citations. Built in ~90 seconds.
+          Market sizing, real competitors, a Business Model Canvas, GTM, live unit economics, a risk
+          register and a pitch — with citations. Built in ~90 seconds.
         </p>
       </header>
 

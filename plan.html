@@ -224,6 +224,7 @@
     <button class="tab" data-tab="demo" data-i18n="toc_demo"></button>
     <button class="tab" data-tab="risks" data-i18n="toc_risks"></button>
     <button class="tab" data-tab="stack" data-i18n="toc_stack"></button>
+    <button class="tab" data-tab="integrations" data-i18n="toc_integrations"></button>
     <button class="tab" data-tab="sources" data-i18n="toc_sources"></button>
   </nav>
 
@@ -344,6 +345,54 @@
     </div>
   </section>
 
+  <!-- ===================== INTEGRATIONS ===================== -->
+  <section id="integrations" data-panel="integrations">
+    <p class="label" data-i18n="int_label"></p>
+    <p class="sub" data-i18n="int_sub"></p>
+
+    <h3 data-i18n="int_ready_h"></h3>
+    <table>
+      <thead><tr><th>API</th><th data-i18n="int_th_form"></th><th data-i18n="int_th_auth"></th></tr></thead>
+      <tbody>
+        <tr><td>App Store Connect</td><td><span class="tag">generated · url</span></td><td>JWT</td></tr>
+        <tr><td>Google Play</td><td><span class="tag">generated · url</span></td><td>Service Account</td></tr>
+        <tr><td>Reddit</td><td><span class="tag">handwritten</span></td><td>OAuth2 + UA</td></tr>
+        <tr><td>Product Hunt</td><td><span class="tag">handwritten · GraphQL</span></td><td>OAuth2</td></tr>
+        <tr><td>G2</td><td><span class="tag">handwritten</span></td><td>RapidAPI key</td></tr>
+        <tr><td>Capterra</td><td><span class="tag">handwritten</span></td><td>API key</td></tr>
+        <tr><td>Kickstarter</td><td><span class="tag">handwritten</span></td><td>—</td></tr>
+        <tr><td>Apptopia</td><td><span class="tag">handwritten</span></td><td>API token</td></tr>
+        <tr><td>data.ai</td><td><span class="tag">handwritten</span></td><td>Bearer key</td></tr>
+        <tr><td>AppTweak</td><td><span class="tag">handwritten</span></td><td>x-apptweak-key</td></tr>
+      </tbody>
+    </table>
+
+    <h3 data-i18n="int_skip_h"></h3>
+    <table>
+      <thead><tr><th>API</th><th data-i18n="int_th_form"></th><th data-i18n="int_th_reason"></th></tr></thead>
+      <tbody>
+        <tr><td>BigIdeasDB</td><td><span class="tag">unavailable</span></td><td data-i18n="int_skip_reason"></td></tr>
+      </tbody>
+    </table>
+
+    <h3 data-i18n="int_gap_h"></h3>
+    <table>
+      <thead><tr><th>API</th><th data-i18n="int_th_auth"></th><th data-i18n="int_th_fix"></th></tr></thead>
+      <tbody>
+        <tr><td>Appfigures</td><td>apiKey</td><td data-i18n="int_fix_rest"></td></tr>
+        <tr><td>Crunchbase</td><td>apiKey</td><td data-i18n="int_fix_rest"></td></tr>
+        <tr><td>Trustpilot</td><td>apiKey</td><td data-i18n="int_fix_rest"></td></tr>
+        <tr><td>Similarweb</td><td>apiKey</td><td data-i18n="int_fix_rest"></td></tr>
+        <tr><td>AppBrain</td><td>apiKey</td><td data-i18n="int_fix_rest"></td></tr>
+        <tr><td>iTunes Search API</td><td>—</td><td data-i18n="int_fix_itunes"></td></tr>
+        <tr><td>Unofficial Play Store</td><td>—</td><td data-i18n="int_fix_scraper"></td></tr>
+      </tbody>
+    </table>
+
+    <div class="note" data-i18n="int_inconsistency"></div>
+    <div class="note" data-i18n="int_doc"></div>
+  </section>
+
   <!-- ===================== SOURCES ===================== -->
   <section id="sources" data-panel="sources">
     <p class="label" data-i18n="src_label"></p>
@@ -380,6 +429,7 @@
   { "date":"2026-05-30", "time":"12:40", "author":"Mykhailo", "workstream":"C", "summary":"C1: ported funnel-analyzer design system into packages/ui (@hahaton/ui) — shadcn primitives + theme (Tailwind v4 'caffeine') + StatusPill/Badge + AppBackground + EmotionArcChart; relative imports, no app collision. Drops into the OpenNext apps/web shell (see README).", "commit":"—" },
   { "date":"2026-05-30", "time":"12:30", "author":"Anton", "workstream":"A", "summary":"Add packages/scout/PLAN.md — spec for the Scout sub-agent (fan-out → fan-in → fan-out): plan sources from the frozen @hahaton/integrations registry, build concrete HTTP requests, query sources in parallel (Firecrawl fallback), aggregate, then LLM per-source reports. Researched live no-auth APIs (HN Algolia, iTunes, Reddit) + Firecrawl. Added roadmap A13–A17.", "commit":"6578056" },
   { "date":"2026-05-30", "time":"12:25", "author":"Anton", "workstream":"—", "summary":"CLAUDE.md: require a claim-commit pushed at session start (before any code) — update plan.html JSON islands or an empty commit (git commit --allow-empty) announcing the sub-task, so the team sees who works on what BEFORE the task is done.", "commit":"—" },
+  { "date":"2026-05-30", "time":"12:55", "author":"Ruslan", "workstream":"D", "summary":"✅ D3 (review): Cloudflare migration done on the phasekit pattern — apps/api is a Hono Worker (wrangler.jsonc, SSE /agent/stream), D1+Drizzle persistence (packages/db + store), apps/web Next.js via OpenNext, Biome + pnpm catalog, source-exported libs (bundler resolution), CI deploy.yml (ci → deploy-api w/ D1 migrate+rollback → deploy-web). Verified: check+typecheck+test 13/13, wrangler dry-run bundles, D1 local migrate, live /health + /unit-economics + /runs/:id, OpenNext build. Node bumped to 22 (wrangler 4.x). Remaining: create D1 db + set GH secrets (CLOUDFLARE_API_TOKEN/ACCOUNT_ID, LLM_GATEWAY_API_KEY, API_URL).", "commit":"—" },
   { "date":"2026-05-30", "time":"12:20", "author":"Ruslan", "workstream":"D", "summary":"🔨 started D3: migrate stack to Cloudflare on the phasekit pattern — Hono Worker (apps/api), D1+Drizzle (packages/db), OpenNext surface (apps/web), Biome, and CI deploy.yml.", "commit":"—" },
   { "date":"2026-05-30", "time":"12:15", "author":"Mykhailo", "workstream":"C", "summary":"🔨 started C1: UI stack = Next.js + shadcn; porting the design system from funnel-analyzer into apps/web (stripping funnel/prisma/auth/crawler).", "commit":"—" },
   { "date":"2026-05-30", "time":"12:10", "author":"Anton", "workstream":"D", "summary":"Drop Railway deploy integration (delete railway.json) — target is Cloudflare now; updated README/PLAN/CLAUDE/plan.html refs (incl. risk #3, D3) + .env.example. Trash-commit leftovers were already gone via the monorepo migration.", "commit":"—" },
@@ -440,7 +490,7 @@
 
   { "id":"D1", "group":"D", "title_uk":"Експорт PDF (HTML → PDF + sources appendix)", "title_en":"PDF export (HTML → PDF + sources appendix)", "owner":"—", "status":"todo" },
   { "id":"D2", "group":"D", "title_uk":"PPTX-дек (stretch)", "title_en":"PPTX deck (stretch)", "owner":"—", "status":"todo" },
-  { "id":"D3", "group":"D", "title_uk":"Hardening деплою Cloudflare (Workers/Pages)", "title_en":"Cloudflare deploy hardening (Workers/Pages)", "owner":"Ruslan", "status":"in-progress" },
+  { "id":"D3", "group":"D", "title_uk":"Hardening деплою Cloudflare (Workers/Pages)", "title_en":"Cloudflare deploy hardening (Workers/Pages)", "owner":"Ruslan", "status":"review" },
   { "id":"D4", "group":"D", "title_uk":"Golden-прогони (offline-реплей)", "title_en":"Golden demo runs (offline replay)", "owner":"—", "status":"todo" },
   { "id":"D5", "group":"D", "title_uk":"Демо-сценарій + репетиція", "title_en":"Demo script + rehearsal", "owner":"—", "status":"todo" }
 ]
@@ -455,7 +505,19 @@
       pill_priority:"Пріоритет <b>бізнес-цінність + чисте демо</b>", pill_stack:"Стек <b>Express · Claude API · Cloudflare</b>",
       toc_status:"Статус", toc_progress:"Прогрес", toc_concept:"Концепція", toc_validation:"Валідація",
       toc_pipeline:"Пайплайн", toc_demo:"Демо", toc_risks:"Ризики", toc_stack:"Стек", toc_sources:"Джерела",
-      toc_roadmap:"Roadmap",
+      toc_roadmap:"Roadmap", toc_integrations:"Інтеграції",
+      int_label:"Стан інтеграцій зовнішніх API",
+      int_sub:"Контракт існує у трьох формах: <code>generated</code> (авто з OpenAPI-URL), <code>handwritten</code> (рукописні типи з доків) і <code>local</code> (чекає на vendored-спеку). Звірено 2026-05-30 · 18 джерел.",
+      int_ready_h:"✅ Готово — можна ковиряти API (10/18)",
+      int_skip_h:"⏭️ Свідомо скіпнуто",
+      int_gap_h:"🔴 Прогалини — контракту нема, треба додати (7)",
+      int_th_form:"Форма", int_th_auth:"Auth", int_th_reason:"Причина", int_th_fix:"Як закрити",
+      int_skip_reason:"платний; форма API не підтверджена (Supabase REST чи MCP); цінність дублює наш ресерч-пайплайн",
+      int_fix_rest:"офіційний REST — написати handwritten або vendor-нути OpenAPI",
+      int_fix_itunes:"простий публічний REST — handwritten зробити легко",
+      int_fix_scraper:"типи від scraper-бібліотеки (google-play-scraper), не наш контракт",
+      int_inconsistency:"<strong>Неузгодженість:</strong> 8 handwritten-джерел досі мають у реєстрі <code>spec.kind: \"local\"</code> на неіснуючі файли — генератор їх вічно скіпатиме. Джерело правди для них — тека <code>handwritten/</code>, не <code>specs/</code>.",
+      int_doc:"Повний стан — у <a href='docs/integrations-status.md'>docs/integrations-status.md</a>; реєстр — <code>packages/integrations/src/sources.ts</code>.",
       roadmap_label:"Roadmap — декомпозиція на саб-таски",
       roadmap_note:"Це claimable-дошка задач. Беручи саб-таск у роботу, агент у <code>#data-roadmap</code> виставляє йому <code>status</code> + <code>owner</code> (по <code>id</code>) і пушить — щоб інші бачили, що зайнято і ким. Деталі — у CLAUDE.md.",
       rm_g_F:"Фундамент / контракти", rm_g_A:"A · Пайплайн агента + grounding", rm_g_B:"B · Стрімінг, сервер, персист", rm_g_C:"C · Report UI", rm_g_D:"D · Експорт, демо, деплой",
@@ -523,7 +585,19 @@
       pill_priority:"Priority <b>business value + clean demo</b>", pill_stack:"Stack <b>Express · Claude API · Cloudflare</b>",
       toc_status:"Status", toc_progress:"Progress", toc_concept:"Concept", toc_validation:"Validation",
       toc_pipeline:"Pipeline", toc_demo:"Demo", toc_risks:"Risks", toc_stack:"Stack", toc_sources:"Sources",
-      toc_roadmap:"Roadmap",
+      toc_roadmap:"Roadmap", toc_integrations:"Integrations",
+      int_label:"External API integration status",
+      int_sub:"A contract exists in three forms: <code>generated</code> (auto from an OpenAPI URL), <code>handwritten</code> (hand types from docs) and <code>local</code> (awaiting a vendored spec). Reconciled 2026-05-30 · 18 sources.",
+      int_ready_h:"✅ Ready — you can hit the API (10/18)",
+      int_skip_h:"⏭️ Intentionally skipped",
+      int_gap_h:"🔴 Gaps — no contract yet, needs adding (7)",
+      int_th_form:"Form", int_th_auth:"Auth", int_th_reason:"Reason", int_th_fix:"How to close",
+      int_skip_reason:"paid; API form unconfirmed (Supabase REST vs MCP); value duplicated by our research pipeline",
+      int_fix_rest:"official REST — write handwritten or vendor an OpenAPI",
+      int_fix_itunes:"simple public REST — handwritten is easy",
+      int_fix_scraper:"types from a scraper lib (google-play-scraper), not our contract",
+      int_inconsistency:"<strong>Inconsistency:</strong> 8 handwritten sources still carry <code>spec.kind: \"local\"</code> pointing at files that will never exist — the generator skips them forever. Their source of truth is the <code>handwritten/</code> folder, not <code>specs/</code>.",
+      int_doc:"Full state in <a href='docs/integrations-status.md'>docs/integrations-status.md</a>; registry at <code>packages/integrations/src/sources.ts</code>.",
       roadmap_label:"Roadmap — sub-task breakdown",
       roadmap_note:"A claimable task board. When you start a sub-task, set its <code>status</code> + <code>owner</code> in <code>#data-roadmap</code> (by <code>id</code>) and push — so others see what's taken and by whom. Details in CLAUDE.md.",
       rm_g_F:"Foundation / contracts", rm_g_A:"A · Agent pipeline + grounding", rm_g_B:"B · Streaming, server, persistence", rm_g_C:"C · Report UI", rm_g_D:"D · Export, demo, deploy",

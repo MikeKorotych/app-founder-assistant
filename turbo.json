@@ -2,25 +2,19 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "globalEnv": ["NODE_ENV"],
-  "globalPassThroughEnv": ["ANTHROPIC_API_KEY", "PORT"],
+  "globalPassThroughEnv": ["ANTHROPIC_API_KEY"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", ".open-next/**"]
     },
     "dev": {
-      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
-    "start": {
-      "dependsOn": ["build"],
-      "cache": false,
-      "persistent": true
-    },
-    "typecheck": {
-      "dependsOn": ["^build"]
-    },
+    "test": {},
+    "typecheck": {},
+    "//#check": {},
     "generate:contracts": {
       "cache": false
     },
