@@ -3,6 +3,7 @@
 import type { SearchExpansion } from "@hahaton/contracts";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@hahaton/ui";
 import { useState } from "react";
+import { apiUrl } from "../../_lib/api";
 
 type Status =
   | { kind: "idle" }
@@ -43,7 +44,7 @@ export function SearchForm() {
 
     setStatus({ kind: "submitting" });
     try {
-      const res = await fetch("/api/search-intent", {
+      const res = await fetch(apiUrl("/search-intent"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: trimmed }),

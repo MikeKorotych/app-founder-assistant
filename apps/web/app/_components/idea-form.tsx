@@ -4,6 +4,7 @@ import type { Run, RunInput } from "@hahaton/contracts";
 import { Button, Card, CardContent, CardHeader, CardTitle, Label } from "@hahaton/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { apiUrl } from "../_lib/api";
 
 /** Sample ideas for the "Suggest an idea" button — specific & demo-friendly. */
 const SAMPLE_IDEAS = [
@@ -49,7 +50,7 @@ export function IdeaForm() {
     const body: RunInput = { idea: idea.trim() };
 
     try {
-      const res = await fetch("/api/pipeline", {
+      const res = await fetch(apiUrl("/pipeline"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
