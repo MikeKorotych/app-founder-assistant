@@ -420,6 +420,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"14:49", "author":"Anton", "workstream":"A", "summary":"🔨 started A15 (PH fix): Product Hunt always returned empty — it pulled a global top-VOTES batch and substring-filtered locally, so niche keywords never matched. Reworking producthunt.ts to query posts(topic: $slug, order: VOTES) per mapped category/topic slug.", "commit":"—" },
   { "date":"2026-05-30", "time":"15:45", "author":"Mykhailo", "workstream":"C", "summary":"Fix report page: server-side fetch defaulted to http://localhost:3000 (nothing there) → every /runs/:id 500'd locally. Changed default to :8787 (matches next.config API_URL). /runs/golden-dogfood now renders 200 with the full report (verified: brief/market/competitors/canvas/gtm/UE/risks/synthesis/validation + citations).", "commit":"—" },
   { "date":"2026-05-30", "time":"15:35", "author":"Mykhailo", "workstream":"C/D", "summary":"Golden mock Run for report UI + demo replay: scripts/seed-golden-run.mjs builds a full Run (fresh dog food / Poland) per @hahaton/contracts — all 8 sections + validation panel (53/82/67, 3 disagreements) + 5 cited sources — and seeds local D1 (id golden-dogfood). Verified GET /runs/golden-dogfood = 200. Open /runs/golden-dogfood to build/polish the report unblocked from the LLM gateway.", "commit":"—" },
   { "date":"2026-05-30", "time":"15:20", "author":"Mykhailo", "workstream":"—", "summary":"Diagnosed the web 'Request failed (500)': API wasn't running → web rewrites /api → :8787 → 500. Local run needs: pnpm install (wrangler was missing) → start @hahaton/api (wrangler dev) → `wrangler d1 migrations apply hahaton --local` (was 'no such table: runs'). After that /pipeline = 200. Run still status:failed because the validation step hits the LLM gateway (:4000) which isn't up ('Connection error'), and the 8 content steps are still stubs.", "commit":"—" },
@@ -486,7 +487,7 @@
 
   { "id":"A13", "group":"A", "title_uk":"Scout: каркас пакета + типи + таблиця competitors (D1)", "title_en":"Scout: package scaffold + types + competitors D1 table", "owner":"Anton", "status":"review" },
   { "id":"A14", "group":"A", "title_uk":"Scout: планувальник джерел + шаблони HTTP-запитів", "title_en":"Scout: source planner + HTTP request templates", "owner":"Codex", "status":"in-progress" },
-  { "id":"A15", "group":"A", "title_uk":"Scout: паралельний fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "title_en":"Scout: parallel fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "owner":"Anton", "status":"review" },
+  { "id":"A15", "group":"A", "title_uk":"Scout: паралельний fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "title_en":"Scout: parallel fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "owner":"Anton", "status":"in-progress" },
   { "id":"A16", "group":"A", "title_uk":"Scout: LLM-ранжування сумісності (0–100 + rationale)", "title_en":"Scout: LLM compatibility ranking (0–100 + rationale)", "owner":"Anton", "status":"review" },
   { "id":"A17", "group":"A", "title_uk":"Scout: /scout ендпоінт + Cloudflare Workflow + персист у D1", "title_en":"Scout: /scout endpoint + Cloudflare Workflow + D1 persistence", "owner":"Anton", "status":"review" },
 
