@@ -78,7 +78,7 @@ function Chips({ items, tone }: { items: string[]; tone: "keyword" | "category" 
       ? "border-primary/40 bg-primary/10 text-foreground"
       : "border-border/60 bg-muted/60 text-muted-foreground";
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="stagger-enter flex flex-wrap gap-2">
       {items.map((item) => (
         <span key={item} className={`rounded-full border px-3 py-1 text-sm ${cls}`}>
           {item}
@@ -150,59 +150,62 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
     }
 
     let expansion: SearchExpansion | undefined;
-    (async () => {
-      try {
-        // Step 1 — search intent: idea → keywords + categories (validated JSON).
-        const siRes = await fetch(apiUrl("/search-intent"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query: idea }),
-        });
-        if (!siRes.ok) {
-          const e = (await siRes.json().catch(() => ({}))) as { error?: string };
-          throw new Error(e.error ?? `search-intent failed (${siRes.status})`);
-        }
-        expansion = (await siRes.json()) as SearchExpansion;
-        if (cancelled.current) return;
-
-        // Step 2 — kick off the Scout Workflow with the expansion output.
-        const scoutRes = await fetch(apiUrl("/scout"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            keywords: expansion.keywords,
-            categories: expansion.categories,
-            idea,
-          }),
-        });
-        if (!scoutRes.ok) {
-          const e = (await scoutRes.json().catch(() => ({}))) as { error?: string };
-          throw new Error(e.error ?? `scout failed (${scoutRes.status})`);
-        }
-        const { id: scoutId } = (await scoutRes.json()) as { id: string };
-        if (cancelled.current) return;
-
-        setPhase({ kind: "scanning", expansion, scoutId });
-        const competitors = await poll(scoutId);
-        if (cancelled.current) return;
-
-        setPhase({ kind: "done", expansion, competitors });
-
-        // Step 3 — chain into validation automatically.
-        await runValidation(competitors);
-      } catch (err) {
-        if (!cancelled.current) {
-          setPhase({
-            kind: "error",
-            message: err instanceof Error ? err.message : String(err),
-            expansion,
+    const startTimer = window.setTimeout(() => {
+      (async () => {
+        try {
+          // Step 1 — search intent: idea → keywords + categories (validated JSON).
+          const siRes = await fetch(apiUrl("/search-intent"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query: idea }),
           });
+          if (!siRes.ok) {
+            const e = (await siRes.json().catch(() => ({}))) as { error?: string };
+            throw new Error(e.error ?? `search-intent failed (${siRes.status})`);
+          }
+          expansion = (await siRes.json()) as SearchExpansion;
+          if (cancelled.current) return;
+
+          // Step 2 — kick off the Scout Workflow with the expansion output.
+          const scoutRes = await fetch(apiUrl("/scout"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              keywords: expansion.keywords,
+              categories: expansion.categories,
+              idea,
+            }),
+          });
+          if (!scoutRes.ok) {
+            const e = (await scoutRes.json().catch(() => ({}))) as { error?: string };
+            throw new Error(e.error ?? `scout failed (${scoutRes.status})`);
+          }
+          const { id: scoutId } = (await scoutRes.json()) as { id: string };
+          if (cancelled.current) return;
+
+          setPhase({ kind: "scanning", expansion, scoutId });
+          const competitors = await poll(scoutId);
+          if (cancelled.current) return;
+
+          setPhase({ kind: "done", expansion, competitors });
+
+          // Step 3 — chain into validation automatically.
+          await runValidation(competitors);
+        } catch (err) {
+          if (!cancelled.current) {
+            setPhase({
+              kind: "error",
+              message: err instanceof Error ? err.message : String(err),
+              expansion,
+            });
+          }
         }
-      }
-    })();
+      })();
+    }, 0);
 
     return () => {
       cancelled.current = true;
+      window.clearTimeout(startTimer);
     };
   }, [idea]);
 
@@ -238,7 +241,7 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
 
   return (
     <div className="flex flex-col gap-6">
-      <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+      <Card className="animate-enter border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <CardHeader>
           <CardTitle className="text-base">Ідея</CardTitle>
         </CardHeader>
@@ -253,7 +256,7 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
           )}
 
           {expansion && (
-            <div className="flex flex-col gap-4">
+            <div className="animate-enter flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                   Категорії · {expansion.categories.length}
