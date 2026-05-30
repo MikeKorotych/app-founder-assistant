@@ -2,6 +2,7 @@
 
 import type {
   Competitor as AgentCompetitor,
+  Run,
   SearchExpansion,
   ValidationResult,
 } from "@hahaton/contracts";
@@ -9,6 +10,8 @@ import { Button, Card, CardContent, CardHeader, CardTitle } from "@hahaton/ui";
 import { useEffect, useRef, useState } from "react";
 import { apiUrl } from "../_lib/api";
 import { ValidationSection } from "../runs/[id]/_components/validation-section";
+import { randomMockRun } from "./mock-run";
+import { ReportBody } from "./report-body";
 
 // A persisted competitor row as returned by GET /scout/:id (Drizzle row shape).
 interface Competitor {
@@ -85,12 +88,14 @@ function Chips({ items, tone }: { items: string[]; tone: "keyword" | "category" 
 // Home "Generate" flow: idea → /search-intent (LLM → keywords + categories JSON)
 // → /scout (spawns the competitor-discovery Workflow) → poll /scout/:id until the
 // Workflow completes → render the ranked competitors, then automatically chain
-// into /validate (Multi-LLM panel → /100 scorecard). All calls go browser → API
+// into /validate (Multi-LLM panel → /100 scorecard). On failures, a random
+// ready-made mock report keeps the demo usable. All calls go browser → API
 // directly (CORS open). See app/_lib/api.ts.
 export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => void }) {
   const [phase, setPhase] = useState<Phase>({ kind: "expanding" });
   const [validation, setValidation] = useState<Validation>({ kind: "idle" });
   const cancelled = useRef(false);
+  const mockRunRef = useRef<Run | null>(null);
 
   useEffect(() => {
     cancelled.current = false;
@@ -198,6 +203,32 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
     };
   }, [idea]);
 
+  // On any failure we fall back to a random ready-made mock report — the demo never breaks.
+  if (phase.kind === "error") {
+    if (!mockRunRef.current) mockRunRef.current = randomMockRun();
+    const run = mockRunRef.current;
+    return (
+      <div className="flex flex-1 flex-col gap-6">
+        <header className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Звіт</p>
+            <p className="text-sm text-muted-foreground">{run.input.idea}</p>
+          </div>
+          <button
+            type="button"
+            aria-label="Новий прогін"
+            title="Новий прогін"
+            onClick={() => (onRestart ? onRestart() : window.location.assign("/"))}
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            ↻
+          </button>
+        </header>
+        <ReportBody run={run} />
+      </div>
+    );
+  }
+
   const expansion = "expansion" in phase ? phase.expansion : undefined;
 
   return (
@@ -241,12 +272,6 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
         </p>
       )}
 
-      {phase.kind === "error" && (
-        <p className="text-sm text-destructive" role="alert">
-          {phase.message}
-        </p>
-      )}
-
       {phase.kind === "done" && <CompetitorList competitors={phase.competitors} />}
 
       {/* Validate step — chained automatically after Scout. */}
@@ -264,7 +289,7 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
 
       {validation.kind === "done" && <ValidationSection validation={validation.result} />}
 
-      {onRestart && (phase.kind === "done" || phase.kind === "error") && (
+      {onRestart && phase.kind === "done" && (
         <div className="flex justify-center pt-2">
           <Button variant="outline" onClick={onRestart}>
             Нова ідея

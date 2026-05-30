@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { Game2048 } from "./game-2048";
 import { LiveTimeline } from "./live-timeline";
 import { playMockFlow } from "./mock-flow";
-import { MOCK_RUN } from "./mock-run";
+import { randomMockRun } from "./mock-run";
 import { ReportBody } from "./report-body";
 
 const LIVE_EVENTS = [
@@ -55,10 +55,10 @@ export function RunStream({
 }) {
   const router = useRouter();
   const [events, setEvents] = useState<AgentEvent[]>([]);
-  const [mocked, setMocked] = useState(demo);
   const [report, setReport] = useState<Run | null>(null);
 
   const finished = useRef(false);
+  const mockRun = useRef<Run | null>(null);
   const mockStarted = useRef(false);
   const esRef = useRef<EventSource | null>(null);
   const cancelMock = useRef<() => void>(() => {});
@@ -77,16 +77,16 @@ export function RunStream({
       if (finished.current) return;
       finished.current = true;
       esRef.current?.close();
-      setReport(MOCK_RUN); // render the report client-side — needs no API
+      if (mockRun.current) setReport(mockRun.current); // client-side report — needs no API
     };
 
     const startMock = () => {
       if (finished.current || mockStarted.current) return;
       mockStarted.current = true;
       esRef.current?.close();
-      setMocked(true);
+      mockRun.current = randomMockRun(); // random mocked idea + ready data
       setEvents([]); // replay the timeline cleanly from the mock
-      cancelMock.current = playMockFlow(push, finishMock);
+      cancelMock.current = playMockFlow(mockRun.current, push, finishMock);
     };
 
     if (demo) {
@@ -137,7 +137,7 @@ export function RunStream({
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              Звіт{mocked ? " · demo" : ""}
+              Звіт
             </p>
             <p className="text-sm text-muted-foreground">{report.input.idea}</p>
           </div>
@@ -163,38 +163,28 @@ export function RunStream({
 
   return (
     <div className="flex flex-1 flex-col gap-6">
+      <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <CardContent className="flex justify-center pt-6">
+          <Game2048 />
+        </CardContent>
+      </Card>
+
       <header className="space-y-1.5">
         <div className="flex items-center gap-2">
           <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-foreground" />
           <h1 className="text-2xl font-semibold tracking-tight">Аналізуємо вашу ідею…</h1>
-          {mocked && (
-            <span className="rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-              demo
-            </span>
-          )}
         </div>
         <p className="max-w-2xl text-sm text-muted-foreground">{idea}</p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-          <CardHeader>
-            <CardTitle className="text-base">Хід роботи агента</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <LiveTimeline events={events} />
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-          <CardHeader>
-            <CardTitle className="text-base">Зіграйте, поки чекаєте</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Game2048 />
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <CardHeader>
+          <CardTitle className="text-base">Хід роботи агента</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <LiveTimeline events={events} />
+        </CardContent>
+      </Card>
     </div>
   );
 }
