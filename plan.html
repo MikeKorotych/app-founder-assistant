@@ -476,6 +476,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"14:58", "author":"Anton", "workstream":"A", "summary":"🔨 started A17 (resilience): isolate Scout source failures — right now all four fetch steps sit under one Promise.all, so one source erroring after retries (e.g. AlternativeTo 403) kills the whole run. Making each source degrade to [] after its retry limit + surface warnings in ScoutSummary.", "commit":"—" },
   { "date":"2026-05-30", "time":"16:00", "author":"Mykhailo", "workstream":"—", "summary":"plan.html: new Flow tab — bilingual node diagram of the whole pipeline (Input → Orchestrator DAG[9 steps] → Validation panel → Persist/D1 → Report → Export, with LLM gateway + grounding/Scout side-notes), a what/why per step, and a textual step-by-step flow. Pure-CSS nodes, no external libs; JS/JSON validated.", "commit":"—" },
   { "date":"2026-05-30", "time":"14:53", "author":"Anton", "workstream":"A", "summary":"✅ A15 (PH fix): Product Hunt now queries posts(topic: $slug, order: VOTES) per category — slugified + aliased (e.g. Health & Fitness → health-and-fitness), capped at 6 topics, falls back to slugified keywords when no categories. Drops the broken global top-VOTES batch + local substring filter that made niche keywords always return empty. HTTP errors throw (step retries); unknown topics degrade to empty. +4 fetchProductHunt tests (stubbed fetch); scout 8/8, typecheck + biome clean.", "commit":"—" },
   { "date":"2026-05-30", "time":"14:49", "author":"Anton", "workstream":"A", "summary":"🔨 started A15 (PH fix): Product Hunt always returned empty — it pulled a global top-VOTES batch and substring-filtered locally, so niche keywords never matched. Reworking producthunt.ts to query posts(topic: $slug, order: VOTES) per mapped category/topic slug.", "commit":"—" },
@@ -547,7 +548,7 @@
   { "id":"A14", "group":"A", "title_uk":"Scout: планувальник джерел + шаблони HTTP-запитів", "title_en":"Scout: source planner + HTTP request templates", "owner":"Codex", "status":"in-progress" },
   { "id":"A15", "group":"A", "title_uk":"Scout: паралельний fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "title_en":"Scout: parallel fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "owner":"Anton", "status":"review" },
   { "id":"A16", "group":"A", "title_uk":"Scout: LLM-ранжування сумісності (0–100 + rationale)", "title_en":"Scout: LLM compatibility ranking (0–100 + rationale)", "owner":"Anton", "status":"review" },
-  { "id":"A17", "group":"A", "title_uk":"Scout: /scout ендпоінт + Cloudflare Workflow + персист у D1", "title_en":"Scout: /scout endpoint + Cloudflare Workflow + D1 persistence", "owner":"Anton", "status":"review" },
+  { "id":"A17", "group":"A", "title_uk":"Scout: /scout ендпоінт + Cloudflare Workflow + персист у D1", "title_en":"Scout: /scout endpoint + Cloudflare Workflow + D1 persistence", "owner":"Anton", "status":"in-progress" },
 
   { "id":"B1", "group":"B", "title_uk":"SSE /agent/stream (apps/api)", "title_en":"SSE /agent/stream (apps/api)", "owner":"—", "status":"todo" },
   { "id":"B2", "group":"B", "title_uk":"Схема подій + heartbeats", "title_en":"Event schema + heartbeats", "owner":"—", "status":"todo" },
