@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, RainbowButton } from "@hahaton/ui";
+import { RainbowButton } from "@hahaton/ui";
 import { useRef, useState } from "react";
 import { startBackgroundMusic, stopBackgroundMusic } from "../_lib/background-music";
 import { RunStream } from "./run-stream";
@@ -120,9 +120,7 @@ export function IdeaForm() {
         </p>
       </header>
       <div className="animate-enter animate-enter-delay-3 mx-auto w-full max-w-3xl">
-        <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-          <CardContent className="pt-6">
-            <form onSubmit={onSubmit} className="flex flex-col gap-5">
+        <form onSubmit={onSubmit} className="flex flex-col gap-5">
               <div className="relative">
                 <textarea
                   ref={textareaRef}
@@ -164,9 +162,7 @@ export function IdeaForm() {
                   Згенерувати план
                 </RainbowButton>
               </div>
-            </form>
-          </CardContent>
-        </Card>
+        </form>
       </div>
     </div>
   );
