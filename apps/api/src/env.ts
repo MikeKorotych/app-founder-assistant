@@ -6,6 +6,11 @@ export interface Bindings {
   LLM_GATEWAY_BASE_URL?: string;
   LLM_GATEWAY_API_KEY?: string;
   LLM_TIMEOUT_MS?: string;
+  /** Scout competitor-discovery workflow binding (wrangler.jsonc → workflows). */
+  DISCOVERY_WORKFLOW: Workflow;
+  /** Scout source secrets. */
+  SEARCH_API_KEY?: string;
+  PRODUCTHUNT_TOKEN?: string;
   /** Plain vars. */
   APP_ENV?: string;
   SURFACE_BASE_URL?: string;

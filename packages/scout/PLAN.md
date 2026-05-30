@@ -1,363 +1,102 @@
-# Plan: Scout sub-agent — grounded source fan-out (`@hahaton/scout`)
+# Scout — mobile-app competitor finder + ranker (`@hahaton/scout`)
 
-> **What it is.** A self-contained research sub-agent that turns one business idea into
-> a set of **per-source research reports** grounded in real external data. It is the
-> "go pull real signals from the web" stage that feeds the main pipeline's `market` and
-> `competitors` steps (and can run standalone via an API endpoint).
->
-> **Status:** plan only — no runtime code yet. This file is the spec; build under the
-> roadmap sub-tasks `A13…A17` (workstream A, see `plan.html` → Roadmap).
+> **Status: implemented.** Given a mobile-app idea (pre-extracted keywords), Scout
+> discovers competing apps across 4 sources, ranks them by how directly they compete,
+> and persists the ranked list to D1. Runs as a **Cloudflare Workflow**.
 
----
-
-## 1. The shape (matches the requested workflow)
+## Shape (fan-out → fan-in → rank)
 
 ```
-            idea prompt
-                │
-        ┌───────▼─────────┐
-        │  ENTRYPOINT     │  runScout(input) — single public fn
-        └───────┬─────────┘
-                │
-        ┌───────▼──────────────────────────────────┐
-        │  PHASE 1 · PLAN          (1 LLM call)     │  idea + SOURCES registry
-        │  "find the API contract for each source   │  → SourceRequest[]
-        │   and build a concrete HTTP request"      │  (url, headers, query, body)
-        └───────┬──────────────────────────────────┘
-                │  fan-out (one task per source)
-     ┌──────────┼───────────┬───────────┐
-     ▼          ▼           ▼           ▼
- ┌───────┐  ┌───────┐   ┌───────┐   ┌───────┐   PHASE 2 · QUERY (parallel)
- │source │  │source │   │source │   │source │   each: do the HTTP call with the
- │  A    │  │  B    │   │  C    │   │  D    │   provided request → raw output
- └───┬───┘  └───┬───┘   └───┬───┘   └───┬───┘   (skip if no usable API)
-     └──────────┴─────┬─────┴───────────┘
-                      ▼
-        ┌──────────────────────────────┐         PHASE 3 · AGGREGATE (barrier)
-        │  await ALL source outputs     │         one task that waits for every
-        │  → normalize + dedupe         │         source result, then continues
-        └───────┬──────────────────────┘
-                │  fan-out again (one per source)
-     ┌──────────┼───────────┬───────────┐
-     ▼          ▼           ▼           ▼
- ┌───────┐  ┌───────┐   ┌───────┐   ┌───────┐   PHASE 4 · REPORT (parallel)
- │report │  │report │   │report │   │report │   each: LLM turns one source's raw
- │  A    │  │  B    │   │  C    │   │  D    │   data → a structured SourceReport
- └───┬───┘  └───┬───┘   └───┬───┘   └───┬───┘
-     └──────────┴─────┬─────┴───────────┘
-                      ▼
-                ScoutReport         ← FINISH LINE
-        { requests, results, reports[], citations }
+POST /scout {keywords[], categories?[], idea?, country?}
+        │  spawns
+        ▼
+ CompetitorDiscoveryWorkflow            ← apps/api/src/scout/workflow.ts
+   ├─ step fetch:itunes        ┐
+   ├─ step fetch:googleplay    │ 4 isolated, retried (exp. backoff) steps, in parallel
+   ├─ step fetch:producthunt   │ → RawCompetitor[]
+   ├─ step fetch:alternativeto ┘
+   ├─ dedupeById (merge same app across keywords)        ← fan-in
+   ├─ step rank   → LLM (Haiku) scores each 0–100 + rationale, sorts desc
+   └─ step ingest → upsert into D1 `competitors` (by id)
+        ▼
+GET /scout/:id → { status, competitors[] }  (best compatibility first)
 ```
 
-This is a textbook **fan-out → fan-in → fan-out** pipeline and maps 1:1 to the requested
-design: a planner, parallel per-source query workers, one aggregator that waits on all of
-them, then a per-source report generator.
+## Sources (`packages/scout/src/sources/`)
 
----
-
-## 2. Key reconciliation: the "API contracts" already exist
-
-The request says "the scout looks on the web to find API contracts for the sites (they're
-in Notion)." **That Notion table is already encoded in this repo** as the frozen
-`@hahaton/integrations` source registry (`packages/integrations/src/sources.ts`,
-18 sources with `auth`, `requiresAuth`, `canUseWithoutAuth`, `howToGetAuth`, `apiAccess`,
-`researchValue`, and an OpenAPI `spec`).
-
-So Phase 1 does **not** re-discover contracts from scratch. It:
-
-1. **Reads `SOURCES`** as ground truth for which APIs exist and how they authenticate.
-2. **Picks the relevant subset** for the idea (LLM ranks by `researchValue` + idea fit).
-3. **Builds a concrete request** per chosen source from a small per-source
-   **request template** (Section 5) — filling in the idea's keywords/query terms.
-4. Optionally uses `web_search` **only to confirm an exact endpoint/param** when a
-   registry entry is ambiguous — never to scrape. A source with no usable keyword API
-   is skipped, not scraped (scraping is out of scope — see Section 3).
-
-This keeps the contract frozen and the demo grounded, instead of letting the agent
-hallucinate endpoints live. Honest, reproducible, and fast.
-
----
-
-## 3. Demo-viable sources (no-auth first)
-
-From live API research (May 2026). The MVP runs the **no-auth** set so the demo works
-with zero credential setup; auth'd sources are gated behind `input.demoSafe === false`
-and the registry's `canUseWithoutAuth` flag.
-
-| Source | Auth for demo | Endpoint (built in Phase 1) | Keyword search? |
+| Source | Auth | How | Notes |
 |---|---|---|---|
-| **Hacker News** (Algolia) | none ✅ | `GET https://hn.algolia.com/api/v1/search?query=<kw>&tags=story&hitsPerPage=20` | ✅ |
-| **iTunes Search** | none ✅ | `GET https://itunes.apple.com/search?term=<kw>&media=software&country=US&limit=25` | ✅ |
-| **Reddit** (public) | none ✅ (UA header) | `GET https://www.reddit.com/search.json?q=<kw>&sort=top&t=year&limit=25` | ✅ |
-| Reddit (OAuth), Product Hunt, G2, Capterra, Crunchbase, Trustpilot, Similarweb, App Store Connect, Google Play, Appfigures, Apptopia, data.ai, AppTweak, AppBrain, BigIdeasDB, Indiegogo, Kickstarter | requires creds | from registry + per-source template | mixed |
+| **iTunes Search** | none | `GET itunes.apple.com/search?media=software&entity=software` | iOS apps; rich metadata. |
+| **Google Play** | `SEARCH_API_KEY` | SerpApi `google_play` engine | `google-play-scraper` can't run on Workers → SERP API. Degrades to empty without a key. |
+| **Product Hunt** | `PRODUCTHUNT_TOKEN` | API v2 GraphQL (popular posts, keyword-filtered client-side — v2 has no text search) | Degrades to empty without a token. |
+| **AlternativeTo** | none | `HTMLRewriter` scrape of the search page | No public API; best-effort, brittle, degrades to empty on markup change. |
 
-**Scope note.** Scout queries **structured source APIs only**. Firecrawl (and any
-generic web-scraping tool) is a **separate instrument we don't use for scouting** — no
-scrape fallback. A source with no usable keyword API is simply **skipped**, not scraped.
+Each source maps its results to the unified **`RawCompetitor`** (`id` = `${source}-${externalId}`),
+deduped within-source across keywords. Sources fail independently — a retried step that
+ultimately errors just contributes nothing.
 
-**Honest caveats from research (encode as `unavailable`/`skip` in templates):**
-- **AlternativeTo** — no public API → **skip** (no scout coverage).
-- **Indiegogo** — public API is fetch-by-ID only, **no keyword search** → **skip**.
-- **Product Hunt / Reddit-OAuth / Kickstarter** — OAuth; skip in demo-safe mode.
-- **Reddit public `.json`** — must send a descriptive `User-Agent` or it throttles.
+## Ranking (`rank.ts`)
 
-The 3 no-auth sources (HN + iTunes + Reddit) are enough for a believable live run.
+One batched **Haiku** (`MODELS.haiku`) call via the `LlmProvider` seam (`@hahaton/llm`,
+LiteLLM gateway). System prompt scores each candidate 0–100 for how *directly* it competes
+with the idea (or keywords+categories when no `idea` given), each with a one-line rationale.
+Output is parsed defensively (tolerates code fences / stray text; clamps 0–100; unscored
+candidates default to 0 and sink, never dropped), then sorted descending.
 
----
+## Persistence (`persist.ts` + `packages/db`)
 
-## 4. Package layout
+New D1 table **`competitors`** (migration `packages/db/migrations/0001_living_chat.sql`):
+upsert on `id` (chunked `db.batch` + `onConflictDoUpdate`) so overlapping keywords / re-runs
+update rather than duplicate. `runId` = the workflow `instanceId`. `listCompetitors(db, runId)`
+reads them back ordered by `compatibilityScore desc`.
 
-New package `packages/scout` → `@hahaton/scout` (depends on `@hahaton/contracts` +
-`@hahaton/integrations`; LLM via `@anthropic-ai/sdk`, or `LlmProvider` once the
-llm-gateway plan lands — see `specs/llm-gateway-plan.md`).
+## Files
 
 ```
-packages/scout/
-├── package.json              "@hahaton/scout", exports → ./dist, deps: contracts, integrations
-├── tsconfig.json             extends ../../tsconfig.base.json
-├── PLAN.md                   this file
-└── src/
-    ├── index.ts              barrel + runScout
-    ├── types.ts              scout contracts (Section 6) — proposed addition to @hahaton/contracts
-    ├── scout.ts              orchestrator: the 5 phases, event emission
-    ├── plan-sources.ts       PHASE 1 — LLM picks sources + builds SourceRequest[]
-    ├── request-templates.ts  per-source concrete request builders (Section 5)
-    ├── fetch-source.ts       PHASE 2 — execute one SourceRequest (auth inject + timeout)
-    ├── aggregate.ts          PHASE 3 — fan-in: collect + dedupe + normalize
-    └── report-source.ts      PHASE 4 — LLM: one source's raw data → SourceReport
+packages/scout/src/
+  types.ts                 ScoutParams / RawCompetitor / ScoredCompetitor / ScoutSummary
+  sources/{itunes,googleplay,producthunt,alternativeto}.ts
+  normalize.ts             dedupeById
+  rank.ts                  rankCompetitors (Haiku batch)
+  persist.ts               persistCompetitors / listCompetitors (D1)
+  index.ts                 barrel + runScout (in-process runner for local/tests)
+  scout.spec.ts            unit tests (dedupe + ranking parse/clamp/sort)
+apps/api/src/
+  scout/workflow.ts        CompetitorDiscoveryWorkflow (WorkflowEntrypoint)
+  index.ts                 POST /scout, GET /scout/:id, exports the workflow class
+  env.ts                   DISCOVERY_WORKFLOW + SEARCH_API_KEY + PRODUCTHUNT_TOKEN bindings
+  wrangler.jsonc           workflows[] binding (top-level + prod + dev)
+packages/db/src/schema/index.ts   competitors table
 ```
 
----
+## Decisions (per the user)
+- Build target: **Cloudflare Workflow + D1 now** (not a transport-agnostic deferral).
+- Sources: **Gemini's set** (iTunes + Google Play SERP + Product Hunt + AlternativeTo).
+- Input: **pre-extracted `{keywords, categories}`** (+ optional `idea` to sharpen ranking).
+- Persistence: **D1 via Drizzle**.
 
-## 5. Request templates (the "generate HTTP request info" core)
+## Credentials
+- `SEARCH_API_KEY` — SerpApi (`serpapi.com` → Dashboard → API Key); `google_play` engine.
+- `PRODUCTHUNT_TOKEN` — Product Hunt v2 developer token (`producthunt.com/v2/oauth/applications`
+  → Add app → Create Token).
+- Set both via `wrangler secret put`; locally in `apps/api/.dev.vars`.
 
-A `request-templates.ts` keyed by `ApiSource.id`. Each template takes resolved
-keywords + the registry entry and returns the `http` descriptor. The LLM in Phase 1
-**chooses sources and keywords**; templates **build the exact request** (deterministic,
-no hallucinated URLs). Grounded shapes from research:
+## Verification (done)
+- `pnpm typecheck` — 11/11 green (incl. scout + api). `pnpm --filter @hahaton/scout test` — 4/4.
+- `wrangler deploy --dry-run` — Worker bundles; `DISCOVERY_WORKFLOW (CompetitorDiscoveryWorkflow)` binding recognized.
+- `wrangler d1 migrations apply hahaton --local` — `competitors` table created.
+- Manual: `wrangler dev` then
+  `curl -X POST localhost:8787/scout -H 'content-type: application/json' -d '{"keywords":["habit tracker","fitness coach"],"idea":"social accountability habit tracker"}'`
+  → `{id}`; poll `GET /scout/:id`. (Needs LLM gateway env + at least iTunes reachable; Play/PH need keys.)
 
-```ts
-// keywords: string[] derived from the idea (Phase 1). enc = encodeURIComponent.
-export const TEMPLATES: Record<string, (kw: string[], src: ApiSource) => SourceRequest> = {
-  // No-auth, demo-safe -------------------------------------------------------
-  hackernews: (kw) => ({
-    sourceId: "hackernews", label: "Hacker News",
-    rationale: "Founder/builder discussion + show-hn launches around the idea.",
-    http: { method: "GET",
-      url: `https://hn.algolia.com/api/v1/search?query=${enc(kw[0])}&tags=story&hitsPerPage=20` },
-  }),
-  itunessearch: (kw) => ({
-    sourceId: "itunessearch", label: "iTunes Search",
-    rationale: "Existing iOS apps in the space → competitors, prices, ratings.",
-    http: { method: "GET",
-      url: `https://itunes.apple.com/search?term=${enc(kw.join(" "))}&media=software&country=US&limit=25` },
-  }),
-  reddit: (kw) => ({
-    sourceId: "reddit", label: "Reddit (public)",
-    rationale: "Real user pain points, complaints, demand signals.",
-    http: { method: "GET",
-      url: `https://www.reddit.com/search.json?q=${enc(kw.join(" "))}&sort=top&t=year&limit=25`,
-      headers: { "User-Agent": "hahaton-2026-scout/0.1 (research)" } },
-  }),
-  // …auth'd sources reuse @hahaton/integrations auth.ts for header injection.
-};
-```
+## Coordination
+A14 (source auth metadata for paid mobile-intel APIs, in `packages/integrations`) is **Codex's** —
+no file overlap with this work (scout / db / api). Scout reads its source keys directly from
+env today; it can adopt Codex's auth helpers later.
 
-Auth injection for credentialed sources reuses the `Auth` discriminated union from
-`@hahaton/integrations` (`apiKey` → header+prefix, `oauth2` → bearer, `jwt`,
-`serviceAccount`, `supabaseAnon`). The `${ENV}` placeholders are resolved in
-`fetch-source.ts`, never in the planner output (keeps secrets out of logs/persisted runs).
-
----
-
-## 6. Contracts (proposed — freeze at team sync before consuming downstream)
-
-Scout-local types live in `src/types.ts` first to avoid editing the frozen
-`@hahaton/contracts`. Promote them into `contracts` once the shape is agreed. Reuses
-`Citation` and `Fact` from `@hahaton/contracts`.
-
-```ts
-import type { Citation, Fact } from "@hahaton/contracts";
-
-export interface ScoutInput {
-  idea: string;            // raw idea, or brief.problem/valueProp from step 1
-  region?: string;
-  keywords?: string[];     // optional pre-extracted search terms
-  demoSafe?: boolean;      // default true → only sources with canUseWithoutAuth
-}
-
-/** PHASE 1 output — one per chosen source. */
-export interface SourceRequest {
-  sourceId: string;        // === ApiSource.id
-  label: string;
-  rationale: string;
-  http: {
-    method: "GET" | "POST";
-    url: string;                          // GET: query already in the URL
-    headers?: Record<string, string>;     // ${ENV} placeholders, resolved at fetch
-    body?: unknown;
-  };
-}
-
-/** PHASE 2 output — one per source. */
-export interface SourceResult {
-  sourceId: string;
-  ok: boolean;
-  via: "api" | "skipped";
-  status?: number;
-  data?: unknown;          // raw JSON from the source API
-  error?: { kind: string; message: string; retryable: boolean };
-  fetchedAt: string;
-  citations: Citation[];   // URLs touched (deduped into ScoutReport.citations)
-}
-
-export interface ScoutSignal {
-  kind: "competitor" | "painPoint" | "demand" | "pricing" | "review" | "trend";
-  text: string;
-  evidence?: string;       // short verbatim quote
-  citationId?: string;
-  metric?: Fact;           // grounded number or estimated:true (same honesty rule)
-}
-
-/** PHASE 4 output — one per source. */
-export interface SourceReport {
-  sourceId: string;
-  label: string;
-  summary: string;
-  signals: ScoutSignal[];
-  citations: Citation[];
-}
-
-export interface ScoutReport {
-  input: ScoutInput;
-  requests: SourceRequest[];
-  results: SourceResult[];
-  reports: SourceReport[];
-  citations: Citation[];   // all sources, deduped by URL
-  createdAt: string;
-}
-```
-
-**Streaming events** (scout-local; mirror the main pipeline's SSE style so the UI can
-render a live "scouting" timeline). Keep local until merged into `AgentEvent`:
-
-```ts
-export type ScoutEvent =
-  | { type: "scout_started"; at: string }
-  | { type: "scout_source_planned"; sourceId: string; label: string; at: string }
-  | { type: "scout_source_started"; sourceId: string; at: string }
-  | { type: "scout_source_fetched"; sourceId: string; ok: boolean; via: string; at: string }
-  | { type: "scout_aggregated"; sources: number; at: string }
-  | { type: "scout_source_report"; sourceId: string; signals: number; at: string }
-  | { type: "scout_completed"; at: string }
-  | { type: "scout_error"; sourceId?: string; message: string; at: string };
-```
-
----
-
-## 7. Orchestration mechanism (fan-out / fan-in)
-
-**MVP — in-process, `Promise.allSettled`.** Fits the current Express stack and is the
-simplest thing that gives true parallelism + a clean barrier. One source failing never
-sinks the run (`allSettled` → degrade to a `SourceResult` with `ok:false`).
-
-```ts
-export async function runScout(input: ScoutInput, emit: (e: ScoutEvent) => void = () => {}): Promise<ScoutReport> {
-  emit({ type: "scout_started", at: nowIso() });
-
-  // PHASE 1 — plan
-  const requests = await planSources(input, client, emit);     // 1 LLM call
-
-  // PHASE 2 — fan-out: query every source in parallel
-  const settled = await Promise.allSettled(
-    requests.map((r) => fetchSource(r, emit)),
-  );
-  const results = settled.map(toSourceResult);                 // never throws
-
-  // PHASE 3 — fan-in barrier: aggregate + dedupe citations
-  const aggregated = aggregate(results);
-  emit({ type: "scout_aggregated", sources: results.length, at: nowIso() });
-
-  // PHASE 4 — fan-out again: one report per source, in parallel
-  const reports = (await Promise.allSettled(
-    aggregated.results.filter((r) => r.ok).map((r) => reportSource(r, input, client, emit)),
-  )).flatMap((s) => (s.status === "fulfilled" ? [s.value] : []));
-
-  emit({ type: "scout_completed", at: nowIso() });
-  return { input, requests, results, reports, citations: aggregated.citations, createdAt: nowIso() };
-}
-```
-
-**Production mapping (Cloudflare).** The deploy target is Cloudflare Workers, where a long
-multi-fetch run should live in a **Workflow / Durable Object**, not one Worker invoke
-(matches PLAN.md risk #3). The phases above map directly to Workflow steps: Phase 1 = one
-step, Phase 2 = parallel `step.do()` per source, Phase 3 = the implicit join, Phase 4 =
-parallel `step.do()` per report. Keep `runScout` transport-agnostic so the same function
-body runs in-process locally and as Workflow steps in prod. (Trigger.dev — MCP is
-connected — is a viable alternative orchestrator but adds infra; not needed for MVP.)
-
-**Resilience.** Reuse the outbound core from `specs/llm-gateway-plan.md`
-(`OutboundHttpClient`: timeout + retry + breaker) for Phase-2 fetches once it lands; until
-then, plain `fetch` with an `AbortController` per-source timeout (~8s) and the `allSettled`
-degrade path. Per-source token/time budgets in Phase 4.
-
----
-
-## 8. Integration with the main pipeline
-
-Two consumption modes, both off one `runScout`:
-
-1. **Grounding provider for steps 2–3.** `competitorsStep` / `marketStep` call `runScout`
-   (or read a pre-run `ScoutReport`) and feed `reports[].signals` + `citations` into their
-   LLM context — turning today's stubbed `web_search` into real, multi-source grounding.
-   Citations flow straight into `run.citations` (same `Citation` shape).
-2. **Standalone endpoint.** `apps/api` adds `POST /scout` (and SSE `GET /scout/stream`)
-   that runs `runScout` and streams `ScoutEvent`s — lets the UI show a dedicated
-   "scouting sources" timeline before the business-plan steps.
-
-The `Citation` reuse means scout's sources appear in the existing **Sources appendix** and
-inline footnotes with zero extra UI work.
-
----
-
-## 9. Build order (roadmap sub-tasks A13–A17)
-
-- **A13 — Scaffold + contracts.** Package, `tsconfig`, `package.json`, `src/types.ts`,
-  `src/index.ts`. `pnpm typecheck` green. Wire deps (`contracts`, `integrations`).
-- **A14 — Phase 1 planner + templates.** `plan-sources.ts` + `request-templates.ts` for the
-  4 no-auth sources. Unit-test: idea → expected `SourceRequest[]` (deterministic URLs).
-- **A15 — Phase 2 fetch.** `fetch-source.ts`: auth injection from the registry,
-  per-source `AbortController` timeout, `allSettled` degrade, skip sources with no usable
-  API. Live smoke test against HN + iTunes + Reddit (no creds).
-- **A16 — Phase 3 + 4.** `aggregate.ts` (dedupe citations) + `report-source.ts` (LLM →
-  `SourceReport`, honesty rule: every metric grounded or `estimated:true`). Emit events.
-- **A17 — Wire-in.** `POST /scout` + SSE in `apps/api`; feed `competitorsStep`/`marketStep`;
-  one golden `ScoutReport` persisted for offline replay.
-
----
-
-## 10. Verification
-
-1. **Planner determinism:** known idea → `SourceRequest[]` with exact, valid URLs for the
-   no-auth set; demo-safe mode excludes credentialed sources.
-2. **Live fan-out:** `runScout` against the demo idea hits HN + iTunes + Reddit, returns
-   ≥3 `ok` results, one slow/failing source degrades (not the whole run).
-3. **Graceful skip:** a source with no usable keyword API (AlternativeTo, Indiegogo) is
-   reported `via:"skipped"`, never scraped, and never blocks the run.
-4. **Aggregation barrier:** Phase 4 starts only after all Phase-2 tasks settle; citations
-   deduped by URL.
-5. **Honesty:** every `ScoutSignal.metric` carries a `citationId` or `estimated:true`;
-   no fabricated URLs (URLs only ever come from real responses).
-6. **Replay:** a persisted `ScoutReport` re-renders the scouting timeline with no network.
-
----
-
-## Open questions
-
-1. **LLM client.** Use `@anthropic-ai/sdk` now, or wait for the `LlmProvider` shim from
-   `specs/llm-gateway-plan.md`? (Lean: SDK now, swap later — same one-line change as the
-   main pipeline.)
-2. **Keyword extraction.** Fold into the Phase-1 planner call, or reuse step-1 `brief`?
-   (Lean: if a `brief` exists, derive keywords from it; else a small Haiku call.)
-3. **Promote scout types into `@hahaton/contracts`** — needs a team-sync (frozen contract).
+## Known limitations / follow-ups
+- Product Hunt v2 has no text search → we keyword-filter popular posts (coarse recall).
+- AlternativeTo scraping is brittle by nature (no API).
+- Cross-store dedupe is by `id` only (same app on iOS+Android stays two rows) — a fuzzy
+  title+developer merge is a possible follow-up.
+- No SSE timeline yet; `/scout/:id` is poll-based. Wire into `competitorsStep` later.

@@ -1,0 +1,27 @@
+{
+  "name": "@hahaton/scout",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Scout — mobile-app competitor discovery + LLM compatibility ranking. Runtime-agnostic core consumed by the Cloudflare Workflow in @hahaton/api.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rimraf .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@hahaton/contracts": "workspace:*",
+    "@hahaton/db": "workspace:*",
+    "@hahaton/llm": "workspace:*",
+    "drizzle-orm": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "rimraf": "^6.0.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

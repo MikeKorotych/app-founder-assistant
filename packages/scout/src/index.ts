@@ -1,0 +1,68 @@
+/**
+ * @hahaton/scout — mobile-app competitor discovery + LLM compatibility ranking.
+ *
+ * Runtime-agnostic core. The durable orchestration (isolated, retried steps)
+ * lives in the Cloudflare Workflow in `@hahaton/api`; these functions are what
+ * each step calls. `runScout` runs the whole thing in-process for tests/local.
+ */
+import type { Db } from "@hahaton/db";
+import type { LlmProvider } from "@hahaton/llm";
+import { dedupeById } from "./normalize.js";
+import { persistCompetitors } from "./persist.js";
+import { rankCompetitors } from "./rank.js";
+import { fetchAlternativeTo } from "./sources/alternativeto.js";
+import { fetchGooglePlay } from "./sources/googleplay.js";
+import { fetchItunes } from "./sources/itunes.js";
+import { fetchProductHunt } from "./sources/producthunt.js";
+import type { ScoutParams, ScoutSummary } from "./types.js";
+
+export { dedupeById } from "./normalize.js";
+export { listCompetitors, persistCompetitors } from "./persist.js";
+export { rankCompetitors } from "./rank.js";
+export { fetchAlternativeTo } from "./sources/alternativeto.js";
+export { fetchGooglePlay } from "./sources/googleplay.js";
+export { fetchItunes } from "./sources/itunes.js";
+export { fetchProductHunt } from "./sources/producthunt.js";
+export type {
+  RawCompetitor,
+  ScoredCompetitor,
+  ScoutParams,
+  ScoutSummary,
+  SourceId,
+} from "./types.js";
+
+/** Credentials/handles the in-process runner needs. */
+export interface ScoutDeps {
+  llm: LlmProvider;
+  db: Db;
+  searchApiKey?: string;
+  productHuntToken?: string;
+}
+
+/**
+ * Run the full pipeline in one process (no Workflow). Fetches all sources
+ * concurrently — a failing source degrades to empty rather than sinking the run
+ * — then ranks and persists. The Workflow variant isolates+retries each step.
+ */
+export async function runScout(
+  deps: ScoutDeps,
+  runId: string,
+  params: ScoutParams,
+): Promise<ScoutSummary> {
+  const country = params.country ?? "us";
+  const settled = await Promise.allSettled([
+    fetchItunes(params, country),
+    fetchGooglePlay(params, deps.searchApiKey, country),
+    fetchProductHunt(params, deps.productHuntToken),
+    fetchAlternativeTo(params),
+  ]);
+  const candidates = dedupeById(settled.flatMap((r) => (r.status === "fulfilled" ? r.value : [])));
+  const scored = await rankCompetitors(deps.llm, params, candidates);
+  await persistCompetitors(deps.db, runId, scored);
+  return {
+    runId,
+    discovered: candidates.length,
+    ranked: scored.length,
+    topCompetitorId: scored[0]?.id,
+  };
+}
