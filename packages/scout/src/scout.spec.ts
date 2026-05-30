@@ -5,9 +5,10 @@ import type {
   LlmRequest,
   LlmResponse,
 } from "@hahaton/llm";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { dedupeById } from "./normalize.js";
 import { rankCompetitors } from "./rank.js";
+import { fetchProductHunt } from "./sources/producthunt.js";
 import type { RawCompetitor } from "./types.js";
 
 const app = (over: Partial<RawCompetitor>): RawCompetitor => ({
@@ -89,5 +90,67 @@ describe("rankCompetitors", () => {
     const ranked = await rankCompetitors(llm, { keywords: ["x"] }, candidates);
     expect(ranked.find((c) => c.id === "ios-1")?.compatibilityScore).toBe(100);
     expect(ranked.find((c) => c.id === "play-2")?.compatibilityScore).toBe(0);
+  });
+});
+
+describe("fetchProductHunt", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  /** Captures request bodies and replays one canned PH posts payload per call. */
+  function stubFetch(nodesByCall: PhStubNode[][]) {
+    const bodies: { slug: string; first: number }[] = [];
+    let call = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init: { body: string }) => {
+        const parsed = JSON.parse(init.body) as { variables: { slug: string; first: number } };
+        bodies.push(parsed.variables);
+        const nodes = nodesByCall[call++] ?? [];
+        return {
+          ok: true,
+          json: async () => ({ data: { posts: { edges: nodes.map((node) => ({ node })) } } }),
+        } as Response;
+      }),
+    );
+    return bodies;
+  }
+
+  type PhStubNode = { id: string; name: string; tagline?: string; votesCount?: number };
+
+  it("returns empty without a token (no request made)", async () => {
+    const bodies = stubFetch([]);
+    const out = await fetchProductHunt({ keywords: ["habit tracker"] }, undefined);
+    expect(out).toEqual([]);
+    expect(bodies).toHaveLength(0);
+  });
+
+  it("queries one VOTES-ordered topic per category slug (aliased + slugified)", async () => {
+    const bodies = stubFetch([
+      [{ id: "1", name: "Notion", tagline: "docs", votesCount: 99 }],
+      [{ id: "2", name: "Strava", tagline: "runs", votesCount: 50 }],
+    ]);
+    const out = await fetchProductHunt(
+      { keywords: ["x"], categories: ["Productivity", "Health & Fitness"] },
+      "tok",
+    );
+    expect(bodies.map((b) => b.slug)).toEqual(["productivity", "health-and-fitness"]);
+    expect(out.map((c) => c.id)).toEqual(["ph-1", "ph-2"]);
+    expect(out[0]).toMatchObject({ source: "producthunt", reviewCount: 99, platforms: ["web"] });
+  });
+
+  it("falls back to slugified keywords when no categories are given", async () => {
+    const bodies = stubFetch([[]]);
+    await fetchProductHunt({ keywords: ["Developer Tools"] }, "tok");
+    expect(bodies.map((b) => b.slug)).toEqual(["developer-tools"]);
+  });
+
+  it("throws on a non-ok response so the workflow step can retry", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({ ok: false, status: 401 }) as Response),
+    );
+    await expect(
+      fetchProductHunt({ keywords: ["x"], categories: ["productivity"] }, "tok"),
+    ).rejects.toThrow(/Product Hunt 401/);
   });
 });
