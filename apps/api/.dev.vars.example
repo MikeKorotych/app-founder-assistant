@@ -9,3 +9,10 @@
 LLM_GATEWAY_BASE_URL=http://localhost:4000
 LLM_GATEWAY_API_KEY=sk-replace-me
 LLM_TIMEOUT_MS=120000
+
+# Appfigures — app market intelligence (Bearer = PAT). See docs/sources/appfigures.md.
+# NOTE: current account is owned-apps-only (no connected apps); competitor/market
+# data needs Partner API Access. Real values go in .dev.vars (gitignored).
+APPFIGURES_PAT=
+APPFIGURES_CLIENT_KEY=
+APPFIGURES_SECRET_KEY=
