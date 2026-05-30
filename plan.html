@@ -420,6 +420,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"13:50", "author":"Anton", "workstream":"A", "summary":"🔨 started A13/A15/A16/A17: build Scout as a mobile-app competitor finder — Cloudflare Workflow (CompetitorDiscoveryWorkflow) over 4 isolated+retried source steps (iTunes / Google Play via SERP key / Product Hunt / AlternativeTo), LLM compatibility ranking (0–100 + rationale), persist to a new D1 'competitors' table; POST /scout spawns the workflow. A14 (source auth metadata) stays Codex's — no file overlap (scout/db/api vs integrations).", "commit":"—" },
   { "date":"2026-05-30", "time":"13:40", "author":"scaffold", "workstream":"C", "summary":"Fix UI design system in apps/web: (1) Tailwind v4 @source the @hahaton/ui package (node_modules was unscanned → shadcn classes missing); (2) add 'use client' to emotion-arc-chart/theme-provider/theme-toggle (barrel pulled client-only recharts/next-themes into RSC → createContext crash). Home renders 200, caffeine theme applies. Dev on :3001.", "commit":"—" },
   { "date":"2026-05-30", "time":"13:24", "author":"scaffold", "workstream":"A", "summary":"Free alternatives to Appfigures: docs/sources/free-app-intel.md — verified no-auth iTunes Search/Lookup + RSS reviews + RSS charts, HN Algolia, google-play-scraper, plus Reddit/PH/web_search/Wikidata; mapped to validation categories. No download/revenue estimates free — proxy via rating counts + chart rank.", "commit":"—" },
   { "date":"2026-05-30", "time":"13:20", "author":"scaffold", "workstream":"A", "summary":"Appfigures: stored creds in apps/api/.dev.vars (gitignored) + placeholders in env examples + docs/sources/appfigures.md. PAT valid but owned-apps-only (none connected); competitor/market data needs Partner API Access — kept DEFERRED, not wired.", "commit":"—" },
@@ -471,11 +472,11 @@
   { "id":"A11", "group":"A", "title_uk":"Multi-LLM панель + скоринг 4×25 + gaps", "title_en":"Multi-LLM panel + 4×25 scoring + gaps", "owner":"—", "status":"todo" },
   { "id":"A12", "group":"A", "title_uk":"Роутинг моделей + prompt caching", "title_en":"Model routing + prompt caching", "owner":"—", "status":"todo" },
 
-  { "id":"A13", "group":"A", "title_uk":"Scout: каркас пакета + контракти (packages/scout)", "title_en":"Scout: package scaffold + contracts (packages/scout)", "owner":"—", "status":"todo" },
+  { "id":"A13", "group":"A", "title_uk":"Scout: каркас пакета + типи + таблиця competitors (D1)", "title_en":"Scout: package scaffold + types + competitors D1 table", "owner":"Anton", "status":"in-progress" },
   { "id":"A14", "group":"A", "title_uk":"Scout: планувальник джерел + шаблони HTTP-запитів", "title_en":"Scout: source planner + HTTP request templates", "owner":"Codex", "status":"in-progress" },
-  { "id":"A15", "group":"A", "title_uk":"Scout: паралельний fetch джерел (timeout + skip без API)", "title_en":"Scout: parallel source fetch (timeout + skip if no API)", "owner":"—", "status":"todo" },
-  { "id":"A16", "group":"A", "title_uk":"Scout: агрегація + звіт по кожному джерелу (LLM)", "title_en":"Scout: aggregate + per-source report (LLM)", "owner":"—", "status":"todo" },
-  { "id":"A17", "group":"A", "title_uk":"Scout: /scout ендпоінт + інтеграція в крок конкурентів/ринку", "title_en":"Scout: /scout endpoint + wire into competitors/market step", "owner":"—", "status":"todo" },
+  { "id":"A15", "group":"A", "title_uk":"Scout: паралельний fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "title_en":"Scout: parallel fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "owner":"Anton", "status":"in-progress" },
+  { "id":"A16", "group":"A", "title_uk":"Scout: LLM-ранжування сумісності (0–100 + rationale)", "title_en":"Scout: LLM compatibility ranking (0–100 + rationale)", "owner":"Anton", "status":"in-progress" },
+  { "id":"A17", "group":"A", "title_uk":"Scout: /scout ендпоінт + Cloudflare Workflow + персист у D1", "title_en":"Scout: /scout endpoint + Cloudflare Workflow + D1 persistence", "owner":"Anton", "status":"in-progress" },
 
   { "id":"B1", "group":"B", "title_uk":"SSE /agent/stream (apps/api)", "title_en":"SSE /agent/stream (apps/api)", "owner":"—", "status":"todo" },
   { "id":"B2", "group":"B", "title_uk":"Схема подій + heartbeats", "title_en":"Event schema + heartbeats", "owner":"—", "status":"todo" },
