@@ -4,16 +4,8 @@ import type { Run } from "@hahaton/contracts";
 import { Button } from "@hahaton/ui";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ReportBody } from "../../../_components/report-body";
 import { apiUrl } from "../../../_lib/api";
-import { BriefSection } from "./brief-section";
-import { CanvasSection } from "./canvas-section";
-import { CompetitorsSection } from "./competitors-section";
-import { GtmSection } from "./gtm-section";
-import { MarketSection } from "./market-section";
-import { RisksSection } from "./risks-section";
-import { SynthesisSection } from "./synthesis-section";
-import { UnitEconomicsSection } from "./unit-economics-section";
-import { ValidationSection } from "./validation-section";
 
 const STATUS_LABEL: Record<Run["status"], string> = {
   running: "Виконується",
@@ -91,7 +83,7 @@ export function RunReport({ id }: { id: string }) {
   }, [id]);
 
   if (state.kind === "loading") {
-    return <p className="text-sm text-muted-foreground">Завантаження прогону…</p>;
+    return <p className="animate-enter text-sm text-muted-foreground">Завантаження прогону…</p>;
   }
   if (state.kind === "missing") {
     return (
@@ -108,7 +100,7 @@ export function RunReport({ id }: { id: string }) {
   const { run } = state;
   return (
     <main className="flex flex-1 flex-col gap-6">
-      <header className="flex flex-wrap items-start justify-between gap-3">
+      <header className="animate-enter flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Прогін
@@ -122,17 +114,7 @@ export function RunReport({ id }: { id: string }) {
         <NewRunLink />
       </header>
 
-      <div className="flex flex-col gap-5">
-        <BriefSection brief={run.brief} />
-        <MarketSection market={run.market} citations={run.citations} />
-        <CompetitorsSection scan={run.competitors} citations={run.citations} />
-        <CanvasSection canvas={run.canvas} />
-        <GtmSection gtm={run.gtm} />
-        <UnitEconomicsSection assumptions={run.assumptions} citations={run.citations} />
-        <RisksSection register={run.risks} />
-        <SynthesisSection synthesis={run.synthesis} />
-        <ValidationSection validation={run.validation} />
-      </div>
+      <ReportBody run={run} />
     </main>
   );
 }

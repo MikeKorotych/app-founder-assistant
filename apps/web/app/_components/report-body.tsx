@@ -15,7 +15,7 @@ import { ValidationSection } from "../runs/[id]/_components/validation-section";
  *  the client-side demo fallback (so the report needs no API to display). */
 export function ReportBody({ run }: { run: Run }) {
   return (
-    <div className="flex flex-col gap-5">
+    <div className="stagger-enter flex flex-col gap-5">
       <BriefSection brief={run.brief} />
       <MarketSection market={run.market} citations={run.citations} />
       <CompetitorsSection scan={run.competitors} citations={run.citations} />

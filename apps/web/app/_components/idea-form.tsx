@@ -3,6 +3,7 @@
 import { Button, Card, CardContent } from "@hahaton/ui";
 import { useRef, useState } from "react";
 import { RunStream } from "./run-stream";
+import { ScoutRun } from "./scout-run";
 
 /** Sample ideas for the "Suggest an idea" button — specific & demo-friendly. */
 const SAMPLE_IDEAS = [
@@ -44,6 +45,7 @@ export function IdeaForm() {
   const [error, setError] = useState("");
   const [started, setStarted] = useState<string | null>(null);
   const [demo, setDemo] = useState(false);
+  const [restarting, setRestarting] = useState(false);
 
   function fitTextareaHeight(node = textareaRef.current) {
     if (!node) return;
@@ -68,15 +70,40 @@ export function IdeaForm() {
     // ?demo=1 forces the mocked flow (presentation safety); otherwise the real
     // run is attempted and falls back to the mock automatically on any failure.
     const forceDemo =
-      typeof window !== "undefined" && new URLSearchParams(window.location.search).get("demo") === "1";
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("demo") === "1";
     setDemo(forceDemo);
     setStarted(value);
   }
 
-  if (started) return <RunStream idea={started} demo={demo} />;
+  function restartRun() {
+    setRestarting(true);
+    window.setTimeout(() => {
+      setIdea("");
+      setError("");
+      setDemo(false);
+      setStarted(null);
+      setRestarting(false);
+      requestAnimationFrame(() => fitTextareaHeight());
+    }, 160);
+  }
+
+  // Real flow: idea → search-intent → Scout (competitor discovery) → Validate.
+  // ?demo=1 keeps the scripted RunStream as a presentation safety net.
+  if (started) {
+    return (
+      <div className={restarting ? "animate-exit" : "animate-enter"}>
+        {demo ? (
+          <RunStream idea={started} demo={demo} onRestart={restartRun} />
+        ) : (
+          <ScoutRun idea={started} onRestart={restartRun} />
+        )}
+      </div>
+    );
+  }
 
   return (
-    <Card className="border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+    <Card className="animate-enter border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <CardContent className="pt-6">
         <form onSubmit={onSubmit} className="flex flex-col gap-5">
           <div className="relative">

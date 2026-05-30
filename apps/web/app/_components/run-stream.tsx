@@ -44,7 +44,15 @@ function RestartIcon() {
  * automatically falls back to the scripted mock flow so a demo never breaks.
  * `demo` forces the mock straight away (?demo=1).
  */
-export function RunStream({ idea, demo = false }: { idea: string; demo?: boolean }) {
+export function RunStream({
+  idea,
+  demo = false,
+  onRestart,
+}: {
+  idea: string;
+  demo?: boolean;
+  onRestart?: () => void;
+}) {
   const router = useRouter();
   const [events, setEvents] = useState<AgentEvent[]>([]);
   const [mocked, setMocked] = useState(demo);
@@ -136,7 +144,10 @@ export function RunStream({ idea, demo = false }: { idea: string; demo?: boolean
           <Button
             aria-label="Новий прогін"
             className="h-9 w-9 shrink-0 text-muted-foreground [&_svg]:size-5"
-            onClick={() => window.location.assign("/")}
+            onClick={() => {
+              if (onRestart) onRestart();
+              else router.push("/");
+            }}
             size="icon"
             title="Новий прогін"
             type="button"

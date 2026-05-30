@@ -201,16 +201,87 @@
 @keyframes enter-up {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    filter: blur(4px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
+    filter: blur(0);
     transform: translateY(0);
   }
 }
 
 .animate-enter {
-  animation: enter-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: enter-up 0.52s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-enter-delay-1 {
+  animation-delay: 80ms;
+}
+
+.animate-enter-delay-2 {
+  animation-delay: 160ms;
+}
+
+.animate-enter-delay-3 {
+  animation-delay: 240ms;
+}
+
+@keyframes exit-soft {
+  from {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(4px);
+  }
+}
+
+.animate-exit {
+  animation: exit-soft 0.16s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.stagger-enter > * {
+  animation: enter-up 0.52s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.stagger-enter > *:nth-child(1) {
+  animation-delay: 90ms;
+}
+
+.stagger-enter > *:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.stagger-enter > *:nth-child(3) {
+  animation-delay: 210ms;
+}
+
+.stagger-enter > *:nth-child(4) {
+  animation-delay: 270ms;
+}
+
+.stagger-enter > *:nth-child(5) {
+  animation-delay: 330ms;
+}
+
+.stagger-enter > *:nth-child(6) {
+  animation-delay: 390ms;
+}
+
+.stagger-enter > *:nth-child(7) {
+  animation-delay: 450ms;
+}
+
+.stagger-enter > *:nth-child(8) {
+  animation-delay: 510ms;
+}
+
+.stagger-enter > *:nth-child(9) {
+  animation-delay: 570ms;
 }
 
 /* ─── Status pill · animated ring around the dot ───────────────────── */
@@ -234,6 +305,7 @@
   *,
   *::before,
   *::after {
+    animation-delay: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
