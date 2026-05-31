@@ -386,7 +386,12 @@ async function generateAndSaveDigest(env: Bindings) {
   // Append today's capture to the time-series BEFORE building the digest, so
   // today counts toward each app's observed rank history (real momentum).
   const capturedOn = new Date().toISOString().slice(0, 10);
-  await saveChartSnapshots(db, charts, FEED, capturedOn);
+  // Time-series is auxiliary — a snapshot hiccup must never break the digest.
+  try {
+    await saveChartSnapshots(db, charts, FEED, capturedOn);
+  } catch (err) {
+    console.error("chart snapshot save failed (continuing):", err);
+  }
   const digest = await buildGlobalDigest(llm, {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),

@@ -185,11 +185,25 @@ export async function saveChartSnapshots(
     }
   }
   const rows = [...byKey.values()];
-  for (let i = 0; i < rows.length; i += 100) {
-    await db
-      .insert(chartSnapshots)
-      .values(rows.slice(i, i + 100))
-      .onConflictDoNothing();
+  // D1 caps bound parameters per query at ~100; each row binds 7 → ≤12 rows/insert.
+  const ROWS_PER_INSERT = 12;
+  const stmts = [];
+  for (let i = 0; i < rows.length; i += ROWS_PER_INSERT) {
+    stmts.push(
+      db
+        .insert(chartSnapshots)
+        .values(rows.slice(i, i + ROWS_PER_INSERT))
+        .onConflictDoNothing(),
+    );
+  }
+  if (stmts.length === 0) return;
+  // db.batch sends many statements in ONE round trip (one subrequest) — essential
+  // under the Workers subrequest cap. Group so each batch stays modest.
+  const STMTS_PER_BATCH = 40;
+  type Batch = Parameters<typeof db.batch>[0];
+  for (let i = 0; i < stmts.length; i += STMTS_PER_BATCH) {
+    const chunk = stmts.slice(i, i + STMTS_PER_BATCH) as unknown as Batch;
+    await db.batch(chunk);
   }
 }
 
