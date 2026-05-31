@@ -1,4 +1,10 @@
-import { runAgent, runPipeline, validateIdea } from "@hahaton/agent";
+import {
+  buildCompetitorProfiles,
+  buildOpportunityReport,
+  runAgent,
+  runPipeline,
+  validateIdea,
+} from "@hahaton/agent";
 import type {
   AgentEvent,
   Assumptions,
@@ -8,7 +14,13 @@ import type {
 } from "@hahaton/contracts";
 import { createDb } from "@hahaton/db";
 import { createLlmProvider } from "@hahaton/llm";
-import { listCompetitors, type ScoutParams } from "@hahaton/scout";
+import {
+  classifyReviews,
+  collectReviews,
+  listCompetitors,
+  type RawCompetitor,
+  type ScoutParams,
+} from "@hahaton/scout";
 import { expandSearchIntent } from "@hahaton/search-intent";
 import { loadRun, loadSearchExpansion, saveRun, saveSearchExpansion } from "@hahaton/store";
 import { computeUnitEconomics } from "@hahaton/unit-economics";
@@ -171,6 +183,65 @@ app.post("/validate", async (c) => {
   } catch (err) {
     console.error("validate error:", err);
     return c.json({ error: "Validation failed." }, 500);
+  }
+});
+
+// Opportunity analysis — mine the discovered competitors' reviews, classify
+// them into signals, then synthesize the Opportunity Radar (decision map) +
+// per-competitor Competitive Landscape. Stateless; returns { report, profiles }
+// the UI renders directly. Reviews fetched live (iTunes RSS + SerpApi); no paid
+// market-intel keys → install figures are estimated client-side.
+app.post("/opportunity", async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as { idea?: string; scoutId?: string };
+  if (typeof body.idea !== "string" || body.idea.length === 0) {
+    return c.json({ error: "Body must include a non-empty 'idea' string." }, 400);
+  }
+  if (typeof body.scoutId !== "string" || body.scoutId.length === 0) {
+    return c.json({ error: "Body must include a 'scoutId'." }, 400);
+  }
+  try {
+    requireLlmEnv(c.env);
+    const rows = await listCompetitors(createDb(c.env.DB), body.scoutId);
+    const competitors = rows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      source: r.source,
+      url: r.url ?? undefined,
+      positioning: r.rationale ?? r.description ?? undefined,
+      platforms: [] as string[],
+      reviewCount: r.reviewCount ?? 0,
+      rating: r.rating ?? undefined,
+      launchedAt: r.launchedAt ?? undefined,
+    }));
+
+    const reviews = await collectReviews(competitors as unknown as RawCompetitor[], {
+      searchApiKey: c.env.GOOGLE_SEARCH_API_KEY,
+    });
+    const llm = createLlmProvider(c.env);
+    const signals = await classifyReviews(llm, reviews);
+
+    const sourceCounts = new Map<string, number>();
+    for (const r of reviews) sourceCounts.set(r.source, (sourceCounts.get(r.source) ?? 0) + 1);
+    const sources = [...sourceCounts.entries()].map(([source, reviewsCount]) => ({
+      source,
+      reviews: reviewsCount,
+    }));
+
+    const [report, profiles] = await Promise.all([
+      buildOpportunityReport(llm, {
+        idea: body.idea,
+        signals,
+        reviewsAnalyzed: reviews.length,
+        sources,
+        competitorNames: competitors.slice(0, 8).map((x) => x.name),
+      }),
+      buildCompetitorProfiles(llm, { idea: body.idea, competitors, signals }),
+    ]);
+
+    return c.json({ report, profiles });
+  } catch (err) {
+    console.error("opportunity error:", err);
+    return c.json({ error: "Opportunity analysis failed." }, 500);
   }
 });
 

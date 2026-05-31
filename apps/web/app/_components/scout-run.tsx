@@ -2,6 +2,8 @@
 
 import type {
   Competitor as AgentCompetitor,
+  CompetitorProfile,
+  OpportunityReport,
   Run,
   SearchExpansion,
   ValidationResult,
@@ -10,10 +12,12 @@ import { Button, Card, CardContent, CardHeader, CardTitle, cn } from "@hahaton/u
 import { useEffect, useRef, useState } from "react";
 import { apiUrl } from "../_lib/api";
 import { ValidationSection } from "../runs/[id]/_components/validation-section";
+import { CompetitiveLandscape } from "./competitive-landscape";
 import { Game2048 } from "./game-2048";
 import { IdeaGraph } from "./idea-graph";
 import { MarketDataMock } from "./market-data-mock";
 import { randomMockRun } from "./mock-run";
+import { OpportunityRadar } from "./opportunity-radar";
 import { PlatformPie } from "./platform-pie";
 import { ReportBody } from "./report-body";
 import { ScoutLoading } from "./scout-loading";
@@ -55,6 +59,14 @@ type Validation =
   | { kind: "idle" }
   | { kind: "running" }
   | { kind: "done"; result: ValidationResult }
+  | { kind: "error"; message: string };
+
+// Opportunity analysis (review mining → Opportunity Radar + Competitive Landscape),
+// chained after Scout alongside validation.
+type Opportunity =
+  | { kind: "idle" }
+  | { kind: "running" }
+  | { kind: "done"; report: OpportunityReport; profiles: CompetitorProfile[] }
   | { kind: "error"; message: string };
 
 type ViewMode = "real" | "mock";
@@ -320,6 +332,7 @@ function SearchIntentSection({
 export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => void }) {
   const [phase, setPhase] = useState<Phase>({ kind: "expanding" });
   const [validation, setValidation] = useState<Validation>({ kind: "idle" });
+  const [opportunity, setOpportunity] = useState<Opportunity>({ kind: "idle" });
   const [viewMode, setViewMode] = useState<ViewMode>("real");
   const cancelled = useRef(false);
   const mockRunRef = useRef<Run | null>(null);
@@ -373,6 +386,35 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
       }
     }
 
+    // Step 3b — mine competitor reviews → Opportunity Radar + Competitive Landscape.
+    async function runOpportunity(scoutId: string): Promise<void> {
+      setOpportunity({ kind: "running" });
+      try {
+        const res = await fetch(apiUrl("/opportunity"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idea, scoutId }),
+        });
+        if (!res.ok) {
+          const e = (await res.json().catch(() => ({}))) as { error?: string };
+          throw new Error(e.error ?? `opportunity failed (${res.status})`);
+        }
+        const data = (await res.json()) as {
+          report: OpportunityReport;
+          profiles: CompetitorProfile[];
+        };
+        if (cancelled.current) return;
+        setOpportunity({ kind: "done", report: data.report, profiles: data.profiles });
+      } catch (err) {
+        if (!cancelled.current) {
+          setOpportunity({
+            kind: "error",
+            message: err instanceof Error ? err.message : String(err),
+          });
+        }
+      }
+    }
+
     let expansion: SearchExpansion | undefined;
     const startTimer = window.setTimeout(() => {
       (async () => {
@@ -413,8 +455,8 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
 
           setPhase({ kind: "done", expansion, competitors });
 
-          // Step 3 — chain into validation automatically.
-          await runValidation(competitors);
+          // Step 3 — chain into validation + opportunity analysis (parallel).
+          await Promise.all([runValidation(competitors), runOpportunity(scoutId)]);
         } catch (err) {
           if (!cancelled.current) {
             setPhase({
@@ -526,6 +568,25 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
 
       {/* Market & revenue data (mock until paid market-intel APIs are connected). */}
       {phase.kind === "done" && <MarketDataMock competitors={phase.competitors} />}
+
+      {/* Opportunity analysis — mined from competitor reviews. */}
+      {opportunity.kind === "running" && (
+        <ScoutLoading
+          title="Аналізуємо відгуки конкурентів…"
+          hint="Збираємо й класифікуємо відгуки → конкурентний ландшафт + Opportunity Radar."
+        />
+      )}
+      {opportunity.kind === "done" && (
+        <div className="flex flex-col gap-6">
+          <CompetitiveLandscape profiles={opportunity.profiles} />
+          <OpportunityRadar report={opportunity.report} />
+        </div>
+      )}
+      {opportunity.kind === "error" && (
+        <p className="animate-enter text-sm text-muted-foreground" role="alert">
+          Аналіз відгуків не вдався: {opportunity.message}
+        </p>
+      )}
     </div>
   );
 }
