@@ -1,5 +1,6 @@
 import { AppBackground, ThemeProvider } from "@hahaton/ui";
 import type { Metadata } from "next";
+import { SiteNav } from "./_components/site-nav";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AppBackground />
           <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-5xl flex-col px-6 py-10">
+            <SiteNav />
             {children}
           </div>
         </ThemeProvider>
