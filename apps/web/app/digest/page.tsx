@@ -201,14 +201,15 @@ export default function DigestPage() {
             Оновлюється за розкладом; можна згенерувати вручну.
           </p>
         </div>
-        <Button
-          className="animate-enter animate-enter-delay-3"
-          onClick={generate}
-          disabled={state === "running"}
-          variant="outline"
-        >
-          {state === "running" ? "Генеруємо…" : "Згенерувати зараз"}
-        </Button>
+        {state === "empty" && (
+          <Button
+            className="animate-enter animate-enter-delay-3"
+            onClick={generate}
+            variant="outline"
+          >
+            Згенерувати зараз
+          </Button>
+        )}
       </header>
 
       {error && (
@@ -217,7 +218,11 @@ export default function DigestPage() {
         </p>
       )}
 
-      {state === "loading" && <p className="text-sm text-muted-foreground">Завантаження…</p>}
+      {state === "loading" && (
+        <div className="flex justify-center py-8">
+          <span className="h-7 w-7 animate-spin rounded-full border-2 border-muted-foreground/25 border-t-foreground" />
+        </div>
+      )}
 
       {state === "empty" && !error && (
         <p className="text-sm text-muted-foreground">
@@ -247,6 +252,14 @@ export default function DigestPage() {
               <span className="rounded-full border border-border/60 bg-muted/60 px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
                 {digest.countriesScanned.length} ринків
               </span>
+              <button
+                type="button"
+                onClick={generate}
+                title="Згенерувати знову"
+                className="ml-auto rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                ↻ Оновити
+              </button>
             </div>
             {digest.summary && <p className="text-sm text-muted-foreground">{digest.summary}</p>}
             <p className="text-xs text-muted-foreground/70">
