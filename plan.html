@@ -290,9 +290,9 @@
       <thead><tr><th data-i18n="out_th_priority"></th><th data-i18n="out_th_why"></th><th data-i18n="out_th_status"></th></tr></thead>
       <tbody>
         <tr><td data-i18n="out_p1k"></td><td data-i18n="out_p1v"></td><td><span class="tag">M1 → M4</span></td></tr>
-        <tr><td data-i18n="out_p2k"></td><td data-i18n="out_p2v"></td><td><span class="tag">C / API</span></td></tr>
+        <tr><td data-i18n="out_p2k"></td><td data-i18n="out_p2v"></td><td><span class="tag">M5 · M6</span></td></tr>
         <tr><td data-i18n="out_p3k"></td><td data-i18n="out_p3v"></td><td><span class="tag">D1 · D5</span></td></tr>
-        <tr><td data-i18n="out_p4k"></td><td data-i18n="out_p4v"></td><td><span class="tag">P / M5 / M6</span></td></tr>
+        <tr><td data-i18n="out_p4k"></td><td data-i18n="out_p4v"></td><td><span class="tag">P2 → P5</span></td></tr>
       </tbody>
     </table>
     <div class="note" data-i18n="out_note"></div>
@@ -506,7 +506,7 @@
 <!-- ===================== JSON ISLANDS (agents edit these) ===================== -->
 <script type="application/json" id="data-workstreams">
 [
-  { "id":"A", "title_uk":"Scout + grounding + Opportunity Radar", "title_en":"Scout + grounding + Opportunity Radar", "owner":"Codex / Anton", "status":"in-progress" },
+  { "id":"A", "title_uk":"Scout + grounding + Opportunity Radar", "title_en":"Scout + grounding + Opportunity Radar", "owner":"Codex / Anton", "status":"review" },
   { "id":"B", "title_uk":"API, персист, workflows, юніт-економіка", "title_en":"API, persistence, workflows, unit economics", "owner":"Ruslan", "status":"review" },
   { "id":"C", "title_uk":"Real-run UI + інтерактивний звіт", "title_en":"Real-run UI + interactive report", "owner":"Mykhailo", "status":"review" },
   { "id":"D", "title_uk":"Експорт, демо, деплой, post-hackathon packaging", "title_en":"Export, demo, deploy, post-hackathon packaging", "owner":"—", "status":"todo" }
@@ -514,6 +514,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-31", "time":"21:34", "author":"Codex", "workstream":"M", "summary":"Synced the post-hackathon plan with the actual Market Intelligence state: M1–M4 are now done in the real run (/opportunity + Opportunity Radar + Competitive Landscape), while M5/M6 are code-complete in review pending live deploy verification. Updated the outcomes narrative and docs/market-intel-plan.md so the roadmap no longer describes already-shipped work as future work.", "commit":"—" },
   { "date":"2026-05-30", "time":"19:13", "author":"Mykhailo", "workstream":"M", "summary":"Market Intelligence suite shipped end-to-end. M1 review data-layer (iTunes RSS + SerpApi + batch classifier, took over after Codex runtime hung) → M2 Opportunity Radar + M3 Competitive Landscape (live, fed by /opportunity) → M4 integration → M5 Global Niche Radar (cross-country localized winners) → M6 recurring Global Digest (Cloudflare Cron + D1 digests table + /digest page). Fixed zero-reviews regression (filter reviewable iTunes/Play sources before compat-selection) and unified the live-progress UI into one loader under the bar. turbo typecheck 12/12, tests green. M1–M4 done; M5/M6 code-complete, pending live deploy verification.", "commit":"ee736ae" },
   { "date":"2026-05-31", "time":"17:57", "author":"Codex", "workstream":"—", "summary":"Post-hackathon plan refresh: added the Outcomes tab, recorded that the team did not win, clarified the real shipped value (competitor/app radar), documented presentation/rehearsal lessons, and reprioritized the roadmap around Opportunity Radar (reviews → signals → decision map) before exports, Slack digests, and global niche radar.", "commit":"—" },
   { "date":"2026-05-30", "time":"17:50", "author":"Mykhailo", "workstream":"M", "summary":"Compose the Market Intelligence suite into the roadmap (new group M): M1 scout review data-layer (Codex, in progress), M2 Opportunity Radar + M3 Competitive Landscape (built — contracts/agent/UI typecheck-green, pending integration), M4 /opportunity wiring, M5 Global Niche Radar (cross-country top charts), M6 recurring digest (ties to P3/P4). Detailed implementation plans in docs/market-intel-plan.md. Also surfaced the previously-orphaned P group in the Roadmap render.", "commit":"—" },
@@ -678,7 +679,7 @@
       out_card1_n:"Outcome", out_card1_t:"Результат хакатону", out_card1_d:"Команда не перемогла. Ймовірні причини: не вистачило часу, презентація була слабкою, фінальний сценарій не був відрепетируваний як реальне використання продукту засновником.",
       out_card2_n:"Shipped value", out_card2_t:"Що вже реально корисне", out_card2_d:"Scout-конкуренти: ідея → ключові слова/категорії → список схожих застосунків з App Store, Google Play, Product Hunt, AlternativeTo, посиланнями, рейтингами, відгуками та поясненням сумісності.",
       out_card3_n:"Limit", out_card3_t:"Де користь поки закінчується", out_card3_d:"Бізнес-план, market sizing, validation score та revenue estimates частково виглядають переконливо, але поки не дають достатньо grounded decision intelligence для реального рішення «робити / не робити».",
-      out_card4_n:"New direction", out_card4_t:"Наступний продуктовий крок", out_card4_d:"Opportunity Radar: добувати повторювані болі з відгуків конкурентів, що люди хвалять, чому ставлять 1–2 зірки, де є незакрита ніша, який перший ICP і який MVP-test зробити за 7 днів.",
+      out_card4_n:"New direction", out_card4_t:"Наступний продуктовий крок", out_card4_d:"Opportunity Radar уже підключено до реального прогону: відгуки конкурентів → сигнали болю/похвали → decision map + профілі конкурентів. Наступна планка — якість grounding, живий деплой Global Niche Radar/Digest і повторюваний сценарій прийняття рішення.",
       out_lessons_h:"Що винесли",
       out_th_area:"Зона", out_th_takeaway:"Висновок",
       out_l1k:"Презентація", out_l1v:"Потрібен не перелік фіч, а одна жива історія: «я фаундер, ввів ідею, за хвилину побачив поле конкурентів і зрозумів, що перевіряти першим».",
@@ -687,11 +688,11 @@
       out_l4k:"Ринок vs execution", out_l4v:"Формула не вирішить, чи варта ідея життя. Але продукт може системно зменшувати невизначеність: показувати болі, прогалини, ризики та перший тест.",
       out_next_h:"Що найважливіше доробити",
       out_th_priority:"Пріоритет", out_th_why:"Навіщо", out_th_status:"Roadmap",
-      out_p1k:"Opportunity Radar з відгуків", out_p1v:"Це перетворює Scout з пошуку схожих застосунків на decision map: болі, praised features, 1–2 star reasons, opportunity gap, ICP, differentiation, 7-day MVP, kill criterion.",
-      out_p2k:"Інтеграція у реальний прогін", out_p2v:"M2/M3 уже мають контракти/agent/UI, але справжня цінність з'явиться лише коли /opportunity збере відгуки, класифікує сигнали і покаже блоки після Scout.",
+      out_p1k:"Якість Opportunity Radar", out_p1v:"M1–M4 вже в реальному прогоні. Тепер головне — перевірити якість сигналів: чи болі справді повторюються, чи цитати релевантні, чи 7-day MVP і kill criterion допомагають прийняти рішення.",
+      out_p2k:"Live verification для Global Radar", out_p2v:"M5/M6 код-компліт у review: Global Niche Radar і регулярний дайджест треба перевірити на live-деплої, реальних країнах/категоріях і зрозумілому digest UI.",
       out_p3k:"Packaging: експорт + сценарій", out_p3v:"Щоб продукт продавався й демився, потрібен короткий golden scenario, PDF/one-pager і повторюваний pitch-flow без хаосу.",
-      out_p4k:"Пізніше: Slack/Global Radar", out_p4v:"Регулярні дайджести, ранки, ідеї та Global Niche Radar мають сенс після того, як основний Opportunity Radar стане grounded і корисним.",
-      out_note:"Поточна північна зірка: <strong>не «AI пише бізнес-план», а «AI показує, де в реальному ринку є шанс і що перевірити першим»</strong>.",
+      out_p4k:"Пізніше: Slack loop", out_p4v:"Slack-алерти, регулярні інсайти з ринку, ідеї нових продуктів і генерація бізнес-плану мають сенс після live-перевірки ядра та дайджесту.",
+      out_note:"Поточна північна зірка: <strong>не «AI пише бізнес-план», а «AI показує, де в реальному ринку є шанс, що болить у користувачів і що перевірити першим»</strong>.",
       flow_label:"Наскрізний флоу",
       flow_h:"Як агент перетворює ідею на валідований план",
       flow_sub:"Один оркестрований прогін: 9 grounded-кроків → оцінка Multi-LLM панелі → збережений, реплеїбельний звіт.",
@@ -798,7 +799,7 @@
       out_card1_n:"Outcome", out_card1_t:"Hackathon result", out_card1_d:"The team did not win. Likely reasons: too little time, a weak presentation, and no final rehearsal of the product as a founder's real-use workflow.",
       out_card2_n:"Shipped value", out_card2_t:"What is already useful", out_card2_d:"Scout competitors: idea → keywords/categories → similar apps from App Store, Google Play, Product Hunt, and AlternativeTo, with links, ratings, review counts, and compatibility rationales.",
       out_card3_n:"Limit", out_card3_t:"Where the value currently ends", out_card3_d:"The business-plan, market sizing, validation score, and revenue estimates look convincing in places, but do not yet provide enough grounded decision intelligence for a real build/no-build choice.",
-      out_card4_n:"New direction", out_card4_t:"The next product step", out_card4_d:"Opportunity Radar: mine repeated pains from competitor reviews, what users praise, why they give 1–2 stars, where an unmet niche exists, the first ICP, and the 7-day MVP test.",
+      out_card4_n:"New direction", out_card4_t:"The next product step", out_card4_d:"Opportunity Radar is now wired into the real run: competitor reviews → pain/praise signals → decision map + competitor profiles. The next bar is grounding quality, live deployment for Global Niche Radar/Digest, and a repeatable founder decision workflow.",
       out_lessons_h:"What we learned",
       out_th_area:"Area", out_th_takeaway:"Takeaway",
       out_l1k:"Presentation", out_l1v:"We need one live story, not a feature list: “I am a founder, I enter an idea, see the competitor field, and know what to test first.”",
@@ -807,11 +808,11 @@
       out_l4k:"Market vs execution", out_l4v:"No formula decides whether an idea deserves to exist. But the product can systematically reduce uncertainty by exposing pains, gaps, risks, and the first test.",
       out_next_h:"What matters most next",
       out_th_priority:"Priority", out_th_why:"Why", out_th_status:"Roadmap",
-      out_p1k:"Opportunity Radar from reviews", out_p1v:"This turns Scout from similar-app search into a decision map: pains, praised features, 1–2 star reasons, opportunity gap, ICP, differentiation, 7-day MVP, kill criterion.",
-      out_p2k:"Wire it into the real run", out_p2v:"M2/M3 already have contracts/agent/UI, but the value becomes real only when /opportunity fetches reviews, classifies signals, and renders those blocks after Scout.",
+      out_p1k:"Opportunity Radar quality", out_p1v:"M1–M4 are now in the real run. The priority is quality: repeated pains, relevant quotes, useful 7-day MVP, and a kill criterion that actually helps a founder decide.",
+      out_p2k:"Live verification for Global Radar", out_p2v:"M5/M6 are code-complete in review: Global Niche Radar and recurring digest need live deploy verification across real countries/categories and a clear digest UI.",
       out_p3k:"Packaging: export + script", out_p3v:"For the product to sell and demo well, it needs a short golden scenario, PDF/one-pager, and a repeatable pitch flow without chaos.",
-      out_p4k:"Later: Slack/Global Radar", out_p4v:"Recurring digests, rankings, ideas, and Global Niche Radar make sense after the core Opportunity Radar is grounded and useful.",
-      out_note:"Current north star: <strong>not “AI writes a business plan,” but “AI shows where the real market gives you a chance and what to test first.”</strong>",
+      out_p4k:"Later: Slack loop", out_p4v:"Slack alerts, recurring market insights, new product ideas, and business-plan generation make sense after the core and digest are verified live.",
+      out_note:"Current north star: <strong>not “AI writes a business plan,” but “AI shows where the real market gives you a chance, what users complain about, and what to test first.”</strong>",
       flow_label:"End-to-end flow",
       flow_h:"How the agent turns an idea into a validated plan",
       flow_sub:"One orchestrated run: 9 grounded steps → a Multi-LLM validation score → a persisted, replayable report.",

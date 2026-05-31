@@ -26,20 +26,20 @@ Global Niche Radar (separate data pipeline)
    → recurring digest (Cloudflare Cron + D1)       (M6 · api, ties to P3/P4)
 ```
 
-## Status (2026-05-30)
+## Status (2026-05-31)
 
 | ID | Feature | Layer state | Status |
 |----|---------|-------------|--------|
-| M1 | Scout review data-layer (fetch + classify) | Codex building (`packages/scout`) | in-progress |
-| M2 | Opportunity Radar | contract + agent + UI done, typecheck-green | review (pending wiring) |
-| M3 | Competitive Landscape | contract + agent + UI done, typecheck-green | review (pending wiring) |
-| M4 | `/opportunity` integration + mount | not started (waits on M1) | todo |
-| M5 | Global Niche Radar (cross-country) | not started | todo |
-| M6 | Recurring global digest | not started (ties to P3/P4) | todo |
+| M1 | Scout review data-layer (fetch + classify) | `packages/scout`: iTunes RSS + SerpApi review fetch, batch classifier, tests | done |
+| M2 | Opportunity Radar | contract + agent + UI, fed by `/opportunity` | done |
+| M3 | Competitive Landscape | contract + agent + UI, fed by `/opportunity` | done |
+| M4 | `/opportunity` integration + mount | API endpoint + `ScoutRun` mount in the real run | done |
+| M5 | Global Niche Radar (cross-country) | country charts data-layer + localized-winner UI | review (pending live deploy verification) |
+| M6 | Recurring global digest | Cloudflare Cron + D1 digest storage + `/digest` UI | review (pending live deploy verification) |
 
 ---
 
-## M1 — Scout review data-layer  *(packages/scout · Codex)*
+## M1 — Scout review data-layer  *(packages/scout · done)*
 
 **Goal:** fetch real user reviews for discovered competitors and classify each into signals.
 
@@ -48,7 +48,7 @@ Global Niche Radar (separate data pipeline)
 - Google Play — **SerpApi `google_play_product`** (key = `GOOGLE_SEARCH_API_KEY`); fewer reviews/call, field names vary → defensive mapping.
 - Product Hunt / AlternativeTo — weak review coverage; skip for now.
 
-**Deliverables:** `sources/itunes-reviews.ts`, `sources/googleplay-reviews.ts`, `reviews.ts` (`collectReviews` — top-N by reviewCount, derive appId from `competitor.id`, `Promise.allSettled`, cap), `classify.ts` (`classifyReviews` — batch ~20/LLM call, structured JSON, multilingual-aware, resilient). Tests for each.
+**Shipped deliverables:** `sources/itunes-reviews.ts`, `sources/googleplay-reviews.ts`, `reviews.ts` (`collectReviews` — top-N by reviewCount, derive appId from `competitor.id`, `Promise.allSettled`, cap), `classify.ts` (`classifyReviews` — batch ~20/LLM call, structured JSON, multilingual-aware, resilient). Tests cover the data-layer and classifier flow.
 
 **Cost/latency controls:** top-5 competitors, ≤40 reviews each, ≤150 total; batch classification; cache by competitor id (D1, later).
 
@@ -56,7 +56,7 @@ Global Niche Radar (separate data pipeline)
 
 ---
 
-## M2 — Opportunity Radar  *(agent + web · done, pending wiring)*
+## M2 — Opportunity Radar  *(agent + web · done)*
 
 **Goal:** decision map from the mined signals — what to test first.
 
@@ -66,11 +66,11 @@ Global Niche Radar (separate data pipeline)
 
 **Files:** `packages/agent/src/steps/opportunity.ts`; `apps/web/app/_components/opportunity-radar.tsx`.
 
-**Verification:** run on a real idea; confirm clusters reflect quotes; report stays tentative when sample is small.
+**Next verification:** run several real ideas; confirm clusters reflect quotes; report stays tentative when sample is small; tune prompts where the 7-day MVP or kill criterion is too generic.
 
 ---
 
-## M3 — Competitive Landscape  *(agent + web · done, pending wiring)*
+## M3 — Competitive Landscape  *(agent + web · done)*
 
 **Goal:** at-a-glance per-competitor picture — strengths/weaknesses, hook, inspire/avoid.
 
@@ -84,7 +84,7 @@ Global Niche Radar (separate data pipeline)
 
 ---
 
-## M4 — Integration  *(api + web · todo, waits on M1)*
+## M4 — Integration  *(api + web · done)*
 
 **Goal:** wire the data-layer to the synthesis + UI.
 
@@ -92,19 +92,19 @@ Global Niche Radar (separate data pipeline)
 `collectReviews` → `classifyReviews` → `Promise.all([buildOpportunityReport, buildCompetitorProfiles])`
 → return `{ report: OpportunityReport, profiles: CompetitorProfile[] }`.
 
-**Web:** mount `<OpportunityRadar>` + `<CompetitiveLandscape>` in `ScoutRun` after the competitor list (toggle or auto after scout completes). Reuse the install-estimate helper.
+**Web:** `<OpportunityRadar>` + `<CompetitiveLandscape>` are mounted in `ScoutRun` after the competitor list and reuse the existing live-run visual language.
 
-**Verification:** real run → both blocks render with grounded content; typecheck + biome + scout tests green; push one coherent commit.
+**Verification:** real run → both blocks render with grounded content; typecheck + scout tests were green in the implementation commit. Remaining work is product-quality verification, not initial wiring.
 
 ---
 
-## M5 — Global Niche Radar  *(scout + agent + web · todo, separate pipeline)*
+## M5 — Global Niche Radar  *(scout + agent + web · review, separate pipeline)*
 
 **Goal:** surface apps that took off in **one country/region** the founder isn't watching (geo-arbitrage).
 
 **Data sources (honest):**
-- **iTunes country top-charts RSS** (free): `…/{country}/rss/topnewfreeapplications/limit={n}/genre={id}/json` (also topfree/topgrossing). Fan out across ~20–40 countries for the idea's category.
-- `topnewfree` = recently launched + popular → proxy for "rising".
+- **iTunes country top-charts RSS** (free): uses a valid country RSS feed such as `newfreeapplications`; fan out across countries for the idea's category.
+- `newfreeapplications` = recently visible free apps → proxy for "rising" on free data.
 
 **Detection:** cross-reference an app's presence/rank across country charts → high in country A but **absent in the home market** = a localized winner. Computed on free data.
 
@@ -112,20 +112,24 @@ Global Niche Radar (separate data pipeline)
 
 **Output (proposed `GlobalRadarEntry[]`):** app name, country/continent, chart + rank, url, "absent in {home}", one-line why-it-works; optional LLM "what to port".
 
-**Files (proposed):** `packages/scout/src/sources/itunes-charts.ts` + `charts.ts`; `packages/agent/src/steps/global-radar.ts`; `apps/web/app/_components/global-niche-radar.tsx`; `POST /global-radar`.
+**Shipped files:** `packages/scout/src/sources/itunes-charts.ts` + `charts.ts`; `packages/agent/src/steps/global-radar.ts`; `apps/web/app/_components/global-niche-radar.tsx`; `POST /global-radar`.
+
+**Next verification:** live deploy check with real country/category combinations; confirm charts are not empty, labels are understandable, and "localized winner" reasoning is useful rather than decorative.
 
 ---
 
-## M6 — Recurring global digest  *(api · todo, ties to P3/P4)*
+## M6 — Recurring global digest  *(api · review, ties to P3/P4)*
 
 **Goal:** regular world digest of newly-risen players by continent/country.
 
-**Mechanism:** **Cloudflare Cron Trigger** → run M5 on a schedule → store in D1 → surface digest (UI first; email/Slack later, per P2/P4). Overlaps the existing **P3/P4** post-MVP plan — build as one track.
+**Mechanism:** **Cloudflare Cron Trigger** → run M5 on a schedule → store in D1 → surface digest in `/digest` (UI first; email/Slack later, per P2/P4). Overlaps the existing **P3/P4** post-MVP plan — build as one track.
+
+**Next verification:** confirm cron bindings, D1 migrations, production data freshness, and the digest page on the deployed environment.
 
 ---
 
 ## Sequencing
 
-1. **Finish M1 → M4 first** (close the loop: Codex lands data-layer → wire `/opportunity` → both blocks live in a real run → push). Don't start M5 until M2/M3 are shipped and visible.
-2. **Then M5** as a focused sprint (new country-charts data-layer).
-3. **Then M6** (Cron digest), merged with the P3/P4 post-MVP plan.
+1. **Now:** verify M1–M4 quality in real founder-like runs: review relevance, quote quality, useful opportunity gaps, non-generic 7-day MVP, and a clear kill criterion.
+2. **Then:** live-deploy verification for M5/M6: country chart coverage, D1 persistence, cron freshness, `/digest` UX.
+3. **Next product layer:** package the output (export/one-pager/golden scenario) and then add Slack alerts + recurring insight loops from the verified digest pipeline.
