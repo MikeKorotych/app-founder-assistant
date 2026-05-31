@@ -236,6 +236,7 @@
 
   <nav class="tabs" id="tabs" role="tablist">
     <button class="tab" data-tab="status" data-i18n="toc_status"></button>
+    <button class="tab" data-tab="outcomes" data-i18n="toc_outcomes"></button>
     <button class="tab" data-tab="roadmap" data-i18n="toc_roadmap"></button>
     <button class="tab" data-tab="concept" data-i18n="toc_concept"></button>
     <button class="tab" data-tab="flow" data-i18n="toc_flow"></button>
@@ -258,6 +259,43 @@
   <section id="progress" data-panel="status">
     <p class="label" data-i18n="progress_label"></p>
     <div class="log" id="log"></div>
+  </section>
+
+  <!-- ===================== HACKATHON OUTCOMES ===================== -->
+  <section id="outcomes" data-panel="outcomes">
+    <p class="label" data-i18n="out_label"></p>
+    <h2 data-i18n="out_h"></h2>
+    <p class="sub" data-i18n="out_sub"></p>
+
+    <div class="grid c2">
+      <div class="card"><span class="n" data-i18n="out_card1_n"></span><h3 data-i18n="out_card1_t"></h3><p class="sub" data-i18n="out_card1_d"></p></div>
+      <div class="card"><span class="n" data-i18n="out_card2_n"></span><h3 data-i18n="out_card2_t"></h3><p class="sub" data-i18n="out_card2_d"></p></div>
+      <div class="card"><span class="n" data-i18n="out_card3_n"></span><h3 data-i18n="out_card3_t"></h3><p class="sub" data-i18n="out_card3_d"></p></div>
+      <div class="card"><span class="n" data-i18n="out_card4_n"></span><h3 data-i18n="out_card4_t"></h3><p class="sub" data-i18n="out_card4_d"></p></div>
+    </div>
+
+    <h3 data-i18n="out_lessons_h"></h3>
+    <table>
+      <thead><tr><th data-i18n="out_th_area"></th><th data-i18n="out_th_takeaway"></th></tr></thead>
+      <tbody>
+        <tr><td data-i18n="out_l1k"></td><td data-i18n="out_l1v"></td></tr>
+        <tr><td data-i18n="out_l2k"></td><td data-i18n="out_l2v"></td></tr>
+        <tr><td data-i18n="out_l3k"></td><td data-i18n="out_l3v"></td></tr>
+        <tr><td data-i18n="out_l4k"></td><td data-i18n="out_l4v"></td></tr>
+      </tbody>
+    </table>
+
+    <h3 data-i18n="out_next_h"></h3>
+    <table>
+      <thead><tr><th data-i18n="out_th_priority"></th><th data-i18n="out_th_why"></th><th data-i18n="out_th_status"></th></tr></thead>
+      <tbody>
+        <tr><td data-i18n="out_p1k"></td><td data-i18n="out_p1v"></td><td><span class="tag">M1 → M4</span></td></tr>
+        <tr><td data-i18n="out_p2k"></td><td data-i18n="out_p2v"></td><td><span class="tag">C / API</span></td></tr>
+        <tr><td data-i18n="out_p3k"></td><td data-i18n="out_p3v"></td><td><span class="tag">D1 · D5</span></td></tr>
+        <tr><td data-i18n="out_p4k"></td><td data-i18n="out_p4v"></td><td><span class="tag">P / M5 / M6</span></td></tr>
+      </tbody>
+    </table>
+    <div class="note" data-i18n="out_note"></div>
   </section>
 
   <!-- ===================== ROADMAP ===================== -->
@@ -468,14 +506,15 @@
 <!-- ===================== JSON ISLANDS (agents edit these) ===================== -->
 <script type="application/json" id="data-workstreams">
 [
-  { "id":"A", "title_uk":"Пайплайн агента + grounding", "title_en":"Agent pipeline + grounding", "owner":"—", "status":"in-progress" },
-  { "id":"B", "title_uk":"Стрімінг, персист, юніт-економіка", "title_en":"Streaming, persistence, unit economics", "owner":"—", "status":"in-progress" },
-  { "id":"C", "title_uk":"Report UI + інтерактив", "title_en":"Report UI + interactivity", "owner":"Mykhailo", "status":"in-progress" },
-  { "id":"D", "title_uk":"Експорт, демо, деплой", "title_en":"Export, demo, deploy", "owner":"Ruslan", "status":"in-progress" }
+  { "id":"A", "title_uk":"Scout + grounding + Opportunity Radar", "title_en":"Scout + grounding + Opportunity Radar", "owner":"Codex / Anton", "status":"in-progress" },
+  { "id":"B", "title_uk":"API, персист, workflows, юніт-економіка", "title_en":"API, persistence, workflows, unit economics", "owner":"Ruslan", "status":"review" },
+  { "id":"C", "title_uk":"Real-run UI + інтерактивний звіт", "title_en":"Real-run UI + interactive report", "owner":"Mykhailo", "status":"review" },
+  { "id":"D", "title_uk":"Експорт, демо, деплой, post-hackathon packaging", "title_en":"Export, demo, deploy, post-hackathon packaging", "owner":"—", "status":"todo" }
 ]
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-31", "time":"17:57", "author":"Codex", "workstream":"—", "summary":"Post-hackathon plan refresh: added the Outcomes tab, recorded that the team did not win, clarified the real shipped value (competitor/app radar), documented presentation/rehearsal lessons, and reprioritized the roadmap around Opportunity Radar (reviews → signals → decision map) before exports, Slack digests, and global niche radar.", "commit":"—" },
   { "date":"2026-05-30", "time":"17:50", "author":"Mykhailo", "workstream":"M", "summary":"Compose the Market Intelligence suite into the roadmap (new group M): M1 scout review data-layer (Codex, in progress), M2 Opportunity Radar + M3 Competitive Landscape (built — contracts/agent/UI typecheck-green, pending integration), M4 /opportunity wiring, M5 Global Niche Radar (cross-country top charts), M6 recurring digest (ties to P3/P4). Detailed implementation plans in docs/market-intel-plan.md. Also surfaced the previously-orphaned P group in the Roadmap render.", "commit":"—" },
   { "date":"2026-05-30", "time":"17:36", "author":"Mykhailo", "workstream":"C", "summary":"Show the interactive Unit Economics block inside the real run's \u0027Показати дані ринку\u0027 toggle, ABOVE the market/competitor-revenue data. Real scout runs carry no unit-economics, so MarketDataMock reuses a memoized randomMockRun()\u0027s assumptions and renders the existing UnitEconomicsSection (interactive sliders → deterministic LTV/CAC/payback/burn) first, then the competitor revenue table. web typecheck green, biome clean." , "commit":"—" },
   { "date":"2026-05-30", "time":"17:19", "author":"Ruslan", "workstream":"A", "summary":"🐛 Fix /validate 500 (and pipeline Step 9). scoreIdea capped each persona at maxTokens:600, but the four Ukrainian rationales routinely run 465–531 tokens and spike past 600 — the response truncated mid-`rationale`, the greedy /\\{[\\s\\S]*\\}/ extractor backtracked to the `scores` brace, and JSON.parse threw 'Expected ',' or '}'… position 115' surfacing as a 500. Reproduced deterministically against the live gateway (finish_reason:length → that exact error). Raised maxTokens 600→1500 and wrapped JSON.parse to surface the raw body on truncation instead of a cryptic SyntaxError. Verified locally: POST /validate 200 on 5/5 (full ValidationResult: 3 personas + consensus + totalScore); agent typecheck green, biome clean.", "commit":"—" },
@@ -580,11 +619,11 @@
   { "id":"A11", "group":"A", "title_uk":"Multi-LLM панель + скоринг 4×25 + gaps", "title_en":"Multi-LLM panel + 4×25 scoring + gaps", "owner":"—", "status":"todo" },
   { "id":"A12", "group":"A", "title_uk":"Роутинг моделей + prompt caching", "title_en":"Model routing + prompt caching", "owner":"—", "status":"todo" },
 
-  { "id":"A13", "group":"A", "title_uk":"Scout: каркас пакета + типи + таблиця competitors (D1)", "title_en":"Scout: package scaffold + types + competitors D1 table", "owner":"Anton", "status":"review" },
-  { "id":"A14", "group":"A", "title_uk":"Scout: планувальник джерел + шаблони HTTP-запитів", "title_en":"Scout: source planner + HTTP request templates", "owner":"Codex", "status":"in-progress" },
-  { "id":"A15", "group":"A", "title_uk":"Scout: паралельний fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "title_en":"Scout: parallel fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "owner":"Anton", "status":"review" },
-  { "id":"A16", "group":"A", "title_uk":"Scout: LLM-ранжування сумісності (0–100 + rationale)", "title_en":"Scout: LLM compatibility ranking (0–100 + rationale)", "owner":"Anton", "status":"review" },
-  { "id":"A17", "group":"A", "title_uk":"Scout: /scout ендпоінт + Cloudflare Workflow + персист у D1", "title_en":"Scout: /scout endpoint + Cloudflare Workflow + D1 persistence", "owner":"Anton", "status":"review" },
+  { "id":"A13", "group":"A", "title_uk":"Scout: каркас пакета + типи + таблиця competitors (D1)", "title_en":"Scout: package scaffold + types + competitors D1 table", "owner":"Anton", "status":"done" },
+  { "id":"A14", "group":"A", "title_uk":"Scout: планувальник джерел + шаблони HTTP-запитів", "title_en":"Scout: source planner + HTTP request templates", "owner":"Codex", "status":"done" },
+  { "id":"A15", "group":"A", "title_uk":"Scout: паралельний fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "title_en":"Scout: parallel fetch — iTunes/Google Play(SERP)/Product Hunt/AlternativeTo", "owner":"Anton", "status":"done" },
+  { "id":"A16", "group":"A", "title_uk":"Scout: LLM-ранжування сумісності (0–100 + rationale)", "title_en":"Scout: LLM compatibility ranking (0–100 + rationale)", "owner":"Anton", "status":"done" },
+  { "id":"A17", "group":"A", "title_uk":"Scout: /scout ендпоінт + Cloudflare Workflow + персист у D1", "title_en":"Scout: /scout endpoint + Cloudflare Workflow + D1 persistence", "owner":"Anton", "status":"done" },
 
   { "id":"B1", "group":"B", "title_uk":"SSE /agent/stream (apps/api)", "title_en":"SSE /agent/stream (apps/api)", "owner":"—", "status":"todo" },
   { "id":"B2", "group":"B", "title_uk":"Схема подій + heartbeats", "title_en":"Event schema + heartbeats", "owner":"—", "status":"todo" },
@@ -599,8 +638,7 @@
   { "id":"C5", "group":"C", "title_uk":"Інтерактивна юніт-економіка (слайдери → перерахунок)", "title_en":"Interactive unit economics (sliders → recompute)", "owner":"Mykhailo", "status":"done" },
   { "id":"C6", "group":"C", "title_uk":"Scorecard валідації (4×25 + gaps + панель)", "title_en":"Validation scorecard (4×25 + gaps + panel)", "owner":"Ruslan", "status":"review" },
   { "id":"C7", "group":"C", "title_uk":"Цитати (inline + sources appendix)", "title_en":"Citations (inline + sources appendix)", "owner":"—", "status":"todo" },
-  { "id":"C8", "group":"C", "title_uk":"Полірування — монохром/Linear", "title_en":"Polish — monochrome/Linear style", "owner":"—", "status":"todo" },
-  { "id":"C9", "group":"C", "title_uk":"Summary-крок: вердикт актуальності бізнесу (CloudSense 4.5), плейсхолдер з лоадером вгорі сторінки, паралельно з Validate", "title_en":"Summary step: business market-relevance verdict (CloudSense 4.5 / Sonnet 4.5), top-of-page placeholder with progress loader, runs parallel to Validate", "owner":"Ruslan", "status":"in-progress" },
+  { "id":"C8", "group":"C", "title_uk":"Полірування — монохром/Linear", "title_en":"Polish — monochrome/Linear style", "owner":"Mykhailo / Anton", "status":"done" },
   { "id":"C9", "group":"C", "title_uk":"Summary-крок: маркет-релевантність бізнесу (CloudSense 4.5), плейсхолдер з лоадером вгорі сторінки, паралельно з Validate", "title_en":"Summary step: business market-relevance verdict (CloudSense 4.5 / Sonnet), top-of-page placeholder with progress loader, runs parallel to Validate", "owner":"Ruslan", "status":"in-progress" },
 
   { "id":"D1", "group":"D", "title_uk":"Експорт PDF (HTML → PDF + sources appendix)", "title_en":"PDF export (HTML → PDF + sources appendix)", "owner":"—", "status":"todo" },
@@ -626,13 +664,33 @@
 <script>
   const I18N = {
     uk: {
-      eyebrow:"Хакатон 2026 · AI-співробітник",
-      lede:"Агент, який із однієї фрази-ідеї збирає обґрунтований, цитований звіт валідації: оцінка за 4 категоріями (×25 → /100), жива юніт-економіка та список gaps для CustDev — робота консультанта за $5k і 2 тижні, за ~90 секунд.",
-      pill_team:"Команда <b>4 особи</b>", pill_time:"Термін <b>1 день</b>",
-      pill_priority:"Пріоритет <b>бізнес-цінність + чисте демо</b>", pill_stack:"Стек <b>Express · Claude API · Cloudflare</b>",
+      eyebrow:"Після хакатону · AI-співробітник",
+      lede:"Хакатон завершено: ми не перемогли, але зібрали корисне ядро — Scout, який за ідеєю знаходить реальних конкурентів у магазинах і на платформах. Наступний фокус: перетворити competitor radar на Opportunity Radar — відгуки → болі → незакриті ніші → 7-денний MVP-test.",
+      pill_team:"Команда <b>4 особи</b>", pill_time:"Хакатон <b>завершено</b>",
+      pill_priority:"Пріоритет <b>корисність після демо</b>", pill_stack:"Стек <b>Next · Hono · D1 · Cloudflare</b>",
       toc_status:"Статус", toc_progress:"Прогрес", toc_concept:"Концепція", toc_validation:"Валідація",
       toc_pipeline:"Пайплайн", toc_demo:"Демо", toc_risks:"Ризики", toc_stack:"Стек", toc_sources:"Джерела",
-      toc_roadmap:"Roadmap", toc_integrations:"Інтеграції", toc_flow:"Flow",
+      toc_roadmap:"Roadmap", toc_integrations:"Інтеграції", toc_flow:"Flow", toc_outcomes:"Підсумки",
+      out_label:"Підсумки хакатону",
+      out_h:"Не перемогли, але знайшли справжнє ядро продукту",
+      out_sub:"Після спокійного використання продукту стало видно: найбільш реальна цінність зараз — швидко побачити ландшафт схожих мобільних застосунків, посилання на сторінки, рейтинги, відгуки та сигнали попиту. Гарний UI допомагає, але сам по собі не є продуктом.",
+      out_card1_n:"Outcome", out_card1_t:"Результат хакатону", out_card1_d:"Команда не перемогла. Ймовірні причини: не вистачило часу, презентація була слабкою, фінальний сценарій не був відрепетируваний як реальне використання продукту засновником.",
+      out_card2_n:"Shipped value", out_card2_t:"Що вже реально корисне", out_card2_d:"Scout-конкуренти: ідея → ключові слова/категорії → список схожих застосунків з App Store, Google Play, Product Hunt, AlternativeTo, посиланнями, рейтингами, відгуками та поясненням сумісності.",
+      out_card3_n:"Limit", out_card3_t:"Де користь поки закінчується", out_card3_d:"Бізнес-план, market sizing, validation score та revenue estimates частково виглядають переконливо, але поки не дають достатньо grounded decision intelligence для реального рішення «робити / не робити».",
+      out_card4_n:"New direction", out_card4_t:"Наступний продуктовий крок", out_card4_d:"Opportunity Radar: добувати повторювані болі з відгуків конкурентів, що люди хвалять, чому ставлять 1–2 зірки, де є незакрита ніша, який перший ICP і який MVP-test зробити за 7 днів.",
+      out_lessons_h:"Що винесли",
+      out_th_area:"Зона", out_th_takeaway:"Висновок",
+      out_l1k:"Презентація", out_l1v:"Потрібен не перелік фіч, а одна жива історія: «я фаундер, ввів ідею, за хвилину побачив поле конкурентів і зрозумів, що перевіряти першим».",
+      out_l2k:"Демо", out_l2v:"Перед фіналом треба обов'язково пройти продукт як реальний користувач: знайти ідею, натиснути, відкрити конкурентів, прочитати відгуки, сформулювати рішення.",
+      out_l3k:"Цінність", out_l3v:"Красивий UI і ефекти мають підсилювати користь, але не замінювати її. Найцінніший артефакт зараз — grounded карта конкурентів.",
+      out_l4k:"Ринок vs execution", out_l4v:"Формула не вирішить, чи варта ідея життя. Але продукт може системно зменшувати невизначеність: показувати болі, прогалини, ризики та перший тест.",
+      out_next_h:"Що найважливіше доробити",
+      out_th_priority:"Пріоритет", out_th_why:"Навіщо", out_th_status:"Roadmap",
+      out_p1k:"Opportunity Radar з відгуків", out_p1v:"Це перетворює Scout з пошуку схожих застосунків на decision map: болі, praised features, 1–2 star reasons, opportunity gap, ICP, differentiation, 7-day MVP, kill criterion.",
+      out_p2k:"Інтеграція у реальний прогін", out_p2v:"M2/M3 уже мають контракти/agent/UI, але справжня цінність з'явиться лише коли /opportunity збере відгуки, класифікує сигнали і покаже блоки після Scout.",
+      out_p3k:"Packaging: експорт + сценарій", out_p3v:"Щоб продукт продавався й демився, потрібен короткий golden scenario, PDF/one-pager і повторюваний pitch-flow без хаосу.",
+      out_p4k:"Пізніше: Slack/Global Radar", out_p4v:"Регулярні дайджести, ранки, ідеї та Global Niche Radar мають сенс після того, як основний Opportunity Radar стане grounded і корисним.",
+      out_note:"Поточна північна зірка: <strong>не «AI пише бізнес-план», а «AI показує, де в реальному ринку є шанс і що перевірити першим»</strong>.",
       flow_label:"Наскрізний флоу",
       flow_h:"Як агент перетворює ідею на валідований план",
       flow_sub:"Один оркестрований прогін: 9 grounded-кроків → оцінка Multi-LLM панелі → збережений, реплеїбельний звіт.",
@@ -726,13 +784,33 @@
       ws_prefix:"Воркстрім", unassigned:"не призначений"
     },
     en: {
-      eyebrow:"Hackathon 2026 · AI Employee",
-      lede:"An agent that turns a one-line idea into a grounded, cited validation report: a score across 4 categories (×25 → /100), live unit economics, and a CustDev gap list — a consultant's $5k, two-week deliverable in ~90 seconds.",
-      pill_team:"Team <b>4 people</b>", pill_time:"Timeline <b>1 day</b>",
-      pill_priority:"Priority <b>business value + clean demo</b>", pill_stack:"Stack <b>Express · Claude API · Cloudflare</b>",
+      eyebrow:"Post-hackathon · AI Employee",
+      lede:"The hackathon is over: we did not win, but we shipped a useful core — Scout, which turns an idea into a real competitor radar across stores and platforms. Next focus: turn competitor radar into Opportunity Radar — reviews → pains → unmet gaps → a 7-day MVP test.",
+      pill_team:"Team <b>4 people</b>", pill_time:"Hackathon <b>finished</b>",
+      pill_priority:"Priority <b>post-demo usefulness</b>", pill_stack:"Stack <b>Next · Hono · D1 · Cloudflare</b>",
       toc_status:"Status", toc_progress:"Progress", toc_concept:"Concept", toc_validation:"Validation",
       toc_pipeline:"Pipeline", toc_demo:"Demo", toc_risks:"Risks", toc_stack:"Stack", toc_sources:"Sources",
-      toc_roadmap:"Roadmap", toc_integrations:"Integrations", toc_flow:"Flow",
+      toc_roadmap:"Roadmap", toc_integrations:"Integrations", toc_flow:"Flow", toc_outcomes:"Outcomes",
+      out_label:"Hackathon outcomes",
+      out_h:"We did not win, but we found the real product core",
+      out_sub:"After using the product calmly, the strongest value is clear: quickly see the landscape of similar mobile apps, store/platform links, ratings, reviews, and demand signals. Polished UI helps, but it is not the product by itself.",
+      out_card1_n:"Outcome", out_card1_t:"Hackathon result", out_card1_d:"The team did not win. Likely reasons: too little time, a weak presentation, and no final rehearsal of the product as a founder's real-use workflow.",
+      out_card2_n:"Shipped value", out_card2_t:"What is already useful", out_card2_d:"Scout competitors: idea → keywords/categories → similar apps from App Store, Google Play, Product Hunt, and AlternativeTo, with links, ratings, review counts, and compatibility rationales.",
+      out_card3_n:"Limit", out_card3_t:"Where the value currently ends", out_card3_d:"The business-plan, market sizing, validation score, and revenue estimates look convincing in places, but do not yet provide enough grounded decision intelligence for a real build/no-build choice.",
+      out_card4_n:"New direction", out_card4_t:"The next product step", out_card4_d:"Opportunity Radar: mine repeated pains from competitor reviews, what users praise, why they give 1–2 stars, where an unmet niche exists, the first ICP, and the 7-day MVP test.",
+      out_lessons_h:"What we learned",
+      out_th_area:"Area", out_th_takeaway:"Takeaway",
+      out_l1k:"Presentation", out_l1v:"We need one live story, not a feature list: “I am a founder, I enter an idea, see the competitor field, and know what to test first.”",
+      out_l2k:"Demo", out_l2v:"Before the final pitch, the team must run the product like a real user: choose an idea, run it, open competitors, read reviews, and make a decision.",
+      out_l3k:"Value", out_l3v:"Beautiful UI and effects should amplify usefulness, not replace it. The most valuable artifact today is the grounded competitor map.",
+      out_l4k:"Market vs execution", out_l4v:"No formula decides whether an idea deserves to exist. But the product can systematically reduce uncertainty by exposing pains, gaps, risks, and the first test.",
+      out_next_h:"What matters most next",
+      out_th_priority:"Priority", out_th_why:"Why", out_th_status:"Roadmap",
+      out_p1k:"Opportunity Radar from reviews", out_p1v:"This turns Scout from similar-app search into a decision map: pains, praised features, 1–2 star reasons, opportunity gap, ICP, differentiation, 7-day MVP, kill criterion.",
+      out_p2k:"Wire it into the real run", out_p2v:"M2/M3 already have contracts/agent/UI, but the value becomes real only when /opportunity fetches reviews, classifies signals, and renders those blocks after Scout.",
+      out_p3k:"Packaging: export + script", out_p3v:"For the product to sell and demo well, it needs a short golden scenario, PDF/one-pager, and a repeatable pitch flow without chaos.",
+      out_p4k:"Later: Slack/Global Radar", out_p4v:"Recurring digests, rankings, ideas, and Global Niche Radar make sense after the core Opportunity Radar is grounded and useful.",
+      out_note:"Current north star: <strong>not “AI writes a business plan,” but “AI shows where the real market gives you a chance and what to test first.”</strong>",
       flow_label:"End-to-end flow",
       flow_h:"How the agent turns an idea into a validated plan",
       flow_sub:"One orchestrated run: 9 grounded steps → a Multi-LLM validation score → a persisted, replayable report.",
