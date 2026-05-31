@@ -8,7 +8,13 @@
  * passes the fetched charts plus id + createdAt.
  */
 
-import type { AppStoreDetails, ChartApp, DigestApp, GlobalDigest } from "@hahaton/contracts";
+import type {
+  AppStoreDetails,
+  ChartApp,
+  DigestApp,
+  GlobalDigest,
+  RankHistory,
+} from "@hahaton/contracts";
 import { type LlmProvider, MODELS } from "@hahaton/llm";
 import { withOutputLanguage } from "../llm-language";
 
@@ -21,6 +27,8 @@ export interface GlobalDigestInput {
   limit?: number;
   /** Injected real-metadata fetcher (scout.fetchItunesAppDetails) — keeps agent decoupled. */
   fetchDetails?: (appIds: string[]) => Promise<Map<string, AppStoreDetails>>;
+  /** Injected rank-history fetcher (store.getRankHistory) — real momentum from our own snapshots. */
+  fetchHistory?: (appIds: string[]) => Promise<Map<string, RankHistory>>;
 }
 
 const MS_PER_MONTH = 1000 * 60 * 60 * 24 * 30.44;
@@ -123,6 +131,25 @@ export async function buildGlobalDigest(
       globalRisers = globalRisers.map((a) => enrichApp(a, details.get(a.appId), input.createdAt));
     } catch {
       // keep un-enriched risers on failure
+    }
+  }
+  // Overlay REAL rank momentum from our own accumulated chart snapshots.
+  if (input.fetchHistory && globalRisers.length > 0) {
+    try {
+      const hist = await input.fetchHistory(globalRisers.map((a) => a.appId));
+      globalRisers = globalRisers.map((a) => {
+        const h = hist.get(a.appId);
+        if (!h) return a;
+        return {
+          ...a,
+          rankTrend: h.trend,
+          rankDelta: h.rankDelta,
+          daysTracked: h.daysTracked,
+          peakRank: h.peakRank,
+        };
+      });
+    } catch {
+      // keep risers without momentum on failure
     }
   }
   const base: GlobalDigest = {

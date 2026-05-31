@@ -29,9 +29,11 @@ import {
 } from "@hahaton/scout";
 import { expandSearchIntent } from "@hahaton/search-intent";
 import {
+  getRankHistory,
   loadLatestDigest,
   loadRun,
   loadSearchExpansion,
+  saveChartSnapshots,
   saveDigest,
   saveRun,
   saveSearchExpansion,
@@ -377,16 +379,23 @@ app.post("/unit-economics", async (c) => {
 // Shared by the Cron schedule and the manual POST /digest/run trigger.
 async function generateAndSaveDigest(env: Bindings) {
   const llm = createLlmProvider(env);
-  const charts = await collectCharts({ feed: "newfreeapplications" });
+  const db = createDb(env.DB);
+  const FEED = "newfreeapplications";
+  const charts = await collectCharts({ feed: FEED });
   const countriesScanned = [...new Set(charts.map((x) => x.country))];
+  // Append today's capture to the time-series BEFORE building the digest, so
+  // today counts toward each app's observed rank history (real momentum).
+  const capturedOn = new Date().toISOString().slice(0, 10);
+  await saveChartSnapshots(db, charts, FEED, capturedOn);
   const digest = await buildGlobalDigest(llm, {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
     charts,
     countriesScanned,
     fetchDetails: (ids) => fetchItunesAppDetails(ids),
+    fetchHistory: (ids) => getRankHistory(db, ids, FEED),
   });
-  await saveDigest(createDb(env.DB), digest);
+  await saveDigest(db, digest);
   return digest;
 }
 

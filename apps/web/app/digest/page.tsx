@@ -34,9 +34,37 @@ function Metric({ label, value }: { label: string; value: string }) {
   );
 }
 
+// Real rank momentum from our own chart time-series. Null until ≥2 days exist.
+function trendView(a: DigestApp): { text: string; cls: string; title: string } | null {
+  const days = a.daysTracked ?? 0;
+  const d = a.rankDelta ?? 0;
+  if (a.rankTrend === "rising")
+    return {
+      text: `↑ +${d}`,
+      cls: "text-success",
+      title: `Піднявся на ${d} позицій за ${days} дн спостережень`,
+    };
+  if (a.rankTrend === "falling")
+    return {
+      text: `↓ ${d}`,
+      cls: "text-destructive",
+      title: `Опустився на ${Math.abs(d)} позицій за ${days} дн спостережень`,
+    };
+  if (a.rankTrend === "flat")
+    return {
+      text: "→ стабільно",
+      cls: "text-muted-foreground",
+      title: `Без істотних змін рангу за ${days} дн`,
+    };
+  return null;
+}
+
 function RiserRow({ a }: { a: DigestApp }) {
   const [open, setOpen] = useState(false);
-  const expandable = Boolean(a.screenshots?.length || a.description || a.reviewCount);
+  const tv = trendView(a);
+  const expandable = Boolean(
+    a.screenshots?.length || a.description || a.reviewCount || a.daysTracked,
+  );
   return (
     <div className="border-t border-border/60 py-3 first:border-t-0">
       <div className="flex items-center gap-3">
@@ -68,6 +96,11 @@ function RiserRow({ a }: { a: DigestApp }) {
               ) : null}
               {a.ageMonths ? <span className="shrink-0">{ageLabel(a.ageMonths)}</span> : null}
               {a.rating ? <span className="shrink-0">★ {a.rating.toFixed(1)}</span> : null}
+              {tv ? (
+                <span className={`shrink-0 font-medium tabular-nums ${tv.cls}`} title={tv.title}>
+                  {tv.text}
+                </span>
+              ) : null}
             </div>
           </div>
         </a>
@@ -102,8 +135,12 @@ function RiserRow({ a }: { a: DigestApp }) {
                 ))}
               </div>
             ) : null}
-            {a.ageMonths || a.reviewCount || a.reviewsPerMonth || a.estInstalls ? (
+            {a.ageMonths || a.reviewCount || a.reviewsPerMonth || a.estInstalls || a.daysTracked ? (
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {a.peakRank ? <Metric label="Пік у чарті" value={`#${a.peakRank}`} /> : null}
+                {a.daysTracked ? (
+                  <Metric label="Днів спостереження" value={String(a.daysTracked)} />
+                ) : null}
                 {a.reviewsPerMonth ? (
                   <Metric label="Відгуків/міс" value={compact(a.reviewsPerMonth)} />
                 ) : null}
@@ -116,6 +153,12 @@ function RiserRow({ a }: { a: DigestApp }) {
                 {a.ageMonths ? <Metric label="Існує" value={ageLabel(a.ageMonths)} /> : null}
               </div>
             ) : null}
+            {a.rankTrend === "new" && (
+              <p className="text-[11px] text-muted-foreground/70">
+                Відстежуємо динаміку рангу — потрібно ще кілька днів спостережень
+                {a.daysTracked ? ` (поки ${a.daysTracked})` : ""}.
+              </p>
+            )}
             {!a.reviewCount && (
               <p className="text-[11px] text-muted-foreground/70">
                 Новий застосунок (&lt; 1 міс на ринку) — даних про завантаження/відгуки ще немає.

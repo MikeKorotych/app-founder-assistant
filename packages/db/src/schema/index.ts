@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 /**
  * One row per pipeline run. The full `Run` object (from `@hahaton/contracts`)
@@ -81,3 +81,29 @@ export const digests = sqliteTable("digests", {
 
 export type DigestRow = typeof digests.$inferSelect;
 export type DigestInsert = typeof digests.$inferInsert;
+
+/**
+ * Time-series of App Store chart positions — one row per (app, country, feed,
+ * day). Captured on every digest/Cron run so we can compute REAL rank momentum
+ * (rising/falling) from observed movement instead of a one-shot heuristic.
+ * `id` = `${appId}:${country}:${feed}:${capturedOn}` → one row per app/market/
+ * feed/day (re-runs the same day are no-ops, keeping the first capture).
+ */
+export const chartSnapshots = sqliteTable(
+  "chart_snapshots",
+  {
+    id: text("id").primaryKey(),
+    appId: text("app_id").notNull(),
+    name: text("name").notNull(),
+    country: text("country").notNull(),
+    feed: text("feed").notNull(),
+    rank: integer("rank").notNull(),
+    /** YYYY-MM-DD (UTC) the snapshot was captured. */
+    capturedOn: text("captured_on").notNull(),
+    createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
+  },
+  (t) => [index("idx_chart_snap_app_feed").on(t.appId, t.feed)],
+);
+
+export type ChartSnapshotRow = typeof chartSnapshots.$inferSelect;
+export type ChartSnapshotInsert = typeof chartSnapshots.$inferInsert;

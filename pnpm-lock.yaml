@@ -316,6 +316,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/node@20.19.41)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.16.9)(tsx@4.22.3)(yaml@2.9.0)
 
   packages/ui:
     dependencies:

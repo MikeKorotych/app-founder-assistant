@@ -546,6 +546,38 @@ export interface DigestApp {
   estInstallsPerMonth?: number;
   /** Composite 0–100 momentum/success score (rating × velocity × breadth × freshness). */
   score?: number;
+
+  // ── Observed rank momentum (our own chart time-series — real, not heuristic) ──
+  /** Trend of best chart rank over the tracked window. */
+  rankTrend?: "rising" | "falling" | "flat" | "new";
+  /** Positions gained since first tracked (positive = climbed up the chart). */
+  rankDelta?: number;
+  /** Distinct days this app has been observed in the feed. */
+  daysTracked?: number;
+  /** Best (lowest) rank ever observed across the tracked window. */
+  peakRank?: number;
+}
+
+/**
+ * Real rank momentum derived from our own accumulated chart snapshots
+ * (no paid API). Meaningful only once ≥2 days of history exist; until then
+ * `trend` is "new".
+ */
+export interface RankHistory {
+  appId: string;
+  /** Distinct days the app was observed in this feed. */
+  daysTracked: number;
+  firstDay: string;
+  lastDay: string;
+  /** Best (lowest) rank on the earliest tracked day. */
+  firstBestRank: number;
+  /** Best (lowest) rank on the latest tracked day. */
+  currentBestRank: number;
+  /** Best (lowest) rank ever observed. */
+  peakRank: number;
+  /** firstBestRank − currentBestRank (positive = climbed up the chart). */
+  rankDelta: number;
+  trend: "rising" | "falling" | "flat" | "new";
 }
 
 /** Raw App Store metadata for one app, from the iTunes Lookup API (free, no key). */
