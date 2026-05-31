@@ -21,14 +21,8 @@ function compact(n?: number): string {
 
 function ageLabel(months?: number): string {
   if (!months) return "—";
+  if (months < 1) return "< 1 міс";
   return months < 12 ? `${Math.round(months)} міс` : `${(months / 12).toFixed(1)} р`;
-}
-
-function scoreTone(s?: number): string {
-  if (s == null) return "border-border/60 bg-muted/50 text-muted-foreground";
-  if (s >= 66) return "border-success/40 bg-success/10 text-success";
-  if (s >= 40) return "border-primary/40 bg-primary/10 text-foreground";
-  return "border-border/60 bg-muted/50 text-muted-foreground";
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -65,13 +59,15 @@ function RiserRow({ a }: { a: DigestApp }) {
           )}
           <div className="min-w-0 flex-1">
             <span className="block truncate font-medium group-hover:underline">{a.name}</span>
-            <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
-              <span>
+            <div className="flex flex-nowrap items-center gap-x-3 overflow-hidden whitespace-nowrap text-[11px] text-muted-foreground">
+              <span className="shrink-0">
                 {a.marketCount} ринків · #{a.bestRank}
               </span>
-              {a.reviewCount ? <span>{compact(a.reviewCount)} відгуків</span> : null}
-              {a.ageMonths ? <span>{ageLabel(a.ageMonths)}</span> : null}
-              {a.rating ? <span>★ {a.rating.toFixed(1)}</span> : null}
+              {a.reviewCount ? (
+                <span className="shrink-0">{compact(a.reviewCount)} відгуків</span>
+              ) : null}
+              {a.ageMonths ? <span className="shrink-0">{ageLabel(a.ageMonths)}</span> : null}
+              {a.rating ? <span className="shrink-0">★ {a.rating.toFixed(1)}</span> : null}
             </div>
           </div>
         </a>
@@ -106,28 +102,23 @@ function RiserRow({ a }: { a: DigestApp }) {
                 ))}
               </div>
             ) : null}
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              <div
-                title="Momentum score (евристика: швидкість відгуків × рейтинг × охоплення ринків × свіжість)"
-                className={`rounded-md border px-2.5 py-1.5 ${a.score != null ? scoreTone(a.score) : "border-border/60 bg-muted/30 text-muted-foreground"}`}
-              >
-                <p className="text-[9px] uppercase tracking-[0.12em] opacity-70">Momentum</p>
-                <p className="text-sm font-medium tabular-nums">{a.score ?? "—"}</p>
+            {a.ageMonths || a.reviewCount || a.reviewsPerMonth || a.estInstalls ? (
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {a.reviewsPerMonth ? (
+                  <Metric label="Відгуків/міс" value={compact(a.reviewsPerMonth)} />
+                ) : null}
+                {a.estInstalls ? (
+                  <Metric label="Завантаж. (оцінка)" value={compact(a.estInstalls)} />
+                ) : null}
+                {a.estInstallsPerMonth ? (
+                  <Metric label="Завант./міс (оцінка)" value={compact(a.estInstallsPerMonth)} />
+                ) : null}
+                {a.ageMonths ? <Metric label="Існує" value={ageLabel(a.ageMonths)} /> : null}
               </div>
-              {a.ageMonths ? <Metric label="Існує" value={ageLabel(a.ageMonths)} /> : null}
-              {a.estInstalls ? (
-                <Metric label="Завантаж. (оцінка)" value={compact(a.estInstalls)} />
-              ) : null}
-              {a.estInstallsPerMonth ? (
-                <Metric label="Завант./міс (оцінка)" value={compact(a.estInstallsPerMonth)} />
-              ) : null}
-              {a.reviewsPerMonth ? (
-                <Metric label="Відгуків/міс" value={compact(a.reviewsPerMonth)} />
-              ) : null}
-            </div>
+            ) : null}
             {!a.reviewCount && (
               <p className="text-[11px] text-muted-foreground/70">
-                Новий застосунок — даних про завантаження/відгуки ще немає.
+                Новий застосунок (&lt; 1 міс на ринку) — даних про завантаження/відгуки ще немає.
               </p>
             )}
             {a.description && (
