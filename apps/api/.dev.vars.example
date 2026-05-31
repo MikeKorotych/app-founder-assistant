@@ -5,9 +5,11 @@
 # LLM_GATEWAY_API_KEY is injected via `wrangler secret put` (see
 # .github/workflows/deploy.yml).
 
-# LiteLLM gateway — the agent routes all LLM calls through it.
-LLM_GATEWAY_BASE_URL=http://localhost:4000
-LLM_GATEWAY_API_KEY=sk-replace-me
+# LLM gateway — OpenAI-compatible. Default: OpenRouter (your account).
+# Key: https://openrouter.ai/keys · models: https://openrouter.ai/models
+# (Model ids live in packages/llm/src/catalog.ts — verify them on OpenRouter.)
+LLM_GATEWAY_BASE_URL=https://openrouter.ai/api/v1
+LLM_GATEWAY_API_KEY=sk-or-v1-replace-me
 LLM_TIMEOUT_MS=120000
 
 # Scout — competitor discovery sources (Worker secrets). Both optional: if unset,

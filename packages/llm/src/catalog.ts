@@ -1,21 +1,22 @@
 /**
- * Model routing — each value is a `model_name` from the LiteLLM proxy config
- * (`model_list`). It MUST exist there, or the gateway 400s.
+ * Model routing — each value is the model id the configured gateway expects.
  *
- * Routing intent (mirrors the pipeline): splurge on visible reasoning, save on
- * extraction/utility.
+ * Provider = OpenRouter (OpenAI-compatible). Set in env:
+ *   LLM_GATEWAY_BASE_URL = https://openrouter.ai/api/v1
+ *   LLM_GATEWAY_API_KEY  = <your OpenRouter key>
+ * Model ids below are OpenRouter ids (`provider/model`). OpenRouter versions
+ * these often — VERIFY the exact current ids at https://openrouter.ai/models
+ * (a wrong id 400s). To go back to a LiteLLM proxy, swap these for its model_names.
+ *
+ * Routing intent: splurge on visible reasoning, save on extraction/utility.
  *   opus   → market sizing, unit economics, synthesis
- *   sonnet → brief, competitors, canvas, gtm, risks, search-intent expansion
+ *   sonnet → brief, competitors, canvas, gtm, risks, search-intent, opportunity
  *   haiku  → utility: input validation, titles, competitor ranking
- *
- * Values are real `model_name`s from the gateway's `/v1/models` list. Bare
- * `opus`/`haiku` aliases are NOT configured there (they 400) — use the versioned
- * Claude names.
  */
 export const MODELS = {
-  opus: "claude-opus-4-7",
-  sonnet: "claude-sonnet-4-5",
-  haiku: "claude-haiku-4-5",
+  opus: "anthropic/claude-opus-4.1",
+  sonnet: "anthropic/claude-sonnet-4.5",
+  haiku: "anthropic/claude-haiku-4.5",
 } as const;
 
 export type ModelAlias = (typeof MODELS)[keyof typeof MODELS];
