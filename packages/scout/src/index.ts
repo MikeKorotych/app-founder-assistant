@@ -16,6 +16,9 @@ import { fetchItunes } from "./sources/itunes.js";
 import { fetchProductHunt } from "./sources/producthunt.js";
 import type { RawCompetitor, ScoutParams, ScoutSummary } from "./types.js";
 
+// Global Niche Radar data-layer — App Store charts across countries.
+export type { CollectChartsOpts } from "./charts.js";
+export { collectCharts, DEFAULT_RADAR_COUNTRIES } from "./charts.js";
 // Opportunity Radar data-layer — review mining + signal classification.
 export { classifyReviews } from "./classify.js";
 export { dedupeById } from "./normalize.js";
@@ -27,6 +30,7 @@ export { fetchAlternativeTo } from "./sources/alternativeto.js";
 export { fetchGooglePlay } from "./sources/googleplay.js";
 export { fetchGooglePlayReviews } from "./sources/googleplay-reviews.js";
 export { fetchItunes } from "./sources/itunes.js";
+export { type ChartFeed, fetchItunesChart } from "./sources/itunes-charts.js";
 export { fetchItunesReviews } from "./sources/itunes-reviews.js";
 export { fetchProductHunt } from "./sources/producthunt.js";
 export type {

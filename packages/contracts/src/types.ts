@@ -439,3 +439,59 @@ export interface CompetitorProfile {
   /** What to avoid / not repeat from this competitor. */
   avoid: string;
 }
+
+// ---------------------------------------------------------------------------
+// Global Niche Radar — cross-country "localized winner" discovery
+//
+// Scan App Store top charts for the niche across many countries, then surface
+// apps that rank/rise in some markets but are (near-)absent in the founder's
+// home market — geo-arbitrage signals. Growth-over-time needs paid APIs and is
+// deferred; "new + high in chart" is the rising proxy. Honest about coverage.
+// ---------------------------------------------------------------------------
+
+/** One app's position on a single country's App Store chart. */
+export interface ChartApp {
+  /** iTunes app id (store-unique). */
+  appId: string;
+  name: string;
+  url?: string;
+  artist?: string;
+  /** 1-based position in that country's chart. */
+  rank: number;
+  /** ISO country code the chart was fetched for. */
+  country: string;
+}
+
+/**
+ * A localized winner: charts in one or a few markets, (near-)absent in the
+ * founder's home market. The geo-arbitrage opportunity.
+ */
+export interface GlobalRadarEntry {
+  appId: string;
+  name: string;
+  url?: string;
+  /** Markets where it charts, best rank first. */
+  markets: Array<{ country: string; rank: number }>;
+  /** Best (lowest) rank across all markets. */
+  bestRank: number;
+  /** How many country charts it appears in. */
+  marketCount: number;
+  /** True when it does NOT appear in the home-market chart. */
+  absentAtHome: boolean;
+  /** LLM enrichment — what the app appears to do + why it works (optional). */
+  whatItDoes?: string;
+  /** LLM enrichment — the takeaway / what a founder could port (optional). */
+  takeaway?: string;
+}
+
+/** The Global Niche Radar result — localized winners across scanned markets. */
+export interface GlobalNicheRadar {
+  /** The founder's home market (apps charting here are NOT "undiscovered"). */
+  homeCountry: string;
+  /** Human label for the App Store genre scanned, when resolved. */
+  genreLabel?: string;
+  /** ISO country codes actually scanned. */
+  countriesScanned: string[];
+  /** Localized winners, strongest signal first. */
+  entries: GlobalRadarEntry[];
+}
