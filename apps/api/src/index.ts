@@ -1,5 +1,6 @@
 import {
   buildCompetitorProfiles,
+  buildGlobalDigest,
   buildGlobalRadar,
   buildOpportunityReport,
   resolveAppStoreGenre,
@@ -25,12 +26,19 @@ import {
   type ScoutParams,
 } from "@hahaton/scout";
 import { expandSearchIntent } from "@hahaton/search-intent";
-import { loadRun, loadSearchExpansion, saveRun, saveSearchExpansion } from "@hahaton/store";
+import {
+  loadLatestDigest,
+  loadRun,
+  loadSearchExpansion,
+  saveDigest,
+  saveRun,
+  saveSearchExpansion,
+} from "@hahaton/store";
 import { computeUnitEconomics } from "@hahaton/unit-economics";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { streamSSE } from "hono/streaming";
-import { type BaseEnv, requireLlmEnv } from "./env";
+import { type BaseEnv, type Bindings, requireLlmEnv } from "./env";
 
 export { CompetitorDiscoveryWorkflow } from "./scout/workflow";
 
@@ -342,4 +350,47 @@ app.post("/unit-economics", async (c) => {
   return c.json(computeUnitEconomics(assumptions));
 });
 
-export default app;
+// Generate + persist a Global Digest from the worldwide "top new" charts.
+// Shared by the Cron schedule and the manual POST /digest/run trigger.
+async function generateAndSaveDigest(env: Bindings) {
+  const llm = createLlmProvider(env);
+  const charts = await collectCharts({ feed: "topnewfreeapplications" });
+  const countriesScanned = [...new Set(charts.map((x) => x.country))];
+  const digest = await buildGlobalDigest(llm, {
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    charts,
+    countriesScanned,
+  });
+  await saveDigest(createDb(env.DB), digest);
+  return digest;
+}
+
+// Latest persisted Global Digest (the recurring worldwide snapshot).
+app.get("/digest/latest", async (c) => {
+  const digest = await loadLatestDigest(createDb(c.env.DB));
+  if (!digest) return c.json({ error: "No digest generated yet." }, 404);
+  return c.json(digest);
+});
+
+// Manually generate a digest now (handy for testing without waiting for cron).
+app.post("/digest/run", async (c) => {
+  try {
+    requireLlmEnv(c.env);
+    const digest = await generateAndSaveDigest(c.env);
+    return c.json(digest);
+  } catch (err) {
+    console.error("digest run error:", err);
+    return c.json({ error: "Digest generation failed." }, 500);
+  }
+});
+
+export default {
+  fetch: app.fetch,
+  // Cloudflare Cron Trigger — regenerate the worldwide digest on schedule.
+  async scheduled(_event: ScheduledController, env: Bindings, ctx: ExecutionContext) {
+    ctx.waitUntil(
+      generateAndSaveDigest(env).catch((err) => console.error("scheduled digest error:", err)),
+    );
+  },
+};

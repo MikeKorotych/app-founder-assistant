@@ -495,3 +495,39 @@ export interface GlobalNicheRadar {
   /** Localized winners, strongest signal first. */
   entries: GlobalRadarEntry[];
 }
+
+// ---------------------------------------------------------------------------
+// Global Digest (M6) — the recurring "what's rising worldwide" snapshot
+//
+// Produced on a schedule (Cloudflare Cron) from App Store "top new" charts
+// across many countries: apps with cross-market momentum. Persisted to D1 so
+// the UI shows the latest snapshot and (later) how it changes over time.
+// ---------------------------------------------------------------------------
+
+/** One app in the global digest, with the markets it's rising in. */
+export interface DigestApp {
+  appId: string;
+  name: string;
+  url?: string;
+  /** Markets where it charts in the "new/rising" feed, best rank first. */
+  markets: Array<{ country: string; rank: number }>;
+  /** How many country charts it appears in (momentum breadth). */
+  marketCount: number;
+  /** Best (lowest) rank across markets. */
+  bestRank: number;
+  /** Optional LLM one-liner: what it is / why it's rising. */
+  note?: string;
+}
+
+/** A persisted snapshot of globally-rising new apps. */
+export interface GlobalDigest {
+  id: string;
+  /** ISO timestamp the digest was generated. */
+  createdAt: string;
+  /** ISO country codes scanned. */
+  countriesScanned: string[];
+  /** Apps rising across the most markets, strongest momentum first. */
+  globalRisers: DigestApp[];
+  /** Optional LLM summary of the movement in this snapshot. */
+  summary?: string;
+}

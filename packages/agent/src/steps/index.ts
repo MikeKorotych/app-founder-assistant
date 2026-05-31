@@ -133,8 +133,11 @@ import { validationStep as _validationStep } from "./validation";
 export type { LandscapeCompetitor, LandscapeInput } from "./competitive-landscape";
 /** Competitive Landscape — per-competitor profile (themes, strengths, hook, inspire/avoid). */
 export { buildCompetitorProfiles } from "./competitive-landscape";
-export type { GlobalRadarInput } from "./global-radar";
 /** Global Niche Radar — detect localized winners across country charts + enrich. */
+export type { GlobalDigestInput } from "./global-digest";
+/** Global Digest — cross-market "rising worldwide" snapshot for the recurring digest. */
+export { buildGlobalDigest } from "./global-digest";
+export type { GlobalRadarInput } from "./global-radar";
 export { buildGlobalRadar, resolveAppStoreGenre } from "./global-radar";
 
 export type { OpportunityInput } from "./opportunity";

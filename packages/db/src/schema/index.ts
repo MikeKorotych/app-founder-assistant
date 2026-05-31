@@ -66,3 +66,18 @@ export const searchExpansions = sqliteTable("search_expansions", {
 
 export type SearchExpansionRow = typeof searchExpansions.$inferSelect;
 export type SearchExpansionInsert = typeof searchExpansions.$inferInsert;
+
+/**
+ * One row per generated Global Digest snapshot (M6). The full `GlobalDigest`
+ * object is stored JSON-serialized in `data`; `kind` keeps room for different
+ * digest flavors. Produced on a Cloudflare Cron schedule, read latest-first.
+ */
+export const digests = sqliteTable("digests", {
+  id: text("id").primaryKey(),
+  kind: text("kind").notNull().default("global"),
+  data: text("data").notNull(),
+  createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
+});
+
+export type DigestRow = typeof digests.$inferSelect;
+export type DigestInsert = typeof digests.$inferInsert;

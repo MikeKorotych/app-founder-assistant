@@ -1,5 +1,5 @@
-import type { Run, SearchExpansion } from "@hahaton/contracts";
-import { type Db, runs, searchExpansions } from "@hahaton/db";
+import type { GlobalDigest, Run, SearchExpansion } from "@hahaton/contracts";
+import { type Db, digests, runs, searchExpansions } from "@hahaton/db";
 import { desc, eq } from "drizzle-orm";
 
 /**
@@ -85,4 +85,25 @@ export async function listSearchExpansions(db: Db, limit = 20): Promise<SearchEx
     .orderBy(desc(searchExpansions.createdAt))
     .limit(limit);
   return rows.map(rowToExpansion);
+}
+
+// ---------------------------------------------------------------------------
+// Global Digest (M6)
+// ---------------------------------------------------------------------------
+
+/** Persist a generated Global Digest snapshot (full JSON in `data`). */
+export async function saveDigest(db: Db, digest: GlobalDigest, kind = "global"): Promise<void> {
+  await db.insert(digests).values({ id: digest.id, kind, data: JSON.stringify(digest) });
+}
+
+/** Load the most recent digest of a kind (the cron writes; the UI reads). */
+export async function loadLatestDigest(db: Db, kind = "global"): Promise<GlobalDigest | null> {
+  const [row] = await db
+    .select()
+    .from(digests)
+    .where(eq(digests.kind, kind))
+    .orderBy(desc(digests.createdAt))
+    .limit(1);
+  if (!row) return null;
+  return JSON.parse(row.data) as GlobalDigest;
 }

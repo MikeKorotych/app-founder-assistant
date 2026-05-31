@@ -32,6 +32,11 @@
     }
   ],
 
+  // Cron Trigger — regenerate the worldwide Global Digest weekly (Mon 08:00 UTC).
+  "triggers": {
+    "crons": ["0 8 * * 1"]
+  },
+
   "env": {
     "prod": {
       "vars": {
