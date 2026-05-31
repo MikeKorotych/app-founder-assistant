@@ -403,3 +403,39 @@ export interface OpportunityReport {
   /** Per-source review counts for transparency. */
   sources: Array<{ source: string; reviews: number }>;
 }
+
+/**
+ * A per-competitor profile for the Competitive Landscape block — the at-a-glance
+ * picture of one rival. Quantitative fields are real where the store exposes
+ * them (reviews, rating, launch date) or clearly estimated (installs); the
+ * qualitative fields are synthesized from that competitor's own reviews.
+ */
+export interface CompetitorProfile {
+  /** RawCompetitor.id this profile is for. */
+  competitorId: string;
+  name: string;
+  source: string;
+  url?: string;
+  /** Real review count from the store listing. */
+  reviewCount: number;
+  /** Real average rating (1–5), when known. */
+  rating?: number;
+  /** Estimated monthly installs — no paid API, so flagged as an estimate in UI. */
+  estimatedInstalls?: number;
+  /** ISO launch date where the source exposes it (Product Hunt etc.). */
+  launchedAt?: string;
+  /** How many of this competitor's reviews fed the synthesis. */
+  reviewsAnalyzed: number;
+  /** General theme of the POSITIVE reviews. */
+  positiveTheme: string;
+  /** General theme of the NEGATIVE reviews. */
+  negativeTheme: string;
+  strengths: string[];
+  weaknesses: string[];
+  /** The product's distinctive angle — its "изюминка". */
+  hook: string;
+  /** What a founder could be inspired by here. */
+  inspiration: string;
+  /** What to avoid / not repeat from this competitor. */
+  avoid: string;
+}
