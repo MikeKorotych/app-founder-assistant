@@ -476,6 +476,7 @@
 </script>
 <script type="application/json" id="data-progress">
 [
+  { "date":"2026-05-30", "time":"17:50", "author":"Mykhailo", "workstream":"M", "summary":"Compose the Market Intelligence suite into the roadmap (new group M): M1 scout review data-layer (Codex, in progress), M2 Opportunity Radar + M3 Competitive Landscape (built — contracts/agent/UI typecheck-green, pending integration), M4 /opportunity wiring, M5 Global Niche Radar (cross-country top charts), M6 recurring digest (ties to P3/P4). Detailed implementation plans in docs/market-intel-plan.md. Also surfaced the previously-orphaned P group in the Roadmap render.", "commit":"—" },
   { "date":"2026-05-30", "time":"17:36", "author":"Mykhailo", "workstream":"C", "summary":"Show the interactive Unit Economics block inside the real run's \u0027Показати дані ринку\u0027 toggle, ABOVE the market/competitor-revenue data. Real scout runs carry no unit-economics, so MarketDataMock reuses a memoized randomMockRun()\u0027s assumptions and renders the existing UnitEconomicsSection (interactive sliders → deterministic LTV/CAC/payback/burn) first, then the competitor revenue table. web typecheck green, biome clean." , "commit":"—" },
   { "date":"2026-05-30", "time":"17:19", "author":"Ruslan", "workstream":"A", "summary":"🐛 Fix /validate 500 (and pipeline Step 9). scoreIdea capped each persona at maxTokens:600, but the four Ukrainian rationales routinely run 465–531 tokens and spike past 600 — the response truncated mid-`rationale`, the greedy /\\{[\\s\\S]*\\}/ extractor backtracked to the `scores` brace, and JSON.parse threw 'Expected ',' or '}'… position 115' surfacing as a 500. Reproduced deterministically against the live gateway (finish_reason:length → that exact error). Raised maxTokens 600→1500 and wrapped JSON.parse to surface the raw body on truncation instead of a cryptic SyntaxError. Verified locally: POST /validate 200 on 5/5 (full ValidationResult: 3 personas + consensus + totalScore); agent typecheck green, biome clean.", "commit":"—" },
   { "date":"2026-05-30", "time":"17:14", "author":"Mykhailo", "workstream":"C", "summary":"SearchIntent UI: replace the category/keyword chip lists with an Obsidian-style interactive force graph (new apps/web/app/_components/idea-graph.tsx) — central Ідея node → category nodes → keywords hung off categories; dependency-free SVG spring/charge sim with draggable nodes, hover-highlight of neighbours, monochrome theme-token styling (foreground/primary/muted), honours prefers-reduced-motion. Kept the count labels above it; removed the now-unused Chips helper. Also: animated typewriter placeholder in the idea input (new use-typed-placeholder.ts) that types/deletes short app-idea prompts with a cursor block while the field is empty. web typecheck green, biome clean." , "commit":"—" },
@@ -612,7 +613,13 @@
   { "id":"P2", "group":"P", "title_uk":"Post-MVP: Slack alert коли Run/Scout готовий", "title_en":"Post-MVP: Slack alert when Run/Scout completes", "owner":"—", "status":"todo" },
   { "id":"P3", "group":"P", "title_uk":"Post-MVP: регулярний Scout cron + D1 insights", "title_en":"Post-MVP: recurring Scout cron + D1 insights", "owner":"—", "status":"todo" },
   { "id":"P4", "group":"P", "title_uk":"Post-MVP: Slack digest з ранками, інсайтами та ідеями", "title_en":"Post-MVP: Slack digest with ranks, insights, and product ideas", "owner":"—", "status":"todo" },
-  { "id":"P5", "group":"P", "title_uk":"Post-MVP: CTA зі Slack → створити business plan", "title_en":"Post-MVP: CTA from Slack → create business plan", "owner":"—", "status":"todo" }
+  { "id":"P5", "group":"P", "title_uk":"Post-MVP: CTA зі Slack → створити business plan", "title_en":"Post-MVP: CTA from Slack → create business plan", "owner":"—", "status":"todo" },
+  { "id":"M1", "group":"M", "title_uk":"Scout data-layer: фетч відгуків (iTunes RSS + SerpApi GP) + батч-класифікатор сигналів", "title_en":"Scout data-layer: fetch reviews (iTunes RSS + SerpApi GP) + batch signal classifier", "owner":"Codex", "status":"in-progress" },
+  { "id":"M2", "group":"M", "title_uk":"Opportunity Radar: кластеризація сигналів + синтез карти рішень + UI-блок", "title_en":"Opportunity Radar: cluster signals + synthesize decision map + UI block", "owner":"Mykhailo", "status":"review" },
+  { "id":"M3", "group":"M", "title_uk":"Competitive Landscape: профіль по кожному конкуренту (теми/сильні/слабкі/ізюминка) + UI", "title_en":"Competitive Landscape: per-competitor profile (themes/strengths/weaknesses/hook) + UI", "owner":"Mykhailo", "status":"review" },
+  { "id":"M4", "group":"M", "title_uk":"Інтеграція: /opportunity ендпоінт (reviews→classify→radar+profiles) + монтаж блоків у ScoutRun", "title_en":"Integration: /opportunity endpoint (reviews→classify→radar+profiles) + mount blocks in ScoutRun", "owner":"Mykhailo", "status":"todo" },
+  { "id":"M5", "group":"M", "title_uk":"Global Niche Radar: топ-чарти по країнах (iTunes country RSS) + детекція локальних переможців", "title_en":"Global Niche Radar: per-country top charts (iTunes country RSS) + localized-winner detection", "owner":"—", "status":"todo" },
+  { "id":"M6", "group":"M", "title_uk":"Global Niche Radar: регулярний дайджест по континентах (Cloudflare Cron + D1) — звʼязати з P3/P4", "title_en":"Global Niche Radar: recurring digest by continent (Cloudflare Cron + D1) — ties to P3/P4", "owner":"—", "status":"todo" }
 ]
 </script>
 
@@ -660,7 +667,7 @@
       int_doc:"Повний стан — у <a href='docs/integrations-status.md'>docs/integrations-status.md</a>; реєстр — <code>packages/integrations/src/sources.ts</code>.",
       roadmap_label:"Roadmap — декомпозиція на саб-таски",
       roadmap_note:"Це claimable-дошка задач. Беручи саб-таск у роботу, агент у <code>#data-roadmap</code> виставляє йому <code>status</code> + <code>owner</code> (по <code>id</code>) і пушить — щоб інші бачили, що зайнято і ким. Деталі — у CLAUDE.md.",
-      rm_g_F:"Фундамент / контракти", rm_g_A:"A · Пайплайн агента + grounding", rm_g_B:"B · Стрімінг, сервер, персист", rm_g_C:"C · Report UI", rm_g_D:"D · Експорт, демо, деплой",
+      rm_g_F:"Фундамент / контракти", rm_g_A:"A · Пайплайн агента + grounding", rm_g_B:"B · Стрімінг, сервер, персист", rm_g_C:"C · Report UI", rm_g_D:"D · Експорт, демо, деплой", rm_g_M:"M · Маркет-аналітика (відгуки → інсайти)", rm_g_P:"P · Post-MVP (алерти, дайджести, cron)",
       status_label:"Статус воркстрімів",
       status_note:"Ця секція та «Прогрес» оновлюються автоматично: агенти учасників за кожного push редагують JSON-острови внизу сторінки (<code>#data-workstreams</code>, <code>#data-progress</code>) — не верстку.",
       progress_label:"Лог прогресу",
@@ -760,7 +767,7 @@
       int_doc:"Full state in <a href='docs/integrations-status.md'>docs/integrations-status.md</a>; registry at <code>packages/integrations/src/sources.ts</code>.",
       roadmap_label:"Roadmap — sub-task breakdown",
       roadmap_note:"A claimable task board. When you start a sub-task, set its <code>status</code> + <code>owner</code> in <code>#data-roadmap</code> (by <code>id</code>) and push — so others see what's taken and by whom. Details in CLAUDE.md.",
-      rm_g_F:"Foundation / contracts", rm_g_A:"A · Agent pipeline + grounding", rm_g_B:"B · Streaming, server, persistence", rm_g_C:"C · Report UI", rm_g_D:"D · Export, demo, deploy",
+      rm_g_F:"Foundation / contracts", rm_g_A:"A · Agent pipeline + grounding", rm_g_B:"B · Streaming, server, persistence", rm_g_C:"C · Report UI", rm_g_D:"D · Export, demo, deploy", rm_g_M:"M · Market intelligence (reviews → insights)", rm_g_P:"P · Post-MVP (alerts, digests, cron)",
       status_label:"Workstream status",
       status_note:"This section and “Progress” auto-update: each member's agent edits the JSON islands at the bottom of the page (<code>#data-workstreams</code>, <code>#data-progress</code>) on every push — not the markup.",
       progress_label:"Progress log",
@@ -861,7 +868,7 @@
     if (rm) {
       rm.innerHTML = "";
       const tasks = read("data-roadmap");
-      ["F", "A", "B", "C", "D"].forEach(g => {
+      ["F", "A", "B", "C", "D", "M", "P"].forEach(g => {
         const items = tasks.filter(x => x.group === g);
         if (!items.length) return;
         const done = items.filter(x => x.status === "done").length;
