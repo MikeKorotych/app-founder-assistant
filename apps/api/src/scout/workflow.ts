@@ -21,7 +21,9 @@ import type { Bindings } from "../env";
  * failing the whole run. Then one ranking step (LLM) and one ingest step (D1).
  */
 const SOURCE_RETRY = {
-  retries: { limit: 4, delay: "2 seconds" as const, backoff: "exponential" as const },
+  // Each retry re-issues the source's fetches, multiplying subrequests. Keep it
+  // low so a flaky source can't blow the free-plan 50-subrequest budget.
+  retries: { limit: 2, delay: "2 seconds" as const, backoff: "exponential" as const },
   timeout: "30 seconds" as const,
 };
 
@@ -30,7 +32,10 @@ const SOURCE_RETRY = {
 // blows the Workers free-plan limit of 50 subrequests per invocation ("Too many
 // subrequests"). Cap the keywords the sources actually query to the top-N (the
 // expansion lists them most-relevant first); the full set still feeds ranking.
-const MAX_SOURCE_KEYWORDS = 6;
+// 4 sources × N keywords (+ Product Hunt topics + ranking + retries) must fit
+// the free plan's 50 subrequests/invocation. At 6 the later sources (Google
+// Play, AlternativeTo) were still being dropped, so trim to 3.
+const MAX_SOURCE_KEYWORDS = 3;
 
 /** A source's outcome: its competitors, plus a warning if it gave up. */
 interface SourceResult {

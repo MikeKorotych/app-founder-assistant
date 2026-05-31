@@ -24,8 +24,9 @@ const QUERY = `query Topic($slug: String!, $first: Int!) {
   }
 }`;
 
-/** Cap on distinct topic slugs queried per run (one PH request each). */
-const MAX_TOPICS = 6;
+/** Cap on distinct topic slugs queried per run (one PH request each). Kept low
+ * so the four scout sources together stay under the free-plan subrequest cap. */
+const MAX_TOPICS = 4;
 
 interface PhNode {
   id?: string;

@@ -33,9 +33,11 @@
     }
   ],
 
-  // Cron Trigger — regenerate the worldwide Global Digest weekly (Mon 08:00 UTC).
+  // Cron Trigger — regenerate the worldwide Global Digest daily (08:00 UTC).
+  // Daily cadence is required for the rank time-series: new-apps churn out of the
+  // chart within days, so a weekly snapshot rarely catches the same app twice.
   "triggers": {
-    "crons": ["0 8 * * 1"]
+    "crons": ["0 8 * * *"]
   },
 
   "env": {

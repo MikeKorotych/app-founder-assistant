@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm check)",
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm lint)",
+      "mcp__Claude_Preview__preview_screenshot",
+      "mcp__Claude_Preview__preview_logs",
+      "mcp__Claude_Preview__preview_console_logs",
+      "mcp__Claude_Preview__preview_inspect",
+      "mcp__Claude_Preview__preview_list",
+      "mcp__Claude_Preview__preview_snapshot",
+      "mcp__Amplitude__query_dataset",
+      "mcp__argent__describe",
+      "mcp__argent__screenshot",
+      "mcp__claude-peers__check_messages",
+      "mcp__claude-peers__list_peers"
+    ]
+  }
+}
