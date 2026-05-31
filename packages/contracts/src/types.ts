@@ -309,3 +309,97 @@ export interface SearchExpansion extends SearchIntent {
   /** ISO timestamp of when the expansion was created. */
   createdAt: string;
 }
+
+// ---------------------------------------------------------------------------
+// Opportunity Radar — post-Scout review mining
+//
+// Pipeline: Scout competitors → fetch their store reviews → classify each
+// review into signals → cluster recurring themes → synthesize an
+// OpportunityReport. The report is a DECISION MAP ("what to test first"),
+// never a verdict ("good/bad idea"). Sample size is surfaced for honesty.
+// ---------------------------------------------------------------------------
+
+/** A single user review/comment fetched from a competitor's store listing. */
+export interface Review {
+  /** Stable id, unique within the run (e.g. `${competitorId}#${n}` or the source review id). */
+  id: string;
+  /** The competitor (RawCompetitor.id) this review belongs to. */
+  competitorId: string;
+  /** Source the review came from: "itunes" | "googleplay" | "producthunt" | ... */
+  source: string;
+  /** Star rating 1–5 where the source exposes it. */
+  rating?: number;
+  title?: string;
+  body: string;
+  author?: string;
+  /** ISO date when the review was posted, when available. */
+  at?: string;
+}
+
+/** The signal taxonomy a review can be classified into. */
+export type ReviewSignalKind =
+  | "pain" // a complaint / unmet need
+  | "praised_feature" // something users explicitly love
+  | "missing_feature" // a feature users ask for / wish existed
+  | "pricing_issue" // paywall, too expensive, bad value
+  | "ux_issue" // confusing / clunky interface
+  | "reliability_bug" // crashes, sync loss, broken behaviour
+  | "onboarding_confusion" // first-run / setup friction
+  | "switching_reason" // why they left / would leave a product
+  | "audience_hint"; // a clue about who the user is
+
+/** One classified signal extracted from a review by the LLM classifier. */
+export interface ReviewSignal {
+  /** Which review this came from (Review.id). */
+  reviewId: string;
+  /** Which competitor the review was about (RawCompetitor.id). */
+  competitorId: string;
+  kind: ReviewSignalKind;
+  /** Short normalized theme phrase (the model's summary of the signal). */
+  theme: string;
+  /** Optional supporting verbatim quote from the review. */
+  quote?: string;
+  /** The review's star rating, when known — lets pains from 1–2★ be weighted. */
+  rating?: number;
+}
+
+/** A recurring theme — many signals of the same kind rolled together. */
+export interface ReviewCluster {
+  kind: ReviewSignalKind;
+  /** Human-readable label for the recurring theme. */
+  label: string;
+  /** How many signals rolled into this cluster (its strength). */
+  count: number;
+  /** A few representative verbatim quotes. */
+  examples: string[];
+}
+
+/**
+ * Opportunity Radar — the decision map produced from competitor reviews.
+ * Every field is grounded in the mined signals; it answers "what to test
+ * first", not "is the idea good".
+ */
+export interface OpportunityReport {
+  /** Strongest recurring pains (sorted by strength). */
+  topPains: ReviewCluster[];
+  /** Features users repeatedly praise. */
+  loved: ReviewCluster[];
+  /** Distilled reasons behind 1–2★ ratings. */
+  oneTwoStarReasons: string[];
+  /** Where the market looks crowded / "red zone". */
+  saturation: string;
+  /** The unfilled niche / window of opportunity. */
+  opportunityGap: string;
+  /** The narrow first ICP worth targeting. */
+  firstIcp: string;
+  /** How this idea could meaningfully differentiate. */
+  differentiation: string;
+  /** A concrete experiment to run in 7 days. */
+  sevenDayTest: string;
+  /** Kill criterion — the result at which the idea should be dropped. */
+  killCriterion: string;
+  /** Total reviews the report is based on (honesty about sample size). */
+  reviewsAnalyzed: number;
+  /** Per-source review counts for transparency. */
+  sources: Array<{ source: string; reviews: number }>;
+}
