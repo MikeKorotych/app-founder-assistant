@@ -64,17 +64,7 @@ function RiserRow({ a }: { a: DigestApp }) {
             <div className="h-11 w-11 shrink-0 rounded-xl border border-border/60 bg-muted/40" />
           )}
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="truncate font-medium group-hover:underline">{a.name}</span>
-              {a.score != null && (
-                <span
-                  title="Momentum score (евристика: швидкість відгуків × рейтинг × охоплення × свіжість)"
-                  className={`shrink-0 rounded-full border px-2 py-0.5 text-[11px] font-medium tabular-nums ${scoreTone(a.score)}`}
-                >
-                  {a.score}
-                </span>
-              )}
-            </div>
+            <span className="block truncate font-medium group-hover:underline">{a.name}</span>
             <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
               <span>
                 {a.marketCount} ринків · #{a.bestRank}
@@ -116,7 +106,14 @@ function RiserRow({ a }: { a: DigestApp }) {
                 ))}
               </div>
             ) : null}
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+              <div
+                title="Momentum score (евристика: швидкість відгуків × рейтинг × охоплення ринків × свіжість)"
+                className={`rounded-md border px-2.5 py-1.5 ${a.score != null ? scoreTone(a.score) : "border-border/60 bg-muted/30 text-muted-foreground"}`}
+              >
+                <p className="text-[9px] uppercase tracking-[0.12em] opacity-70">Momentum</p>
+                <p className="text-sm font-medium tabular-nums">{a.score ?? "—"}</p>
+              </div>
               <Metric label="Існує" value={ageLabel(a.ageMonths)} />
               <Metric label="Завантаж. (оцінка)" value={compact(a.estInstalls)} />
               <Metric label="Завант./міс (оцінка)" value={compact(a.estInstallsPerMonth)} />
