@@ -76,7 +76,13 @@ function ProfileCard({ p }: { p: CompetitorProfile }) {
           <span>
             {p.reviewCount > 0 ? `${p.reviewCount.toLocaleString()} відгуків` : "відгуки —"}
           </span>
-          {inst > 0 && <span>~{compact(inst)} вст./міс (оцінка)</span>}
+          {p.installsText ? (
+            <span title="Офіційний показник Google Play" className="text-foreground/80">
+              {p.installsText} встановлень
+            </span>
+          ) : inst > 0 ? (
+            <span>~{compact(inst)} вст. (оцінка)</span>
+          ) : null}
           {launched && <span>з {launched}</span>}
         </div>
       </div>

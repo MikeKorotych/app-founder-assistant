@@ -27,6 +27,8 @@ export interface LandscapeCompetitor {
   rating?: number;
   launchedAt?: string;
   estimatedInstalls?: number;
+  /** Official Google Play install bucket ("500M+"), Android only. */
+  installsText?: string;
 }
 
 export interface LandscapeInput {
@@ -62,7 +64,7 @@ function competitorContext(c: LandscapeCompetitor, idea: string, signals: Review
     `FOUNDER IDEA: ${idea}`,
     `\nCOMPETITOR: ${c.name} (${c.source})`,
     c.positioning ? `POSITIONING: ${c.positioning}` : "",
-    `REVIEWS: ${c.reviewCount}${c.rating ? `, ★ ${c.rating}` : ""}`,
+    `REVIEWS: ${c.reviewCount}${c.rating ? `, ★ ${c.rating}` : ""}${c.installsText ? `, ${c.installsText} installs (Google Play)` : ""}`,
     `\nPOSITIVE SIGNALS (${pos.length}):`,
     ...(pos.length ? pos.slice(0, 8).map(fmt) : ["  (none)"]),
     `\nNEGATIVE SIGNALS (${neg.length}):`,
@@ -95,6 +97,7 @@ async function profileOne(
     reviewCount: c.reviewCount,
     rating: c.rating,
     estimatedInstalls: c.estimatedInstalls,
+    installsText: c.installsText,
     launchedAt: c.launchedAt,
     reviewsAnalyzed,
     positiveTheme: "",

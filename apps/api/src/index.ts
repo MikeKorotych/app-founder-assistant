@@ -21,6 +21,7 @@ import {
   classifyReviews,
   collectCharts,
   collectReviews,
+  fetchGooglePlayProductDetails,
   fetchItunesAppDetails,
   listCompetitors,
   type RawCompetitor,
@@ -237,7 +238,28 @@ app.post("/opportunity", async (c) => {
       reviewCount: r.reviewCount ?? 0,
       rating: r.rating ?? undefined,
       launchedAt: r.launchedAt ?? undefined,
+      estimatedInstalls: undefined as number | undefined,
+      installsText: undefined as string | undefined,
     }));
+
+    // Enrich Android competitors with REAL public install buckets ("500M+")
+    // straight from the Google Play listing (SerpApi `google_play_product`).
+    // Apple hides downloads, so this is iOS-impossible but genuine for Android.
+    const playIds = competitors.filter((c) => c.source === "googleplay").map((c) => c.id);
+    if (playIds.length > 0 && c.env.GOOGLE_SEARCH_API_KEY) {
+      const details = await fetchGooglePlayProductDetails(playIds, c.env.GOOGLE_SEARCH_API_KEY, {
+        limit: playIds.length,
+      });
+      for (const comp of competitors) {
+        const d = details.get(comp.id);
+        if (!d) continue;
+        comp.installsText = d.installsText;
+        comp.estimatedInstalls = d.installs;
+        // The product page is more authoritative than the search snippet.
+        if (d.reviewCount) comp.reviewCount = d.reviewCount;
+        if (typeof d.rating === "number") comp.rating = d.rating;
+      }
+    }
 
     // Pull more reviews per relevant competitor (bounded by the Workers
     // ~50-subrequest/invocation limit: ≤6 apps × pages + classify + profiles).

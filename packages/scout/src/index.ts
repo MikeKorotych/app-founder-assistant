@@ -28,10 +28,14 @@ export type { CollectReviewsOpts } from "./reviews.js";
 export { collectReviews } from "./reviews.js";
 export { fetchAlternativeTo } from "./sources/alternativeto.js";
 export { fetchGooglePlay } from "./sources/googleplay.js";
+export {
+  fetchGooglePlayProductDetails,
+  type GooglePlayDetails,
+} from "./sources/googleplay-details.js";
 export { fetchGooglePlayReviews } from "./sources/googleplay-reviews.js";
 export { fetchItunes } from "./sources/itunes.js";
-export { fetchItunesAppDetails } from "./sources/itunes-details.js";
 export { type ChartFeed, fetchItunesChart } from "./sources/itunes-charts.js";
+export { fetchItunesAppDetails } from "./sources/itunes-details.js";
 export { fetchItunesReviews } from "./sources/itunes-reviews.js";
 export { fetchProductHunt } from "./sources/producthunt.js";
 export type {

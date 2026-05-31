@@ -422,6 +422,11 @@ export interface CompetitorProfile {
   rating?: number;
   /** Estimated monthly installs — no paid API, so flagged as an estimate in UI. */
   estimatedInstalls?: number;
+  /**
+   * Official install bucket Google Play publishes on the listing ("500M+").
+   * Real first-party store data (Android only) — not a third-party estimate.
+   */
+  installsText?: string;
   /** ISO launch date where the source exposes it (Product Hunt etc.). */
   launchedAt?: string;
   /** How many of this competitor's reviews fed the synthesis. */
