@@ -517,6 +517,43 @@ export interface DigestApp {
   bestRank: number;
   /** Optional LLM one-liner: what it is / why it's rising. */
   note?: string;
+
+  // ── Real store metadata (iTunes Lookup API — free) ──────────────────
+  iconUrl?: string;
+  /** Real App Store description (English). */
+  description?: string;
+  screenshots?: string[];
+  /** ISO release date. */
+  releaseDate?: string;
+  rating?: number;
+  reviewCount?: number;
+  genre?: string;
+  price?: string;
+
+  // ── Derived metrics (real where based on reviews/age; installs estimated) ──
+  /** Months since release. */
+  ageMonths?: number;
+  /** reviewCount / ageMonths — real review velocity. */
+  reviewsPerMonth?: number;
+  /** Estimated total installs (reviews × factor — no paid API). */
+  estInstalls?: number;
+  /** Estimated installs / month since launch. */
+  estInstallsPerMonth?: number;
+  /** Composite 0–100 momentum/success score (rating × velocity × breadth × freshness). */
+  score?: number;
+}
+
+/** Raw App Store metadata for one app, from the iTunes Lookup API (free, no key). */
+export interface AppStoreDetails {
+  appId: string;
+  iconUrl?: string;
+  description?: string;
+  screenshots?: string[];
+  releaseDate?: string;
+  rating?: number;
+  reviewCount?: number;
+  genre?: string;
+  price?: string;
 }
 
 /** A persisted snapshot of globally-rising new apps. */

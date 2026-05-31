@@ -30,6 +30,7 @@ export { fetchAlternativeTo } from "./sources/alternativeto.js";
 export { fetchGooglePlay } from "./sources/googleplay.js";
 export { fetchGooglePlayReviews } from "./sources/googleplay-reviews.js";
 export { fetchItunes } from "./sources/itunes.js";
+export { fetchItunesAppDetails } from "./sources/itunes-details.js";
 export { type ChartFeed, fetchItunesChart } from "./sources/itunes-charts.js";
 export { fetchItunesReviews } from "./sources/itunes-reviews.js";
 export { fetchProductHunt } from "./sources/producthunt.js";

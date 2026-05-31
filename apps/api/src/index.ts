@@ -21,6 +21,7 @@ import {
   classifyReviews,
   collectCharts,
   collectReviews,
+  fetchItunesAppDetails,
   listCompetitors,
   type RawCompetitor,
   type ScoutParams,
@@ -361,6 +362,7 @@ async function generateAndSaveDigest(env: Bindings) {
     createdAt: new Date().toISOString(),
     charts,
     countriesScanned,
+    fetchDetails: (ids) => fetchItunesAppDetails(ids),
   });
   await saveDigest(createDb(env.DB), digest);
   return digest;
