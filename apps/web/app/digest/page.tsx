@@ -109,9 +109,21 @@ function RiserRow({ a }: { a: DigestApp }) {
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-label="Деталі застосунку"
-            className={`shrink-0 select-none rounded-md px-2 py-1 text-muted-foreground transition-transform duration-300 hover:bg-accent hover:text-foreground ${open ? "rotate-180" : ""}`}
+            aria-expanded={open}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
-            ⌄
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`h-4 w-4 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
           </button>
         )}
       </div>
