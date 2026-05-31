@@ -97,14 +97,13 @@ jobs:
           # Only push a secret when it's non-empty (optional ones like Product Hunt
           # may be unset) — and pass values via env, not inline, to avoid breakage.
           put() { if [ -n "$2" ]; then printf '%s' "$2" | pnpm --filter @hahaton/api exec wrangler secret put "$1" --env=""; else echo "skip $1 (empty)"; fi; }
-          put LLM_GATEWAY_BASE_URL "$S_LLM_BASE"
+          # LLM_GATEWAY_BASE_URL is a plain var in wrangler.jsonc (not a secret) — don't set it here.
           put LLM_GATEWAY_API_KEY "$S_LLM_KEY"
           put GOOGLE_SEARCH_API_KEY "$S_SERP"
           put PRODUCTHUNT_TOKEN "$S_PH"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          S_LLM_BASE: ${{ secrets.LLM_GATEWAY_BASE_URL }}
           S_LLM_KEY: ${{ secrets.LLM_GATEWAY_API_KEY }}
           S_SERP: ${{ secrets.GOOGLE_SEARCH_API_KEY }}
           S_PH: ${{ secrets.PRODUCTHUNT_TOKEN }}
