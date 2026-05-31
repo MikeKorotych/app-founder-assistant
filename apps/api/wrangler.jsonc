@@ -1,6 +1,6 @@
 {
-  "name": "hahaton-api",
-  "account_id": "dbb2d590e1bf73c311d96144bc7b7476",
+  "name": "founder-assistant-api",
+  "account_id": "efcc3c10b52f6dd425532bb5dd52bb1b",
   "main": "src/index.ts",
   "compatibility_date": "2026-04-05",
   "compatibility_flags": ["nodejs_compat"],
@@ -18,8 +18,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "hahaton",
-      "database_id": "2bf49a4c-5ded-4ad6-ad79-e10513933e7a",
+      "database_name": "founder-assistant",
+      "database_id": "065e4de1-2974-4bb2-9d74-5476c8d916c6",
       "migrations_dir": "../../packages/db/migrations"
     }
   ],
@@ -47,8 +47,8 @@
       "d1_databases": [
         {
           "binding": "DB",
-          "database_name": "hahaton",
-          "database_id": "2bf49a4c-5ded-4ad6-ad79-e10513933e7a",
+          "database_name": "founder-assistant",
+          "database_id": "065e4de1-2974-4bb2-9d74-5476c8d916c6",
           "migrations_dir": "../../packages/db/migrations"
         }
       ],
