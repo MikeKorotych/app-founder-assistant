@@ -106,7 +106,7 @@ function RiserRow({ a }: { a: DigestApp }) {
                 ))}
               </div>
             ) : null}
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <div
                 title="Momentum score (евристика: швидкість відгуків × рейтинг × охоплення ринків × свіжість)"
                 className={`rounded-md border px-2.5 py-1.5 ${a.score != null ? scoreTone(a.score) : "border-border/60 bg-muted/30 text-muted-foreground"}`}
@@ -114,11 +114,22 @@ function RiserRow({ a }: { a: DigestApp }) {
                 <p className="text-[9px] uppercase tracking-[0.12em] opacity-70">Momentum</p>
                 <p className="text-sm font-medium tabular-nums">{a.score ?? "—"}</p>
               </div>
-              <Metric label="Існує" value={ageLabel(a.ageMonths)} />
-              <Metric label="Завантаж. (оцінка)" value={compact(a.estInstalls)} />
-              <Metric label="Завант./міс (оцінка)" value={compact(a.estInstallsPerMonth)} />
-              <Metric label="Відгуків/міс" value={compact(a.reviewsPerMonth)} />
+              {a.ageMonths ? <Metric label="Існує" value={ageLabel(a.ageMonths)} /> : null}
+              {a.estInstalls ? (
+                <Metric label="Завантаж. (оцінка)" value={compact(a.estInstalls)} />
+              ) : null}
+              {a.estInstallsPerMonth ? (
+                <Metric label="Завант./міс (оцінка)" value={compact(a.estInstallsPerMonth)} />
+              ) : null}
+              {a.reviewsPerMonth ? (
+                <Metric label="Відгуків/міс" value={compact(a.reviewsPerMonth)} />
+              ) : null}
             </div>
+            {!a.reviewCount && (
+              <p className="text-[11px] text-muted-foreground/70">
+                Новий застосунок — даних про завантаження/відгуки ще немає.
+              </p>
+            )}
             {a.description && (
               <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">
                 {a.description.length > 600 ? `${a.description.slice(0, 600)}…` : a.description}
