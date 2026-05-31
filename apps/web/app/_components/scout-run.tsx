@@ -1,103 +1,28 @@
 "use client";
 
-import type {
-  Competitor as AgentCompetitor,
-  CompetitorProfile,
-  GlobalNicheRadar as GlobalNicheRadarResult,
-  OpportunityReport,
-  Run,
-  SearchExpansion,
-  ValidationResult,
-} from "@hahaton/contracts";
+import type { SearchExpansion } from "@hahaton/contracts";
 import { Button, Card, CardContent, CardHeader, CardTitle, cn } from "@hahaton/ui";
-import { useEffect, useRef, useState } from "react";
-import { apiUrl } from "../_lib/api";
 import { ValidationSection } from "../runs/[id]/_components/validation-section";
 import { CompetitiveLandscape } from "./competitive-landscape";
 import { Game2048 } from "./game-2048";
 import { GlobalNicheRadar } from "./global-niche-radar";
 import { IdeaGraph } from "./idea-graph";
 import { MarketDataMock } from "./market-data-mock";
-import { randomMockRun } from "./mock-run";
 import { OpportunityRadar } from "./opportunity-radar";
 import { PlatformPie } from "./platform-pie";
 import { ReportBody } from "./report-body";
+import {
+  type Competitor,
+  type GlobalRadar,
+  type Opportunity,
+  type Phase,
+  useRun,
+  type Validation,
+  type ViewMode,
+} from "./run-context";
 import { ScoutLoading } from "./scout-loading";
 
-// A persisted competitor row as returned by GET /scout/:id (Drizzle row shape).
-interface Competitor {
-  id: string;
-  name: string;
-  developer: string | null;
-  description: string | null;
-  url: string | null;
-  source: string;
-  category: string | null;
-  platforms: string | null;
-  price: string | null;
-  iconUrl: string | null;
-  launchedAt: string | null;
-  rating: number;
-  reviewCount: number;
-  compatibilityScore: number | null;
-  rationale: string | null;
-}
-
-interface ScoutStatusResponse {
-  id: string;
-  status: { status?: string } | string;
-  competitors: Competitor[];
-}
-
-type Phase =
-  | { kind: "expanding" }
-  | { kind: "scanning"; expansion: SearchExpansion; scoutId: string }
-  | { kind: "done"; expansion: SearchExpansion; competitors: Competitor[] }
-  | { kind: "error"; message: string; expansion?: SearchExpansion };
-
-// The Validate step runs automatically once Scout finishes — its own state so
-// the competitor list stays visible while the Multi-LLM panel scores.
-type Validation =
-  | { kind: "idle" }
-  | { kind: "running" }
-  | { kind: "done"; result: ValidationResult }
-  | { kind: "error"; message: string };
-
-// Opportunity analysis (review mining → Opportunity Radar + Competitive Landscape),
-// chained after Scout alongside validation.
-type Opportunity =
-  | { kind: "idle" }
-  | { kind: "running" }
-  | { kind: "done"; report: OpportunityReport; profiles: CompetitorProfile[] }
-  | { kind: "error"; message: string };
-
-// Global Niche Radar — cross-country localized winners, chained after Scout.
-type GlobalRadar =
-  | { kind: "idle" }
-  | { kind: "running" }
-  | { kind: "done"; radar: GlobalNicheRadarResult }
-  | { kind: "error"; message: string };
-
-type ViewMode = "real" | "mock";
 type ProgressState = "done" | "active" | "waiting";
-
-const TERMINAL_OK = new Set(["complete", "completed"]);
-const TERMINAL_BAD = new Set(["errored", "terminated", "failed"]);
-
-function statusString(s: ScoutStatusResponse["status"]): string {
-  return (typeof s === "string" ? s : (s?.status ?? "")).toLowerCase();
-}
-
-// Scout's row → the agent's Competitor shape the validation panel reads
-// (it uses name + positioning, and price when present).
-function toAgentCompetitor(c: Competitor): AgentCompetitor {
-  return {
-    name: c.name,
-    positioning: c.rationale ?? c.description ?? "",
-    url: c.url ?? undefined,
-    ...(c.price ? { pricing: { value: c.price, rationale: "Store listing price" } } : {}),
-  };
-}
 
 function RestartIcon() {
   return (
@@ -352,193 +277,26 @@ function SearchIntentSection({
   );
 }
 
-// Home "Generate" flow: idea → /search-intent (LLM → keywords + categories JSON)
-// → /scout (spawns the competitor-discovery Workflow) → poll /scout/:id until the
-// Workflow completes → render the ranked competitors, then automatically chain
-// into /validate (Multi-LLM panel → /100 scorecard). On failures, a random
-// ready-made mock report keeps the demo usable. All calls go browser → API
-// directly (CORS open). See app/_lib/api.ts.
-export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => void }) {
-  const [phase, setPhase] = useState<Phase>({ kind: "expanding" });
-  const [validation, setValidation] = useState<Validation>({ kind: "idle" });
-  const [opportunity, setOpportunity] = useState<Opportunity>({ kind: "idle" });
-  const [globalRadar, setGlobalRadar] = useState<GlobalRadar>({ kind: "idle" });
-  const [viewMode, setViewMode] = useState<ViewMode>("real");
-  const cancelled = useRef(false);
-  const mockRunRef = useRef<Run | null>(null);
+// Stateless VIEW of the run. All lifecycle + state lives in RunProvider (mounted
+// in the root layout), so this component can unmount on navigation and remount
+// on return without losing or restarting the run.
+export function ScoutRun({ onRestart }: { onRestart?: () => void }) {
+  const {
+    idea,
+    phase,
+    validation,
+    opportunity,
+    globalRadar,
+    viewMode,
+    setViewMode,
+    ensureMockRun,
+  } = useRun();
 
-  useEffect(() => {
-    cancelled.current = false;
-
-    // Poll until the Workflow reaches a terminal state; return its competitors.
-    async function poll(scoutId: string): Promise<Competitor[]> {
-      for (let attempt = 0; attempt < 120 && !cancelled.current; attempt++) {
-        await new Promise((r) => setTimeout(r, 2500));
-        if (cancelled.current) return [];
-        const res = await fetch(apiUrl(`/scout/${scoutId}`), { cache: "no-store" });
-        if (!res.ok) throw new Error(`Scout status failed (${res.status})`);
-        const data = (await res.json()) as ScoutStatusResponse;
-        const st = statusString(data.status);
-        if (cancelled.current) return [];
-        if (TERMINAL_OK.has(st)) return data.competitors ?? [];
-        if (TERMINAL_BAD.has(st)) {
-          const found = data.competitors ?? [];
-          if (found.length > 0) return found;
-          throw new Error(`Scout зупинився: ${st}`);
-        }
-      }
-      throw new Error("Scout не завершився вчасно (таймаут).");
-    }
-
-    // Step 3 — validate: idea + discovered competitors → Multi-LLM scorecard.
-    async function runValidation(competitors: Competitor[]): Promise<void> {
-      setValidation({ kind: "running" });
-      try {
-        const res = await fetch(apiUrl("/validate"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idea, competitors: competitors.map(toAgentCompetitor) }),
-        });
-        if (!res.ok) {
-          const e = (await res.json().catch(() => ({}))) as { error?: string };
-          throw new Error(e.error ?? `validate failed (${res.status})`);
-        }
-        const result = (await res.json()) as ValidationResult;
-        if (cancelled.current) return;
-        setValidation({ kind: "done", result });
-      } catch (err) {
-        if (!cancelled.current) {
-          setValidation({
-            kind: "error",
-            message: err instanceof Error ? err.message : String(err),
-          });
-        }
-      }
-    }
-
-    // Step 3b — mine competitor reviews → Opportunity Radar + Competitive Landscape.
-    async function runOpportunity(scoutId: string): Promise<void> {
-      setOpportunity({ kind: "running" });
-      try {
-        const res = await fetch(apiUrl("/opportunity"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idea, scoutId }),
-        });
-        if (!res.ok) {
-          const e = (await res.json().catch(() => ({}))) as { error?: string };
-          throw new Error(e.error ?? `opportunity failed (${res.status})`);
-        }
-        const data = (await res.json()) as {
-          report: OpportunityReport;
-          profiles: CompetitorProfile[];
-        };
-        if (cancelled.current) return;
-        setOpportunity({ kind: "done", report: data.report, profiles: data.profiles });
-      } catch (err) {
-        if (!cancelled.current) {
-          setOpportunity({
-            kind: "error",
-            message: err instanceof Error ? err.message : String(err),
-          });
-        }
-      }
-    }
-
-    // Step 3c — Global Niche Radar (idea-driven, independent of Scout results).
-    async function runGlobalRadar(): Promise<void> {
-      setGlobalRadar({ kind: "running" });
-      try {
-        const res = await fetch(apiUrl("/global-radar"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idea }),
-        });
-        if (!res.ok) {
-          const e = (await res.json().catch(() => ({}))) as { error?: string };
-          throw new Error(e.error ?? `global-radar failed (${res.status})`);
-        }
-        const radar = (await res.json()) as GlobalNicheRadarResult;
-        if (cancelled.current) return;
-        setGlobalRadar({ kind: "done", radar });
-      } catch (err) {
-        if (!cancelled.current) {
-          setGlobalRadar({
-            kind: "error",
-            message: err instanceof Error ? err.message : String(err),
-          });
-        }
-      }
-    }
-
-    let expansion: SearchExpansion | undefined;
-    const startTimer = window.setTimeout(() => {
-      (async () => {
-        try {
-          // Step 1 — search intent: idea → keywords + categories (validated JSON).
-          const siRes = await fetch(apiUrl("/search-intent"), {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: idea }),
-          });
-          if (!siRes.ok) {
-            const e = (await siRes.json().catch(() => ({}))) as { error?: string };
-            throw new Error(e.error ?? `search-intent failed (${siRes.status})`);
-          }
-          expansion = (await siRes.json()) as SearchExpansion;
-          if (cancelled.current) return;
-
-          // Step 2 — kick off the Scout Workflow with the expansion output.
-          const scoutRes = await fetch(apiUrl("/scout"), {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              keywords: expansion.keywords,
-              categories: expansion.categories,
-              idea,
-            }),
-          });
-          if (!scoutRes.ok) {
-            const e = (await scoutRes.json().catch(() => ({}))) as { error?: string };
-            throw new Error(e.error ?? `scout failed (${scoutRes.status})`);
-          }
-          const { id: scoutId } = (await scoutRes.json()) as { id: string };
-          if (cancelled.current) return;
-
-          setPhase({ kind: "scanning", expansion, scoutId });
-          const competitors = await poll(scoutId);
-          if (cancelled.current) return;
-
-          setPhase({ kind: "done", expansion, competitors });
-
-          // Step 3 — chain into validation + opportunity analysis (parallel).
-          await Promise.all([
-            runValidation(competitors),
-            runOpportunity(scoutId),
-            runGlobalRadar(),
-          ]);
-        } catch (err) {
-          if (!cancelled.current) {
-            setPhase({
-              kind: "error",
-              message: err instanceof Error ? err.message : String(err),
-              expansion,
-            });
-          }
-        }
-      })();
-    }, 0);
-
-    return () => {
-      cancelled.current = true;
-      window.clearTimeout(startTimer);
-    };
-  }, [idea]);
+  if (idea === null) return null;
 
   // On any failure we fall back to a random ready-made mock report — the demo never breaks.
   if (phase.kind === "error") {
-    if (!mockRunRef.current) mockRunRef.current = randomMockRun();
-    const run = mockRunRef.current;
+    const run = ensureMockRun();
     return (
       <div className="flex flex-1 flex-col gap-6">
         <RunTopBar
@@ -564,8 +322,7 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
   const isGenerating = phase.kind === "expanding" || phase.kind === "scanning" || analysing;
 
   if (viewMode === "mock") {
-    if (!mockRunRef.current) mockRunRef.current = randomMockRun();
-    const run = mockRunRef.current;
+    const run = ensureMockRun();
     return (
       <div className="flex flex-col gap-6">
         <RunTopBar

@@ -1,4 +1,4 @@
-import type { LlmProvider, LlmRequest } from "@hahaton/llm";
+import { type LlmProvider, type LlmRequest, MODELS } from "@hahaton/llm";
 import { expandSearchIntent } from "./expand";
 
 /** Fake provider — records the last request and returns canned content. */
@@ -34,10 +34,10 @@ describe("expandSearchIntent", () => {
     expect(calls[0]!.temperature).toBe(0);
   });
 
-  it("defaults to the Sonnet 4.5 model and allows a model override", async () => {
+  it("defaults to the catalog Sonnet alias and allows a model override", async () => {
     const { llm, calls } = fakeLlm('{"keywords":[],"categories":[]}');
     await expandSearchIntent({ query: "x" }, llm);
-    expect(calls[0]!.model).toBe("claude-sonnet-4-5");
+    expect(calls[0]!.model).toBe(MODELS.sonnet);
 
     await expandSearchIntent({ query: "x" }, llm, { model: "opus" });
     expect(calls[1]!.model).toBe("opus");

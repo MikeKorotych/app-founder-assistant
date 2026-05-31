@@ -2,7 +2,7 @@
 
 import { RainbowButton } from "@hahaton/ui";
 import { useRef, useState } from "react";
-import { stopBackgroundMusic } from "../_lib/background-music";
+import { useRun } from "./run-context";
 import { RunStream } from "./run-stream";
 import { ScoutRun } from "./scout-run";
 import { useTypedPlaceholder } from "./use-typed-placeholder";
@@ -43,10 +43,9 @@ const SAMPLE_IDEAS = [
 
 export function IdeaForm() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { idea: started, demo, start, restart } = useRun();
   const [idea, setIdea] = useState("");
   const [error, setError] = useState("");
-  const [started, setStarted] = useState<string | null>(null);
-  const [demo, setDemo] = useState(false);
   const [restarting, setRestarting] = useState(false);
   const typedPlaceholder = useTypedPlaceholder(idea.trim().length === 0);
 
@@ -75,18 +74,15 @@ export function IdeaForm() {
     const forceDemo =
       typeof window !== "undefined" &&
       new URLSearchParams(window.location.search).get("demo") === "1";
-    setDemo(forceDemo);
-    setStarted(value);
+    start(value, forceDemo);
   }
 
   function restartRun() {
-    stopBackgroundMusic();
     setRestarting(true);
     window.setTimeout(() => {
       setIdea("");
       setError("");
-      setDemo(false);
-      setStarted(null);
+      restart();
       setRestarting(false);
       requestAnimationFrame(() => fitTextareaHeight());
     }, 160);
@@ -100,7 +96,7 @@ export function IdeaForm() {
         {demo ? (
           <RunStream idea={started} demo={demo} onRestart={restartRun} />
         ) : (
-          <ScoutRun idea={started} onRestart={restartRun} />
+          <ScoutRun onRestart={restartRun} />
         )}
       </div>
     );
