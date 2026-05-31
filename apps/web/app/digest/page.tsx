@@ -3,6 +3,7 @@
 import type { DigestApp, GlobalDigest } from "@hahaton/contracts";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@hahaton/ui";
 import { useEffect, useState } from "react";
+import { ScoutLoading } from "../_components/scout-loading";
 import { apiUrl } from "../_lib/api";
 
 function flag(cc: string): string {
@@ -11,40 +12,136 @@ function flag(cc: string): string {
   return String.fromCodePoint(...[...cc.toUpperCase()].map((ch) => base + ch.charCodeAt(0) - 65));
 }
 
-function RiserRow({ a }: { a: DigestApp }) {
+function compact(n?: number): string {
+  if (!n) return "—";
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${Math.round(n / 1_000)}K`;
+  return `${n}`;
+}
+
+function ageLabel(months?: number): string {
+  if (!months) return "—";
+  return months < 12 ? `${Math.round(months)} міс` : `${(months / 12).toFixed(1)} р`;
+}
+
+function scoreTone(s?: number): string {
+  if (s == null) return "border-border/60 bg-muted/50 text-muted-foreground";
+  if (s >= 66) return "border-success/40 bg-success/10 text-success";
+  if (s >= 40) return "border-primary/40 bg-primary/10 text-foreground";
+  return "border-border/60 bg-muted/50 text-muted-foreground";
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-1.5 border-t border-border/60 py-3 first:border-t-0">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <div className="flex items-baseline gap-2">
-          {a.url ? (
+    <div className="rounded-md border border-border/60 bg-muted/30 px-2.5 py-1.5">
+      <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium tabular-nums">{value}</p>
+    </div>
+  );
+}
+
+function RiserRow({ a }: { a: DigestApp }) {
+  const [open, setOpen] = useState(false);
+  const expandable = Boolean(a.screenshots?.length || a.description || a.reviewCount);
+  return (
+    <div className="border-t border-border/60 py-3 first:border-t-0">
+      <button
+        type="button"
+        onClick={() => expandable && setOpen((v) => !v)}
+        className="flex w-full items-center gap-3 text-left"
+      >
+        {a.iconUrl ? (
+          // biome-ignore lint/performance/noImgElement: external App Store CDN image
+          <img
+            src={a.iconUrl}
+            alt=""
+            loading="lazy"
+            className="h-11 w-11 shrink-0 rounded-xl border border-border/60 object-cover"
+          />
+        ) : (
+          <div className="h-11 w-11 shrink-0 rounded-xl border border-border/60 bg-muted/40" />
+        )}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="truncate font-medium">{a.name}</span>
+            {a.score != null && (
+              <span
+                title="Momentum score (евристика: швидкість відгуків × рейтинг × охоплення × свіжість)"
+                className={`shrink-0 rounded-full border px-2 py-0.5 text-[11px] font-medium tabular-nums ${scoreTone(a.score)}`}
+              >
+                {a.score}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+            <span>
+              {a.marketCount} ринків · #{a.bestRank}
+            </span>
+            {a.reviewCount ? <span>{compact(a.reviewCount)} відгуків</span> : null}
+            {a.ageMonths ? <span>{ageLabel(a.ageMonths)}</span> : null}
+            {a.rating ? <span>★ {a.rating.toFixed(1)}</span> : null}
+          </div>
+        </div>
+        {expandable && (
+          <span
+            className={`shrink-0 select-none text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+          >
+            ⌄
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <div className="mt-3 flex flex-col gap-3 sm:pl-14">
+          {a.screenshots?.length ? (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {a.screenshots.slice(0, 8).map((s) => (
+                // biome-ignore lint/performance/noImgElement: external App Store CDN image
+                <img
+                  key={s}
+                  src={s}
+                  alt=""
+                  loading="lazy"
+                  className="h-44 shrink-0 rounded-lg border border-border/60 object-cover"
+                />
+              ))}
+            </div>
+          ) : null}
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <Metric label="Існує" value={ageLabel(a.ageMonths)} />
+            <Metric label="Завантаж. (оцінка)" value={compact(a.estInstalls)} />
+            <Metric label="Завант./міс (оцінка)" value={compact(a.estInstallsPerMonth)} />
+            <Metric label="Відгуків/міс" value={compact(a.reviewsPerMonth)} />
+          </div>
+          {a.description && (
+            <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">
+              {a.description.length > 600 ? `${a.description.slice(0, 600)}…` : a.description}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-1.5">
+            {a.markets.slice(0, 14).map((m) => (
+              <span
+                key={m.country}
+                title={m.country.toUpperCase()}
+                className="rounded border border-border/60 bg-background/40 px-1.5 py-0.5 text-[11px] tabular-nums text-muted-foreground"
+              >
+                {flag(m.country)} #{m.rank}
+              </span>
+            ))}
+          </div>
+          {a.url && (
             <a
               href={a.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium underline-offset-2 hover:underline"
+              className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
             >
-              {a.name}
+              Відкрити в App Store →
             </a>
-          ) : (
-            <span className="font-medium">{a.name}</span>
           )}
-          <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[11px] tabular-nums">
-            {a.marketCount} ринків · #{a.bestRank}
-          </span>
         </div>
-      </div>
-      <div className="flex flex-wrap gap-1.5">
-        {a.markets.slice(0, 10).map((m) => (
-          <span
-            key={m.country}
-            className="rounded border border-border/60 bg-background/40 px-1.5 py-0.5 text-[11px] tabular-nums text-muted-foreground"
-            title={`${m.country.toUpperCase()} · #${m.rank}`}
-          >
-            {flag(m.country)} #{m.rank}
-          </span>
-        ))}
-      </div>
-      {a.note && <p className="text-sm text-muted-foreground">{a.note}</p>}
+      )}
+      {a.note && !open && <p className="mt-2 text-sm text-muted-foreground sm:pl-14">{a.note}</p>}
     </div>
   );
 }
@@ -129,9 +226,17 @@ export default function DigestPage() {
       )}
 
       {state === "running" && (
-        <p className="text-sm text-muted-foreground">
-          Скануємо світові чарти по країнах — це займе ~30 секунд…
-        </p>
+        <ScoutLoading
+          title="Скануємо світові чарти…"
+          hint="Це займе ~30 секунд."
+          steps={[
+            "Тягнемо «нові» чарти App Store по ~24 країнах.",
+            "Групуємо застосунки за крос-ринковим моментумом.",
+            "Підтягуємо метадані з App Store (іконки, відгуки, дата релізу).",
+            "Рахуємо вік, швидкість відгуків та momentum-score.",
+            "Збираємо дайджест світових новачків.",
+          ]}
+        />
       )}
 
       {digest && state === "ready" && (
