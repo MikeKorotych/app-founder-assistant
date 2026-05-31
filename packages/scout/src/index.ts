@@ -16,12 +16,18 @@ import { fetchItunes } from "./sources/itunes.js";
 import { fetchProductHunt } from "./sources/producthunt.js";
 import type { RawCompetitor, ScoutParams, ScoutSummary } from "./types.js";
 
+// Opportunity Radar data-layer — review mining + signal classification.
+export { classifyReviews } from "./classify.js";
 export { dedupeById } from "./normalize.js";
 export { listCompetitors, persistCompetitors } from "./persist.js";
 export { rankCompetitors } from "./rank.js";
+export type { CollectReviewsOpts } from "./reviews.js";
+export { collectReviews } from "./reviews.js";
 export { fetchAlternativeTo } from "./sources/alternativeto.js";
 export { fetchGooglePlay } from "./sources/googleplay.js";
+export { fetchGooglePlayReviews } from "./sources/googleplay-reviews.js";
 export { fetchItunes } from "./sources/itunes.js";
+export { fetchItunesReviews } from "./sources/itunes-reviews.js";
 export { fetchProductHunt } from "./sources/producthunt.js";
 export type {
   RawCompetitor,
