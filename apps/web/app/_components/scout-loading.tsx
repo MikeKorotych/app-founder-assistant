@@ -48,9 +48,6 @@ export function ScoutLoading({ title, hint, steps }: ScoutLoadingProps) {
   }, [hint, steps, title]);
   const [index, setIndex] = useState(0);
   const current = sequence[index % sequence.length] ?? hint ?? title;
-  const stepPosition =
-    sequence.length <= 1 ? 0.72 : (index % sequence.length) / (sequence.length - 1);
-  const activityPct = Math.round(18 + stepPosition * 74);
 
   useEffect(() => {
     setIndex(0);
@@ -132,15 +129,8 @@ export function ScoutLoading({ title, hint, steps }: ScoutLoadingProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
-            <div
-              className="h-full rounded-full bg-white/80 transition-[width] duration-700 ease-out"
-              style={{ width: `${activityPct}%` }}
-            />
-            <div className="scout-dash-line absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/55 to-transparent" />
-          </div>
-          <span className="w-12 text-right text-xs tabular-nums text-white/45">{activityPct}%</span>
+        <div className="relative h-1 overflow-hidden rounded-full bg-white/10">
+          <div className="scout-dash-line absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/55 to-transparent" />
         </div>
       </div>
     </div>

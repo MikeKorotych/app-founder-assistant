@@ -171,8 +171,16 @@ function RunTopBar({
   );
 }
 
-function progressFor(phase: Phase, validation: Validation) {
+function progressFor(
+  phase: Phase,
+  validation: Validation,
+  opportunity: Opportunity,
+  globalRadar: GlobalRadar,
+) {
   const hasExpansion = "expansion" in phase && Boolean(phase.expansion);
+  const insightsDone =
+    (opportunity.kind === "done" || opportunity.kind === "error") &&
+    (globalRadar.kind === "done" || globalRadar.kind === "error");
   return [
     { label: "Ідея", state: "done" as ProgressState },
     {
@@ -199,6 +207,14 @@ function progressFor(phase: Phase, validation: Validation) {
           ? "active"
           : "waiting") as ProgressState,
     },
+    {
+      label: "Інсайти",
+      state: (insightsDone
+        ? "done"
+        : phase.kind === "done"
+          ? "active"
+          : "waiting") as ProgressState,
+    },
   ];
 }
 
@@ -207,16 +223,21 @@ function ProgressSlideBar({ steps }: { steps: { label: string; state: ProgressSt
   const activeIndex = steps.findIndex((step) => step.state === "active");
   const progressIndex = activeIndex === -1 ? doneCount - 1 : activeIndex;
   const pct = Math.max(0, Math.min(100, (progressIndex / (steps.length - 1)) * 100));
+  const active = steps.some((step) => step.state === "active");
 
   return (
     <Card className="animate-enter border-border/60 bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <CardContent className="py-4">
+        <style>{`@keyframes ps-shimmer { 0% { transform: translateX(-110%); } 100% { transform: translateX(420%); } } .ps-shimmer { animation: ps-shimmer 1.9s ease-in-out infinite; }`}</style>
         <div className="relative flex flex-col gap-3">
           <div className="relative h-1.5 overflow-hidden rounded-full bg-muted/45">
             <div
               className="h-full rounded-full bg-foreground transition-[width] duration-700 ease-out"
               style={{ width: `${pct}%` }}
             />
+            {active && (
+              <div className="ps-shimmer absolute inset-y-0 w-1/4 bg-gradient-to-r from-transparent via-foreground/50 to-transparent" />
+            )}
           </div>
           <div
             className="grid gap-2"
@@ -536,9 +557,12 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
   }
 
   const expansion = "expansion" in phase ? phase.expansion : undefined;
-  const progressSteps = progressFor(phase, validation);
-  const isGenerating =
-    phase.kind === "expanding" || phase.kind === "scanning" || validation.kind === "running";
+  const progressSteps = progressFor(phase, validation, opportunity, globalRadar);
+  const analysing =
+    validation.kind === "running" ||
+    opportunity.kind === "running" ||
+    globalRadar.kind === "running";
+  const isGenerating = phase.kind === "expanding" || phase.kind === "scanning" || analysing;
 
   if (viewMode === "mock") {
     if (!mockRunRef.current) mockRunRef.current = randomMockRun();
@@ -560,6 +584,36 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
     <div className="flex flex-col gap-6">
       <RunTopBar idea={idea} mode={viewMode} onModeChange={setViewMode} onRestart={onRestart} />
       <ProgressSlideBar steps={progressSteps} />
+
+      {/* Single live-progress loader for the whole process. */}
+      {phase.kind === "scanning" && (
+        <ScoutLoading
+          title="Scout шукає конкурентів…"
+          hint="Сканую iTunes, Google Play, Product Hunt та AlternativeTo за цими запитами."
+          steps={[
+            "Готуємо query-пакет для стора.",
+            "Скануємо iTunes Search API.",
+            "Зіставляємо Android-сигнали з Google Play.",
+            "Перевіряємо Product Hunt та AlternativeTo.",
+            "Прибираємо дублікати конкурентів.",
+            "Ранжуємо результати за сумісністю.",
+          ]}
+        />
+      )}
+      {phase.kind === "done" && analysing && (
+        <ScoutLoading
+          title="Аналізуємо ідею…"
+          hint="Валідація · відгуки конкурентів · світові чарти — паралельно."
+          steps={[
+            "Витягуємо відгуки конкурентів.",
+            "Класифікуємо сигнали болю та похвали.",
+            "Multi-LLM панель оцінює ідею.",
+            "Скануємо світові чарти по країнах.",
+            "Збираємо інсайти та можливості.",
+          ]}
+        />
+      )}
+
       {isGenerating && <GameWhileGenerating phase={phase} validation={validation} />}
 
       {validation.kind === "done" && (
@@ -576,46 +630,16 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
 
       <SearchIntentSection idea={idea} phase={phase} expansion={expansion} />
 
-      {phase.kind === "scanning" && (
-        <ScoutLoading
-          title="Scout шукає конкурентів…"
-          hint="Сканую iTunes, Google Play, Product Hunt та AlternativeTo за цими запитами."
-          steps={[
-            "Готуємо query-пакет для стора.",
-            "Скануємо iTunes Search API.",
-            "Зіставляємо Android-сигнали з Google Play.",
-            "Перевіряємо Product Hunt та AlternativeTo.",
-            "Прибираємо дублікати конкурентів.",
-            "Ранжуємо результати за сумісністю.",
-            "Збираємо рейтинги, відгуки та посилання.",
-          ]}
-        />
-      )}
-
       {phase.kind === "done" && (
         <div className="animate-enter">
           <CompetitorList competitors={phase.competitors} />
         </div>
       )}
 
-      {/* Validate step — chained automatically after Scout. */}
-      {validation.kind === "running" && (
-        <ScoutLoading
-          title="Валідуємо ідею…"
-          hint="Multi-LLM панель оцінює ідею: Скептик · Адвокат · Аналітик."
-        />
-      )}
-
       {/* Market & revenue data (mock until paid market-intel APIs are connected). */}
       {phase.kind === "done" && <MarketDataMock competitors={phase.competitors} />}
 
       {/* Opportunity analysis — mined from competitor reviews. */}
-      {opportunity.kind === "running" && (
-        <ScoutLoading
-          title="Аналізуємо відгуки конкурентів…"
-          hint="Збираємо й класифікуємо відгуки → конкурентний ландшафт + Opportunity Radar."
-        />
-      )}
       {opportunity.kind === "done" && (
         <div className="flex flex-col gap-6">
           <CompetitiveLandscape profiles={opportunity.profiles} />
@@ -629,12 +653,6 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
       )}
 
       {/* Global Niche Radar — cross-country localized winners. */}
-      {globalRadar.kind === "running" && (
-        <ScoutLoading
-          title="Скануємо світові чарти…"
-          hint="iTunes top-charts по ~24 країнах → локальні переможці поза твоїм ринком."
-        />
-      )}
       {globalRadar.kind === "done" && <GlobalNicheRadar radar={globalRadar.radar} />}
     </div>
   );

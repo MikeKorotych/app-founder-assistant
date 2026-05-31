@@ -210,10 +210,14 @@ app.post("/opportunity", async (c) => {
     // fall back to the top few by score when too few qualify (never analyze noise).
     const COMPAT_MIN = 70;
     const MIN_COMPETITORS = 3;
-    const scored = rows.filter((r) => typeof r.compatibilityScore === "number");
+    // Only iTunes / Google Play expose reviews we can fetch — filter to those
+    // FIRST, otherwise high-compatibility Product Hunt / AlternativeTo apps fill
+    // the slots and we mine zero reviews.
+    const reviewable = rows.filter((r) => r.source === "itunes" || r.source === "googleplay");
+    const scored = reviewable.filter((r) => typeof r.compatibilityScore === "number");
     const qualified = scored.filter((r) => (r.compatibilityScore ?? 0) >= COMPAT_MIN);
     let pool = qualified;
-    if (qualified.length < MIN_COMPETITORS) pool = scored.length > 0 ? scored : rows;
+    if (qualified.length < MIN_COMPETITORS) pool = scored.length > 0 ? scored : reviewable;
     const competitors = pool.slice(0, 6).map((r) => ({
       id: r.id,
       name: r.name,
