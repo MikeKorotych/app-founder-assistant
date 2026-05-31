@@ -3,6 +3,7 @@
 import type {
   Competitor as AgentCompetitor,
   CompetitorProfile,
+  GlobalNicheRadar as GlobalNicheRadarResult,
   OpportunityReport,
   Run,
   SearchExpansion,
@@ -14,6 +15,7 @@ import { apiUrl } from "../_lib/api";
 import { ValidationSection } from "../runs/[id]/_components/validation-section";
 import { CompetitiveLandscape } from "./competitive-landscape";
 import { Game2048 } from "./game-2048";
+import { GlobalNicheRadar } from "./global-niche-radar";
 import { IdeaGraph } from "./idea-graph";
 import { MarketDataMock } from "./market-data-mock";
 import { randomMockRun } from "./mock-run";
@@ -67,6 +69,13 @@ type Opportunity =
   | { kind: "idle" }
   | { kind: "running" }
   | { kind: "done"; report: OpportunityReport; profiles: CompetitorProfile[] }
+  | { kind: "error"; message: string };
+
+// Global Niche Radar — cross-country localized winners, chained after Scout.
+type GlobalRadar =
+  | { kind: "idle" }
+  | { kind: "running" }
+  | { kind: "done"; radar: GlobalNicheRadarResult }
   | { kind: "error"; message: string };
 
 type ViewMode = "real" | "mock";
@@ -333,6 +342,7 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
   const [phase, setPhase] = useState<Phase>({ kind: "expanding" });
   const [validation, setValidation] = useState<Validation>({ kind: "idle" });
   const [opportunity, setOpportunity] = useState<Opportunity>({ kind: "idle" });
+  const [globalRadar, setGlobalRadar] = useState<GlobalRadar>({ kind: "idle" });
   const [viewMode, setViewMode] = useState<ViewMode>("real");
   const cancelled = useRef(false);
   const mockRunRef = useRef<Run | null>(null);
@@ -415,6 +425,32 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
       }
     }
 
+    // Step 3c — Global Niche Radar (idea-driven, independent of Scout results).
+    async function runGlobalRadar(): Promise<void> {
+      setGlobalRadar({ kind: "running" });
+      try {
+        const res = await fetch(apiUrl("/global-radar"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idea }),
+        });
+        if (!res.ok) {
+          const e = (await res.json().catch(() => ({}))) as { error?: string };
+          throw new Error(e.error ?? `global-radar failed (${res.status})`);
+        }
+        const radar = (await res.json()) as GlobalNicheRadarResult;
+        if (cancelled.current) return;
+        setGlobalRadar({ kind: "done", radar });
+      } catch (err) {
+        if (!cancelled.current) {
+          setGlobalRadar({
+            kind: "error",
+            message: err instanceof Error ? err.message : String(err),
+          });
+        }
+      }
+    }
+
     let expansion: SearchExpansion | undefined;
     const startTimer = window.setTimeout(() => {
       (async () => {
@@ -456,7 +492,11 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
           setPhase({ kind: "done", expansion, competitors });
 
           // Step 3 — chain into validation + opportunity analysis (parallel).
-          await Promise.all([runValidation(competitors), runOpportunity(scoutId)]);
+          await Promise.all([
+            runValidation(competitors),
+            runOpportunity(scoutId),
+            runGlobalRadar(),
+          ]);
         } catch (err) {
           if (!cancelled.current) {
             setPhase({
@@ -587,6 +627,15 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
           Аналіз відгуків не вдався: {opportunity.message}
         </p>
       )}
+
+      {/* Global Niche Radar — cross-country localized winners. */}
+      {globalRadar.kind === "running" && (
+        <ScoutLoading
+          title="Скануємо світові чарти…"
+          hint="iTunes top-charts по ~24 країнах → локальні переможці поза твоїм ринком."
+        />
+      )}
+      {globalRadar.kind === "done" && <GlobalNicheRadar radar={globalRadar.radar} />}
     </div>
   );
 }

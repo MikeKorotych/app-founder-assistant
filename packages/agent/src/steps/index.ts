@@ -133,6 +133,9 @@ import { validationStep as _validationStep } from "./validation";
 export type { LandscapeCompetitor, LandscapeInput } from "./competitive-landscape";
 /** Competitive Landscape — per-competitor profile (themes, strengths, hook, inspire/avoid). */
 export { buildCompetitorProfiles } from "./competitive-landscape";
+export type { GlobalRadarInput } from "./global-radar";
+/** Global Niche Radar — detect localized winners across country charts + enrich. */
+export { buildGlobalRadar, resolveAppStoreGenre } from "./global-radar";
 
 export type { OpportunityInput } from "./opportunity";
 /** Opportunity Radar — cluster review signals + synthesize a decision map (what to test first). */

@@ -1,6 +1,8 @@
 import {
   buildCompetitorProfiles,
+  buildGlobalRadar,
   buildOpportunityReport,
+  resolveAppStoreGenre,
   runAgent,
   runPipeline,
   validateIdea,
@@ -16,6 +18,7 @@ import { createDb } from "@hahaton/db";
 import { createLlmProvider } from "@hahaton/llm";
 import {
   classifyReviews,
+  collectCharts,
   collectReviews,
   listCompetitors,
   type RawCompetitor,
@@ -256,6 +259,36 @@ app.post("/opportunity", async (c) => {
   } catch (err) {
     console.error("opportunity error:", err);
     return c.json({ error: "Opportunity analysis failed." }, 500);
+  }
+});
+
+// Global Niche Radar — scan App Store top charts for the idea's category across
+// ~24 markets and surface apps that chart abroad but are absent in the home
+// market (geo-arbitrage). Stateless; returns a GlobalNicheRadar. Growth-over-time
+// needs paid APIs and is deferred — "new + high in chart" is the rising proxy.
+app.post("/global-radar", async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as { idea?: string; homeCountry?: string };
+  if (typeof body.idea !== "string" || body.idea.length === 0) {
+    return c.json({ error: "Body must include a non-empty 'idea' string." }, 400);
+  }
+  try {
+    requireLlmEnv(c.env);
+    const llm = createLlmProvider(c.env);
+    const homeCountry = (body.homeCountry ?? "us").toLowerCase();
+    const genre = await resolveAppStoreGenre(llm, body.idea);
+    const charts = await collectCharts({ genreId: genre?.id });
+    const countriesScanned = [...new Set(charts.map((x) => x.country))];
+    const radar = await buildGlobalRadar(llm, {
+      idea: body.idea,
+      homeCountry,
+      charts,
+      genreLabel: genre?.label,
+      countriesScanned,
+    });
+    return c.json(radar);
+  } catch (err) {
+    console.error("global-radar error:", err);
+    return c.json({ error: "Global radar failed." }, 500);
   }
 });
 
