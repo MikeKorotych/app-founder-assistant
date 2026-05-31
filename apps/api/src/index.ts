@@ -202,7 +202,16 @@ app.post("/opportunity", async (c) => {
   try {
     requireLlmEnv(c.env);
     const rows = await listCompetitors(createDb(c.env.DB), body.scoutId);
-    const competitors = rows.map((r) => ({
+    // Mine reviews only for the most RELEVANT competitors — those whose
+    // compatibility score clears the bar. Scores skew low for some niches, so
+    // fall back to the top few by score when too few qualify (never analyze noise).
+    const COMPAT_MIN = 70;
+    const MIN_COMPETITORS = 3;
+    const scored = rows.filter((r) => typeof r.compatibilityScore === "number");
+    const qualified = scored.filter((r) => (r.compatibilityScore ?? 0) >= COMPAT_MIN);
+    let pool = qualified;
+    if (qualified.length < MIN_COMPETITORS) pool = scored.length > 0 ? scored : rows;
+    const competitors = pool.slice(0, 6).map((r) => ({
       id: r.id,
       name: r.name,
       source: r.source,
@@ -214,11 +223,16 @@ app.post("/opportunity", async (c) => {
       launchedAt: r.launchedAt ?? undefined,
     }));
 
+    // Pull more reviews per relevant competitor (bounded by the Workers
+    // ~50-subrequest/invocation limit: ≤6 apps × pages + classify + profiles).
     const reviews = await collectReviews(competitors as unknown as RawCompetitor[], {
       searchApiKey: c.env.GOOGLE_SEARCH_API_KEY,
+      topN: 6,
+      perCompetitor: 60,
+      maxTotal: 250,
     });
     const llm = createLlmProvider(c.env);
-    const signals = await classifyReviews(llm, reviews);
+    const signals = await classifyReviews(llm, reviews, { batchSize: 25 });
 
     const sourceCounts = new Map<string, number>();
     for (const r of reviews) sourceCounts.set(r.source, (sourceCounts.get(r.source) ?? 0) + 1);

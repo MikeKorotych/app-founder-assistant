@@ -2,7 +2,7 @@
 
 import { RainbowButton } from "@hahaton/ui";
 import { useRef, useState } from "react";
-import { startBackgroundMusic, stopBackgroundMusic } from "../_lib/background-music";
+import { stopBackgroundMusic } from "../_lib/background-music";
 import { RunStream } from "./run-stream";
 import { ScoutRun } from "./scout-run";
 import { useTypedPlaceholder } from "./use-typed-placeholder";
@@ -75,7 +75,6 @@ export function IdeaForm() {
     const forceDemo =
       typeof window !== "undefined" &&
       new URLSearchParams(window.location.search).get("demo") === "1";
-    void startBackgroundMusic();
     setDemo(forceDemo);
     setStarted(value);
   }
@@ -123,54 +122,54 @@ export function IdeaForm() {
       </header>
       <div className="animate-enter animate-enter-delay-3 mx-auto w-full max-w-3xl">
         <form onSubmit={onSubmit} className="flex flex-col gap-5">
-              <div className="relative">
-                <textarea
-                  ref={textareaRef}
-                  id="idea"
-                  value={idea}
-                  onChange={(e) => {
-                    setIdea(e.target.value);
-                    fitTextareaHeight(e.target);
-                  }}
-                  onKeyDown={(e) => {
-                    // Enter starts the run; Shift+Enter keeps a manual line break.
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      e.currentTarget.form?.requestSubmit();
-                    }
-                  }}
-                  placeholder={typedPlaceholder || "Напр. AI-тренер англійської через голосові"}
-                  rows={1}
-                  className="min-h-12 w-full resize-none overflow-hidden rounded-md border border-input bg-background px-3 py-3 pr-12 text-sm leading-6 shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  required
-                />
-                {idea.trim().length === 0 && (
-                  <button
-                    type="button"
-                    onClick={suggestIdea}
-                    aria-label="Запропонувати ідею"
-                    className="absolute right-2 top-1.5 inline-flex h-9 w-9 items-center justify-center rounded-md text-base text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  >
-                    ✨
-                  </button>
-                )}
-              </div>
+          <div className="relative">
+            <textarea
+              ref={textareaRef}
+              id="idea"
+              value={idea}
+              onChange={(e) => {
+                setIdea(e.target.value);
+                fitTextareaHeight(e.target);
+              }}
+              onKeyDown={(e) => {
+                // Enter starts the run; Shift+Enter keeps a manual line break.
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  e.currentTarget.form?.requestSubmit();
+                }
+              }}
+              placeholder={typedPlaceholder || "Напр. AI-тренер англійської через голосові"}
+              rows={1}
+              className="min-h-12 w-full resize-none overflow-hidden rounded-md border border-input bg-background px-3 py-3 pr-12 text-sm leading-6 shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              required
+            />
+            {idea.trim().length === 0 && (
+              <button
+                type="button"
+                onClick={suggestIdea}
+                aria-label="Запропонувати ідею"
+                className="absolute right-2 top-1.5 inline-flex h-9 w-9 items-center justify-center rounded-md text-base text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                ✨
+              </button>
+            )}
+          </div>
 
-              {error && (
-                <p className="text-sm text-destructive" role="alert">
-                  {error}
-                </p>
-              )}
+          {error && (
+            <p className="text-sm text-destructive" role="alert">
+              {error}
+            </p>
+          )}
 
-              <div className="flex flex-col items-center gap-2">
-                <RainbowButton
-                  type="submit"
-                  size="lg"
-                  className="[--rainbow-button-foreground:#0a0a0b] [--rainbow-button-surface:#f7f7f2] hover:shadow-white/20"
-                >
-                  Згенерувати план
-                </RainbowButton>
-              </div>
+          <div className="flex flex-col items-center gap-2">
+            <RainbowButton
+              type="submit"
+              size="lg"
+              className="[--rainbow-button-foreground:#0a0a0b] [--rainbow-button-surface:#f7f7f2] hover:shadow-white/20"
+            >
+              Згенерувати план
+            </RainbowButton>
+          </div>
         </form>
       </div>
     </div>
