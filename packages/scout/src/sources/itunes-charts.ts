@@ -11,7 +11,7 @@ import type { ChartApp } from "@hahaton/contracts";
 
 export type ChartFeed =
   | "topfreeapplications"
-  | "topnewfreeapplications"
+  | "newfreeapplications"
   | "topgrossingapplications"
   | "toppaidapplications";
 

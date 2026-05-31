@@ -354,7 +354,7 @@ app.post("/unit-economics", async (c) => {
 // Shared by the Cron schedule and the manual POST /digest/run trigger.
 async function generateAndSaveDigest(env: Bindings) {
   const llm = createLlmProvider(env);
-  const charts = await collectCharts({ feed: "topnewfreeapplications" });
+  const charts = await collectCharts({ feed: "newfreeapplications" });
   const countriesScanned = [...new Set(charts.map((x) => x.country))];
   const digest = await buildGlobalDigest(llm, {
     id: crypto.randomUUID(),
