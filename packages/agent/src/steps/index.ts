@@ -134,6 +134,10 @@ export type { ValidationInput } from "./validation";
 /** Reusable Multi-LLM panel — score any idea (+ optional research) /100 + CustDev risks. */
 export { validateIdea } from "./validation";
 
+export type { OpportunityInput } from "./opportunity";
+/** Opportunity Radar — cluster review signals + synthesize a decision map (what to test first). */
+export { buildOpportunityReport, clusterSignals } from "./opportunity";
+
 /** Step 9 — Sonnet ×3 in parallel. Multi-LLM validation panel → score /100 + CustDev risks. */
 export const validationStep = step(
   "validation",
