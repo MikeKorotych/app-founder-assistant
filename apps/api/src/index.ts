@@ -244,10 +244,24 @@ app.post("/opportunity", async (c) => {
       installsText: undefined as string | undefined,
     }));
 
-    // Enrich Android competitors with REAL public install buckets ("500M+")
-    // straight from the Google Play listing (SerpApi `google_play_product`).
-    // Apple hides downloads, so this is iOS-impossible but genuine for Android.
-    const playIds = competitors.filter((c) => c.source === "googleplay").map((c) => c.id);
+    // Review mining is the CORE of the Opportunity Radar, so it gets the
+    // subrequest budget FIRST (on the Workers free plan an invocation is capped
+    // at ~50 subrequests — Google Play enrichment below must not starve this).
+    // Bounded so classify stays fast and the request returns within limits.
+    const reviews = await collectReviews(competitors as unknown as RawCompetitor[], {
+      searchApiKey: c.env.GOOGLE_SEARCH_API_KEY,
+      topN: 6,
+      perCompetitor: 40,
+      maxTotal: 120,
+    });
+    const llm = createLlmProvider(c.env);
+    const signals = await classifyReviews(llm, reviews, { batchSize: 25 });
+
+    // Best-effort: enrich Android competitors with REAL public install buckets
+    // ("500M+") from the Google Play listing (SerpApi `google_play_product`).
+    // Runs AFTER review mining so it can never starve the radar's reviews; on a
+    // tight budget it simply yields nothing. Apple hides iOS downloads.
+    const playIds = competitors.filter((x) => x.source === "googleplay").map((x) => x.id);
     if (playIds.length > 0 && c.env.GOOGLE_SEARCH_API_KEY) {
       const details = await fetchGooglePlayProductDetails(playIds, c.env.GOOGLE_SEARCH_API_KEY, {
         limit: playIds.length,
@@ -262,17 +276,6 @@ app.post("/opportunity", async (c) => {
         if (typeof d.rating === "number") comp.rating = d.rating;
       }
     }
-
-    // Pull more reviews per relevant competitor (bounded by the Workers
-    // ~50-subrequest/invocation limit: ≤6 apps × pages + classify + profiles).
-    const reviews = await collectReviews(competitors as unknown as RawCompetitor[], {
-      searchApiKey: c.env.GOOGLE_SEARCH_API_KEY,
-      topN: 6,
-      perCompetitor: 60,
-      maxTotal: 250,
-    });
-    const llm = createLlmProvider(c.env);
-    const signals = await classifyReviews(llm, reviews, { batchSize: 25 });
 
     const sourceCounts = new Map<string, number>();
     for (const r of reviews) sourceCounts.set(r.source, (sourceCounts.get(r.source) ?? 0) + 1);
