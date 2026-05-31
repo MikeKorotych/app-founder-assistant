@@ -12,7 +12,7 @@
 
   "vars": {
     "APP_ENV": "production",
-    "SURFACE_BASE_URL": "https://hahaton-web.phasekit.workers.dev",
+    "SURFACE_BASE_URL": "https://founder-assistant-web.mikekorotych.workers.dev",
     "LLM_GATEWAY_BASE_URL": "https://openrouter.ai/api/v1"
   },
 
@@ -42,7 +42,7 @@
     "prod": {
       "vars": {
         "APP_ENV": "production",
-        "SURFACE_BASE_URL": "https://hahaton-web.phasekit.workers.dev",
+        "SURFACE_BASE_URL": "https://founder-assistant-web.mikekorotych.workers.dev",
         "LLM_GATEWAY_BASE_URL": "REPLACE_WITH_LITELLM_PROXY_URL"
       },
       "d1_databases": [
