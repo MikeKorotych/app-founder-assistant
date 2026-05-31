@@ -328,10 +328,9 @@ function SearchIntentSection({
         </CardHeader>
         <CardContent className="flex flex-col gap-5">
           {phase.kind === "expanding" && (
-            <ScoutLoading
-              title="Розбираємо ідею…"
-              hint="Виділяємо ключові слова та категорії для пошуку конкурентів."
-            />
+            <p className="text-sm text-muted-foreground/70">
+              Виділяємо ключові слова та категорії…
+            </p>
           )}
 
           {expansion && (
@@ -585,7 +584,13 @@ export function ScoutRun({ idea, onRestart }: { idea: string; onRestart?: () => 
       <RunTopBar idea={idea} mode={viewMode} onModeChange={setViewMode} onRestart={onRestart} />
       <ProgressSlideBar steps={progressSteps} />
 
-      {/* Single live-progress loader for the whole process. */}
+      {/* Single live-progress loader for the whole process — always at the top. */}
+      {phase.kind === "expanding" && (
+        <ScoutLoading
+          title="Розбираємо ідею…"
+          hint="Виділяємо ключові слова та категорії для пошуку конкурентів."
+        />
+      )}
       {phase.kind === "scanning" && (
         <ScoutLoading
           title="Scout шукає конкурентів…"

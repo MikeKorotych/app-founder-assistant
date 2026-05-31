@@ -91,18 +91,25 @@ export default function DigestPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 py-10">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div className="space-y-1">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+      <header className="flex animate-enter flex-col items-center gap-4 text-center">
+        <div className="space-y-2">
+          <p className="animate-enter text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Світовий дайджест
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight">Що злітає у світі</h1>
-          <p className="max-w-xl text-sm text-muted-foreground">
+          <h1 className="animate-enter animate-enter-delay-1 text-3xl font-semibold tracking-tight sm:text-4xl">
+            Що злітає у світі
+          </h1>
+          <p className="animate-enter animate-enter-delay-2 mx-auto max-w-xl text-sm text-muted-foreground">
             Нові застосунки з моментумом одразу в кількох країнах (App Store «нові» чарти).
             Оновлюється за розкладом; можна згенерувати вручну.
           </p>
         </div>
-        <Button onClick={generate} disabled={state === "running"} variant="outline">
+        <Button
+          className="animate-enter animate-enter-delay-3"
+          onClick={generate}
+          disabled={state === "running"}
+          variant="outline"
+        >
           {state === "running" ? "Генеруємо…" : "Згенерувати зараз"}
         </Button>
       </header>
