@@ -5,6 +5,16 @@ AI CEO / Founder Strategist — an agentic **Idea → Business Plan** pipeline.
 Structured as a **Turborepo + pnpm** monorepo: reusable packages shared across
 apps, and standalone apps that deploy to **Cloudflare**.
 
+## Live
+
+| Surface | URL |
+| --- | --- |
+| **App (open this)** | https://founder-assistant-web.mikekorotych.workers.dev |
+| Global Digest | https://founder-assistant-web.mikekorotych.workers.dev/digest |
+| API (Hono Worker) | https://founder-assistant-api.mikekorotych.workers.dev |
+
+Both deploy automatically from `main` via GitHub Actions (`.github/workflows/deploy.yml`).
+
 ## Layout
 
 ```
